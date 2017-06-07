@@ -1,0 +1,31 @@
+<div id="igv-browser">
+</div>
+
+<script type="text/javascript">
+$(document).ready(function () {
+
+  var div = $("#igv-browser")[0],
+  options = {
+    showNavigation: true,
+    showRuler: true,
+    reference: {
+      id: "ref",
+      fastaURL: {{ reference }}
+    },
+    locus: {{ locus }},
+    tracks: [
+      {
+        url: {{ sample }} ,
+        name: 'AMPLICON',
+        samplingWindowSize: 10,
+        colorBy: "strand",
+        samplingDepth: 100,
+        alignmentRowHeight: 8,
+        autoHeight: false,
+        height: "640"
+      }
+    ]
+  };
+  igv.createBrowser(div, options);
+});
+</script>
