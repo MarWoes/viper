@@ -3,16 +3,21 @@ library("DT")
 source("util/util.R")
 source("staticHandlingHack.R")
 
-shiny.global.resultsDir   <- util.readFromConfig("RESULTS_DIR")
-shiny.global.alignmentDir <- util.readFromConfig("ALIGNMENT_DIR")
-shiny.global.fastaRef     <- util.readFromConfig("FASTA_REF")
+if (!exists("SHINY_INPUT")) stop("No shiny config found. Make sure you define SHINY_INPUT with correct values.")
+
+# Is there a better way to do things?
+config <- SHINY_INPUT
+
+shiny.global.workDir   <- config$workDir
+shiny.global.alignmentDir <- config$alignmentDir
+shiny.global.fastaRef     <- config$fastaRef
+shiny.global.analysisDataFile <- util.fileInDir(shiny.global.workDir, "all_analysis.csv")
+
 shiny.global.fastaRefDir  <- dirname(shiny.global.fastaRef)
 shiny.global.fastaRefBase <- basename(shiny.global.fastaRef)
 
-shiny.global.analysisDataFile <- util.fileInDir(shiny.global.resultsDir, "all_analysis.csv")
-
 shiny.global.analysisData  <- read.csv(shiny.global.analysisDataFile, sep = ";", stringsAsFactors = FALSE)
-shiny.global.clusteredData <- read.csv(util.fileInDir(shiny.global.resultsDir, "all_clustered.csv"), sep = ";", stringsAsFactors = FALSE)
+shiny.global.clusteredData <- read.csv(util.fileInDir(shiny.global.workDir, "all_clustered.csv"), sep = ";", stringsAsFactors = FALSE)
 shiny.global.clusteredData$relatedCalls <- sapply(strsplit(as.character(shiny.global.clusteredData$relatedCalls), ","), as.integer)
 
 shiny.global.filters <- list(

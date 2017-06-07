@@ -10,7 +10,7 @@ shiny.server.getBPImageFile <- function (serverValues, index, currentlySelectedS
   svId <- serverValues$filteredData[index, "id"]
   imageFile <- paste(sample, "png", sep = ".")
 
-  filename <- paste(shiny.global.resultsDir, "visualization", svId , bp, imageFile, sep = "/")
+  filename <- paste(shiny.global.workDir, "visualization", svId , bp, imageFile, sep = "/")
 
   return(filename)
 }
@@ -24,7 +24,7 @@ shiny.server.plotInconsistency <- function (serverValues, index, currentlySelect
 
   txtFile <- paste(mergeRegion, "txt", sep = ".")
 
-  filename <- paste(shiny.global.resultsDir, "read-depth", sample, txtFile, sep = "/")
+  filename <- paste(shiny.global.workDir, "read-depth", sample, txtFile, sep = "/")
 
   smoothingFn <- switch(smoothingFnName,
     "mean"   = mean,
@@ -135,7 +135,7 @@ shiny.server.handleSVDecisionButtonClick <- function (serverValues, input, decis
 shiny.server.saveCallData <- function (unifiedData, fileName) {
   writtenData <- unifiedData
   writtenData$relatedCalls <- sapply(writtenData$relatedCalls, function (callIndices) paste(callIndices, collapse = ","))
-  unification.write(writtenData, util.fileInDir(shiny.global.resultsDir, fileName), header = TRUE)
+  unification.write(writtenData, util.fileInDir(shiny.global.workDir, fileName), header = TRUE)
 }
 
 shiny.server.handleSVSaveButtonClick <- function (serverValues) {
@@ -184,8 +184,8 @@ shiny.server.applyFilters <- function (input) {
 }
 
 shiny.server.handleXLSXExportClick <- function (serverValues) {
-  filteredFile <- util.fileInDir(shiny.global.resultsDir, "all_filtered.csv")
-  xlsxFile <- util.fileInDir(shiny.global.resultsDir, "all_filtered.xlsx")
+  filteredFile <- util.fileInDir(shiny.global.workDir, "all_filtered.csv")
+  xlsxFile <- util.fileInDir(shiny.global.workDir, "all_filtered.xlsx")
 
   shiny.server.saveCallData(serverValues$filteredData, "all_filtered.csv")
 
