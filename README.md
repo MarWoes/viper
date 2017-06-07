@@ -2,4 +2,4 @@ VIPER (Variant InsPector and ExpeRt decision tool) can be utilised to view varia
 
 ---
 
-The VIPER icon was provided by courtesy of [Peter van Driel](https://thenounproject.com/petervandriel/collection/medical-symbols/?i=557987)
+The VIPER icon was provided by courtesy of [Boudewijn Mijnlieff](https://thenounproject.com/search/?q=snake&creator=83341&i=95890).
