@@ -15,27 +15,6 @@ shiny.server.getBPImageFile <- function (serverValues, index, currentlySelectedS
   return(filename)
 }
 
-shiny.server.plotInconsistency <- function (serverValues, index, currentlySelectedSample, smoothingRange, smoothingFnName) {
-
-  sample      <- shiny.server.getCurrentlySelectedSample(serverValues, index, currentlySelectedSample)
-  mergeRegion <- shiny.server.getSingleCol(serverValues, index, "mergeRegion")
-  bp1         <- shiny.server.getSingleCol(serverValues, index, "bp1")
-  bp2         <- shiny.server.getSingleCol(serverValues, index, "bp2")
-
-  txtFile <- paste(mergeRegion, "txt", sep = ".")
-
-  filename <- paste(shiny.global.workDir, "read-depth", sample, txtFile, sep = "/")
-
-  smoothingFn <- switch(smoothingFnName,
-    "mean"   = mean,
-    "median" = median
-  )
-  mergeRegionCoverage <- read.csv(filename, sep = ";", stringsAsFactors = FALSE)
-  mergeRegionCoverage$cov <- math.smooth(mergeRegionCoverage$cov, smoothingRange, smoothingFn)
-
-  visualization.plotCoverageInconsistency(mergeRegionCoverage, breakpoints = c(bp1, bp2))
-}
-
 shiny.server.getSingleCol <- function (serverValues, index, column) {
 
   relatedAnalysisCalls <- serverValues$filteredData[index, "relatedCalls"][[1]]
@@ -222,10 +201,6 @@ shinyServer(function(input, output, session) {
     list(src = shiny.server.getBPImageFile (serverValues, input$svIndex, input$currentSampleIndex, "BP2"),
          width = session$clientData$output_bp2_width)
   }, deleteFile = FALSE)
-
-  output$inconsistency <- renderPlot({
-    shiny.server.plotInconsistency(serverValues, input$svIndex, input$currentSampleIndex, input$inconsistencySmoothRange, input$inconsistencySmoothFunction)
-  })
 
   # Generate a summary of the dataset
   output$svId <- renderText({

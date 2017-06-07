@@ -134,16 +134,6 @@ shinyUI(navbarPage(
             )
           )),
 
-          tabPanel("Inconsistency Score",
-                   plotOutput("inconsistency"),
-                   fluidRow(
-                     column(4, sliderInput("inconsistencySmoothRange", label = "Smoothing Range:", min = 1, max = 10, value = 2)),
-                     column(4, selectInput("inconsistencySmoothFunction", label = "Smoothing Function:",
-                                 choices = list("median", "mean"),
-                                 selected = 1))
-                   )
-          ),
-
           tabPanel("Related Analysis Calls", tableOutput("relatedCalls")),
 
           tabPanel("IGV Browser", htmlOutput("igvBrowser"))
