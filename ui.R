@@ -73,7 +73,14 @@ shiny.ui.filteringCriteriaInputs <- function () {
 }
 
 # Define UI for dataset viewer application
-shinyUI(navbarPage("IMI SV pipeline",
+shinyUI(navbarPage(
+  div(
+    img(src="images/logo.svg", style = "height: 50px"),
+    "VIPER",
+    style = "margin-top: -11px"),
+
+  windowTitle = "VIPER",
+
   ## INSPECTOR
   tabPanel("Inspector",
     sidebarLayout(

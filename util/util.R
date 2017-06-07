@@ -1,3 +1,10 @@
+
+util.emptyFrame <- function (colNames) {
+  empty <- data.frame(matrix(nrow = 0, ncol = length(colNames)))
+  colnames(empty) <- colNames
+  return(empty)
+}
+
 util.fileInDir <- function(dirName, fileName) {
   return(paste(dirName, fileName, sep = "/"))
 }
