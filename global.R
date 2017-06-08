@@ -3,6 +3,9 @@ library("data.table")
 
 source("util/util.R")
 source("staticHandlingHack.R")
+source("clustering.R")
+
+options(scipen = 10)
 
 if (!exists("VIPER_ARGS")) stop("No shiny config found. Make sure you define SHINY_INPUT with correct values.")
 
@@ -18,11 +21,10 @@ viper.global.fastaRefDir  <- dirname(viper.global.fastaRef)
 viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
 viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)
-viper.global.clusteredData <- read.csv(util.fileInDir(viper.global.workDir, "all_clustered.csv"), sep = ";", stringsAsFactors = FALSE)
-viper.global.clusteredData$relatedCalls <- sapply(strsplit(as.character(viper.global.clusteredData$relatedCalls), ","), as.integer)
+viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysisData, 5)
 
 viper.global.filters <- list(
-  tools = list(
+  tool = list(
     type      = "checkboxes",
     label     = "Tools:",
     filterFn  = function (column, selected) grepl(paste(selected, collapse = "|"), column),
@@ -51,7 +53,7 @@ viper.global.filters <- list(
     label     = "Max Base balance:",
     filterFn  = util.isInInterval
   ),
-  samples = list(
+  numCalls = list(
     type      = "range",
     label     = "No. Samples:",
     filterFn  = util.isInInterval
