@@ -1,7 +1,7 @@
 library(shiny)
 library(shinyBS)
 
-shiny.ui.checkboxGroupInput <- function (filterCol, caption, columnValues) {
+viper.ui.checkboxGroupInput <- function (filterCol, caption, columnValues) {
 
   choices <- as.list(columnValues)
   choices <- setNames(choices, choices)
@@ -15,7 +15,7 @@ shiny.ui.checkboxGroupInput <- function (filterCol, caption, columnValues) {
   return(uiElement)
 }
 
-shiny.ui.rangeInput <- function (filterCol, caption, columnValues) {
+viper.ui.rangeInput <- function (filterCol, caption, columnValues) {
 
   lower <- floor(min(columnValues))
   upper <- ceiling(max(columnValues))
@@ -29,7 +29,7 @@ shiny.ui.rangeInput <- function (filterCol, caption, columnValues) {
   return(uiElement)
 }
 
-shiny.ui.selectizeInput <- function (filterCol, caption, columnValues) {
+viper.ui.selectizeInput <- function (filterCol, caption, columnValues) {
 
   uiElement <- selectizeInput(paste(filterCol, "Filter", sep = ""),
                               caption,
@@ -44,22 +44,22 @@ shiny.ui.selectizeInput <- function (filterCol, caption, columnValues) {
   return(uiElement)
 }
 
-shiny.ui.filteringCriteriaInputs <- function () {
+viper.ui.filteringCriteriaInputs <- function () {
 
-  filterUIElements <- lapply(names(shiny.global.filters), function (filterColumn) {
+  filterUIElements <- lapply(names(viper.global.filters), function (filterColumn) {
 
-    filterInfo <- shiny.global.filters[[filterColumn]]
+    filterInfo <- viper.global.filters[[filterColumn]]
 
     if (is.null(filterInfo$values)) {
-      columnValues <- na.omit(unique(shiny.global.clusteredData[[filterColumn]]))
+      columnValues <- na.omit(unique(viper.global.clusteredData[[filterColumn]]))
     } else {
       columnValues <- filterInfo$values
     }
 
     uiElements <- switch(filterInfo$type,
-                        checkboxes = shiny.ui.checkboxGroupInput(filterColumn, filterInfo$label, columnValues),
-                        range      = shiny.ui.rangeInput(filterColumn, filterInfo$label, columnValues),
-                        selectize  = shiny.ui.selectizeInput(filterColumn, filterInfo$label, columnValues))
+                        checkboxes = viper.ui.checkboxGroupInput(filterColumn, filterInfo$label, columnValues),
+                        range      = viper.ui.rangeInput(filterColumn, filterInfo$label, columnValues),
+                        selectize  = viper.ui.selectizeInput(filterColumn, filterInfo$label, columnValues))
 
     if (!is.null(filterInfo$includeNA) && filterInfo$includeNA) {
       naFilterInput <- checkboxInput(paste(filterColumn, "NAFilter", sep = ""), value = TRUE, label = em("Allow NA"))
@@ -145,7 +145,7 @@ shinyUI(navbarPage(
            h3("Filtering Criteria:"),
            hr(),
 
-           shiny.ui.filteringCriteriaInputs(),
+           viper.ui.filteringCriteriaInputs(),
 
            hr(),
 

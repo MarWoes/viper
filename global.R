@@ -3,29 +3,29 @@ library("DT")
 source("util/util.R")
 source("staticHandlingHack.R")
 
-if (!exists("SHINY_INPUT")) stop("No shiny config found. Make sure you define SHINY_INPUT with correct values.")
+if (!exists("VIPER_ARGS")) stop("No shiny config found. Make sure you define SHINY_INPUT with correct values.")
 
 # Is there a better way to do things?
-config <- SHINY_INPUT
+config <- VIPER_ARGS
 
-shiny.global.workDir   <- config$workDir
-shiny.global.alignmentDir <- config$alignmentDir
-shiny.global.fastaRef     <- config$fastaRef
-shiny.global.analysisDataFile <- util.fileInDir(shiny.global.workDir, "all_analysis.csv")
+viper.global.workDir   <- config$workDir
+viper.global.alignmentDir <- config$alignmentDir
+viper.global.fastaRef     <- config$fastaRef
+viper.global.analysisDataFile <- util.fileInDir(viper.global.workDir, "all_analysis.csv")
 
-shiny.global.fastaRefDir  <- dirname(shiny.global.fastaRef)
-shiny.global.fastaRefBase <- basename(shiny.global.fastaRef)
+viper.global.fastaRefDir  <- dirname(viper.global.fastaRef)
+viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
-shiny.global.analysisData  <- read.csv(shiny.global.analysisDataFile, sep = ";", stringsAsFactors = FALSE)
-shiny.global.clusteredData <- read.csv(util.fileInDir(shiny.global.workDir, "all_clustered.csv"), sep = ";", stringsAsFactors = FALSE)
-shiny.global.clusteredData$relatedCalls <- sapply(strsplit(as.character(shiny.global.clusteredData$relatedCalls), ","), as.integer)
+viper.global.analysisData  <- read.csv(viper.global.analysisDataFile, sep = ";", stringsAsFactors = FALSE)
+viper.global.clusteredData <- read.csv(util.fileInDir(viper.global.workDir, "all_clustered.csv"), sep = ";", stringsAsFactors = FALSE)
+viper.global.clusteredData$relatedCalls <- sapply(strsplit(as.character(viper.global.clusteredData$relatedCalls), ","), as.integer)
 
-shiny.global.filters <- list(
+viper.global.filters <- list(
   tools = list(
     type      = "checkboxes",
     label     = "Tools:",
     filterFn  = function (column, selected) grepl(paste(selected, collapse = "|"), column),
-    values    = unique(shiny.global.analysisData$tool)
+    values    = unique(viper.global.analysisData$tool)
   ),
   svType = list(
     type      = "checkboxes",
@@ -69,10 +69,10 @@ shiny.global.filters <- list(
     type      = "selectize",
     label     = "Genes:",
     includeNA = TRUE,
-    values    = unique(na.omit(unlist(strsplit(shiny.global.analysisData$genes, ",")))),
+    values    = unique(na.omit(unlist(strsplit(viper.global.analysisData$genes, ",")))),
     filterFn  = function (column, selected) is.null(selected) | grepl(paste(selected, collapse = "|"), column)
   )
 )
 
-addResourcePath("alignment", shiny.global.alignmentDir)
-addResourcePath("genomes", shiny.global.fastaRefDir)
+addResourcePath("alignment", viper.global.alignmentDir)
+addResourcePath("genomes", viper.global.fastaRefDir)
