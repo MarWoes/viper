@@ -1,4 +1,5 @@
 library("DT")
+library("data.table")
 
 source("util/util.R")
 source("staticHandlingHack.R")
@@ -8,15 +9,15 @@ if (!exists("VIPER_ARGS")) stop("No shiny config found. Make sure you define SHI
 # Is there a better way to do things?
 config <- VIPER_ARGS
 
-viper.global.workDir   <- config$workDir
-viper.global.alignmentDir <- config$alignmentDir
-viper.global.fastaRef     <- config$fastaRef
-viper.global.analysisDataFile <- util.fileInDir(viper.global.workDir, "all_analysis.csv")
+viper.global.workDir          <- config$workDir
+viper.global.alignmentDir     <- config$alignmentDir
+viper.global.fastaRef         <- config$fastaRef
+viper.global.analysisDataFile <- config$variantsFile
 
 viper.global.fastaRefDir  <- dirname(viper.global.fastaRef)
 viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
-viper.global.analysisData  <- read.csv(viper.global.analysisDataFile, sep = ";", stringsAsFactors = FALSE)
+viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)
 viper.global.clusteredData <- read.csv(util.fileInDir(viper.global.workDir, "all_clustered.csv"), sep = ";", stringsAsFactors = FALSE)
 viper.global.clusteredData$relatedCalls <- sapply(strsplit(as.character(viper.global.clusteredData$relatedCalls), ","), as.integer)
 
