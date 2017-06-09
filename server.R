@@ -176,6 +176,9 @@ viper.server.handleXLSXExportClick <- function (serverValues) {
 # dataset
 shinyServer(function(input, output, session) {
 
+  viper.global.igvWorker$start()
+  viper.global.igvWorker$setupViewer()
+
   serverValues <- reactiveValues(
     filteredData  = viper.global.clusteredData
   )
@@ -241,4 +244,6 @@ shinyServer(function(input, output, session) {
   observeEvent(input$approveSV, { viper.server.handleSVDecisionButtonClick(serverValues, input, "approved", session) })
   observeEvent(input$saveSVs,   { viper.server.handleSVSaveButtonClick(serverValues) })
   observeEvent(input$saveXLSX,  { viper.server.handleXLSXExportClick(serverValues) })
+
+  session$onSessionEnded(function (...) viper.global.igvWorker$stop())
 })

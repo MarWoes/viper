@@ -4,6 +4,7 @@ library("data.table")
 source("util/util.R")
 source("staticHandlingHack.R")
 source("clustering.R")
+source("igv/igv.R")
 
 options(scipen = 10)
 
@@ -22,6 +23,8 @@ viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
 viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)
 viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysisData, 5)
+
+viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvPort)
 
 viper.global.filters <- list(
   tool = list(
