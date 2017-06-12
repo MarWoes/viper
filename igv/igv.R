@@ -32,12 +32,26 @@ viper.igv.RemoteIGV <-
 
             },
 
-            sendCommands = function(commands) {
+            sendCommands = function(commands, pollingIntervalSecs = 1 / 20, attempts = 1 / pollingIntervalSecs * 120) {
 
               if (is.null(private$igvSocket)) return(warning("[WARNING] IGV socket connection has not been established."))
 
               writeLines(commands, con = private$igvSocket)
 
+              attempt <- 0
+              linesRead <- 0
+
+              while (attempt < attempts && linesRead < private$numLinesWrittenByCommands(commands)) {
+
+                Sys.sleep(pollingIntervalSecs)
+
+                commandResponse <- readLines(con = sock)
+
+                linesRead <- linesRead + length(commandResponse)
+                attempt   <- attempt + 1
+              }
+
+              return(linesRead == private$numLinesWrittenByCommands(commands))
             },
 
             setupViewer = function ()
@@ -96,6 +110,15 @@ viper.igv.RemoteIGV <-
               }
 
               return(FALSE)
+            },
+
+            numLinesWrittenByCommands = function (commands) {
+
+              firstExitCommand <- which("exit" == commands)
+
+              if (length(firstExitCommand) == 0) return(length(commands))
+
+              return(firstExitCommand - 1)
             }
           )
   )
