@@ -33,9 +33,13 @@ viper.igv.RemoteIGV <-
 
             },
 
-            checkCommandState = function () {
+            isIdle = function () {
+              return (length(private$pendingCommands) == 0)
+            },
 
-              if (length(private$pendingCommands) == 0) return(character(0))
+            updatePendingCommands = function () {
+
+              if (self$isIdle()) return(character(0))
 
               igvResponse <- readLines(con = private$igvSocket)
               commandsExecuted <- length(igvResponse)
@@ -46,7 +50,7 @@ viper.igv.RemoteIGV <-
 
                 commandsConsumed <- min(commandsExecuted, private$pendingCommands[[1]])
                 private$pendingCommands[[1]] <- private$pendingCommands[[1]] - commandsConsumed
-                print(private$pendingCommands)
+
                 commandsExecuted <- commandsExecuted - commandsConsumed
 
                 if (private$pendingCommands[[1]] == 0) {
@@ -76,7 +80,7 @@ viper.igv.RemoteIGV <-
                 "setSleepInterval 0"
               ),
 
-            snapshot = function (bamFile, snapshotFileName, chr, pos, viewRange = 15) {
+            snapshot = function (bamFile, snapshotFileName, chr, pos, snapshotKey = UUIDgenerate(), viewRange = 15) {
 
               self$sendCommands(c(
                       "new",
@@ -84,7 +88,7 @@ viper.igv.RemoteIGV <-
                       "collapse",
                 paste("goto", sprintf("%s:%i-%i", chr, pos - viewRange, pos + viewRange)),
                 paste("snapshot", snapshotFileName)
-              ))
+              ), snapshotKey)
 
             }
           ),

@@ -1,5 +1,6 @@
 library(shiny)
 library(datasets)
+library(uuid)
 
 source("util/math.R")
 
@@ -172,6 +173,76 @@ viper.server.handleXLSXExportClick <- function (serverValues) {
   showModal(modalDialog(title = "Info", "Your file was saved."))
 }
 
+viper.server.getSnapshotKey <- function (serverValues, svIndex) {
+
+  id        <- serverValues$filteredData[svIndex, "id"]
+  sample    <- viper.server.getSingleCol(serverValues, svIndex, "sample")
+  snapshotKey <- paste(id, sample, sep = "-")
+
+  return(snapshotKey)
+}
+
+viper.server.scheduleSnapshot <- function (serverValues, svIndex) {
+
+  if (is.null(svIndex)) return()
+
+  snapshotKey <- viper.server.getSnapshotKey(serverValues, svIndex)
+
+  if (snapshotKey %in% names(serverValues$schedule)) return()
+
+  sample      <- viper.server.getSingleCol(serverValues, svIndex, "sample")
+  chr         <- viper.server.getSingleCol(serverValues, svIndex, "chr1")
+  pos         <- viper.server.getSingleCol(serverValues, svIndex, "bp1")
+  imageFile   <- sprintf("/tmp/%s.png", snapshotKey)
+
+  serverValues$schedule[[snapshotKey]] <- list(
+    file      = imageFile,
+    complete  = FALSE
+  )
+
+  viper.global.igvWorker$snapshot(sprintf("%s/%s.bam", viper.global.alignmentDir, sample), imageFile, chr, pos, snapshotKey)
+}
+
+viper.server.scheduleSnapshots <- function (serverValues, svIndex) {
+
+  if (is.null(svIndex)) return()
+
+  # TODO: replace by configuration
+  snapshotsAhead <- 10
+  startIndex <- svIndex
+  endIndex <- math.clamp(startIndex + snapshotsAhead, startIndex, nrow(serverValues$filteredData))
+
+  for (i in seq(startIndex, endIndex)) {
+    viper.server.scheduleSnapshot(serverValues, i)
+  }
+}
+
+viper.server.getBreakpointImageFile <- function (serverValues, svIndex) {
+
+  if (is.null(svIndex)) return("www/images/clock.svg")
+
+  snapshotKey <- viper.server.getSnapshotKey(serverValues, svIndex)
+  scheduledSnapshot <- serverValues$schedule[[snapshotKey]]
+
+  if (!is.null(scheduledSnapshot) && scheduledSnapshot$complete) {
+    return(scheduledSnapshot$file)
+  } else {
+    return("www/images/clock.svg")
+  }
+}
+
+viper.server.updateSnapshotStatus <- function (serverValues) {
+
+  snapshotKeys <- viper.global.igvWorker$updatePendingCommands()
+
+  for (snapshotKey in snapshotKeys) {
+
+    if (!snapshotKey %in% names(serverValues$schedule)) next
+
+    serverValues$schedule[[snapshotKey]]$complete <- TRUE
+  }
+}
+
 # Define server logic required to summarize and view the selected
 # dataset
 shinyServer(function(input, output, session) {
@@ -180,12 +251,11 @@ shinyServer(function(input, output, session) {
   viper.global.igvWorker$setupViewer()
 
   serverValues <- reactiveValues(
-    filteredData  = viper.global.clusteredData
+    filteredData  = viper.global.clusteredData,
+    schedule      = list()
   )
 
-  observe({
-    serverValues$filteredData <- viper.server.applyFilters(input)
-  })
+  observe({ serverValues$filteredData <- viper.server.applyFilters(input) })
 
   output$svChoice <- renderUI({
     numericInput("svIndex",
@@ -196,8 +266,8 @@ shinyServer(function(input, output, session) {
   })
 
   output$bp1  <- renderImage({
-    list(src = viper.server.getBPImageFile (serverValues, input$svIndex, input$currentSampleIndex, "BP1"),
-         width = session$clientData$output_bp1_width)
+    list(src = viper.server.getBreakpointImageFile(serverValues, input$svIndex),
+       width = session$clientData$output_bp1_width)
   }, deleteFile = FALSE)
 
   output$bp2  <- renderImage({
@@ -206,9 +276,7 @@ shinyServer(function(input, output, session) {
   }, deleteFile = FALSE)
 
   # Generate a summary of the dataset
-  output$svId <- renderText({
-    serverValues$filteredData[input$svIndex, "id"]
-  })
+  output$svId <- renderText({ serverValues$filteredData[input$svIndex, "id"] })
 
   output$igvBrowser <- renderUI({
     htmlTemplate("html/igv.tpl.html",
@@ -217,9 +285,7 @@ shinyServer(function(input, output, session) {
                                       reference = viper.server.getGenomeReferencePath())
     })
 
-  output$progress <- renderText({
-    paste("Progress:", input$svIndex, "/", nrow(serverValues$filteredData))
-  })
+  output$progress <- renderText({ paste("Progress:", input$svIndex, "/", nrow(serverValues$filteredData)) })
 
   output$currentSVRow <- renderTable({
     viper.server.getCurrentSVTable(serverValues, input$svIndex)
@@ -229,13 +295,9 @@ shinyServer(function(input, output, session) {
     viper.server.getRelatedCallTable(serverValues, input$svIndex)
   }, html.table.attributes = "class=\"table table-sm table-striped table-bordered\" id=\"relatedAnalysisCallsTable\"")
 
-  output$sampleChoice <- renderUI({
-    viper.server.renderSampleChoice(serverValues, input$svIndex)
-  })
+  output$sampleChoice <- renderUI({ viper.server.renderSampleChoice(serverValues, input$svIndex) })
 
-  output$currentSample <- renderText({
-    viper.server.getCurrentlySelectedSample(serverValues, input$svIndex, input$currentSampleIndex)
-  })
+  output$currentSample <- renderText({ viper.server.getCurrentlySelectedSample(serverValues, input$svIndex, input$currentSampleIndex) })
 
   output$filteredDataDT <- DT::renderDataTable(viper.server.getFilteredDataTable(serverValues))
 
@@ -245,5 +307,8 @@ shinyServer(function(input, output, session) {
   observeEvent(input$saveSVs,   { viper.server.handleSVSaveButtonClick(serverValues) })
   observeEvent(input$saveXLSX,  { viper.server.handleXLSXExportClick(serverValues) })
 
-  session$onSessionEnded(function (...) viper.global.igvWorker$stop())
+  session$onSessionEnded(function (...) {viper.global.igvWorker$stop() })
+
+  observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex) })
+  observe({ viper.server.updateSnapshotStatus(serverValues); invalidateLater(1000)})
 })
