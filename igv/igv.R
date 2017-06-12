@@ -2,6 +2,7 @@
 suppressPackageStartupMessages(library(Biostrings))
 suppressPackageStartupMessages(library(R6))
 suppressPackageStartupMessages(library(future))
+suppressPackageStartupMessages(library(uuid))
 
 plan(multiprocess)
 
@@ -32,26 +33,42 @@ viper.igv.RemoteIGV <-
 
             },
 
-            sendCommands = function(commands, pollingIntervalSecs = 1 / 20, attempts = 1 / pollingIntervalSecs * 120) {
+            checkCommandState = function () {
+
+              if (length(private$pendingCommands) == 0) return(character(0))
+
+              igvResponse <- readLines(con = private$igvSocket)
+              commandsExecuted <- length(igvResponse)
+
+              completedCommands <- character(0)
+
+              while(commandsExecuted > 0) {
+
+                commandsConsumed <- min(commandsExecuted, private$pendingCommands[[1]])
+                private$pendingCommands[[1]] <- private$pendingCommands[[1]] - commandsConsumed
+                print(private$pendingCommands)
+                commandsExecuted <- commandsExecuted - commandsConsumed
+
+                if (private$pendingCommands[[1]] == 0) {
+
+                  completedCommands <- c(completedCommands, names(private$pendingCommands)[1])
+                  private$pendingCommands[[1]] <- NULL
+
+                }
+              }
+
+              return(completedCommands)
+            },
+
+            sendCommands = function(commands, commandToken = UUIDgenerate()) {
 
               if (is.null(private$igvSocket)) return(warning("[WARNING] IGV socket connection has not been established."))
 
               writeLines(commands, con = private$igvSocket)
 
-              attempt <- 0
-              linesRead <- 0
+              private$pendingCommands[[commandToken]] <- private$numLinesWrittenByCommands(commands)
 
-              while (attempt < attempts && linesRead < private$numLinesWrittenByCommands(commands)) {
-
-                Sys.sleep(pollingIntervalSecs)
-
-                commandResponse <- readLines(con = sock)
-
-                linesRead <- linesRead + length(commandResponse)
-                attempt   <- attempt + 1
-              }
-
-              return(linesRead == private$numLinesWrittenByCommands(commands))
+              return(commandToken)
             },
 
             setupViewer = function ()
@@ -75,6 +92,8 @@ viper.igv.RemoteIGV <-
           private = list(
             igvPort   = NULL,
             igvSocket = NULL,
+
+            pendingCommands = list(),
 
             openSocket = function () {
 
