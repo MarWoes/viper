@@ -73,7 +73,7 @@ viper.server.renderSampleChoice <- function (serverValues) {
 
   relatedSamples <- serverValues$currentAnalysisCalls$sample
 
-  sliderInput("currentSampleIndex", label = "Sample:", value = 1, min = 1, max = length(relatedSamples), step = 1)
+  sliderInput("sampleIndex", label = "Sample:", value = 1, min = 1, max = length(relatedSamples), step = 1)
 }
 
 viper.server.handleSVDecisionButtonClick <- function (serverValues, input, decision, session) {
@@ -162,7 +162,7 @@ viper.server.getSnapshotKey <- function (id, sample) {
   return(snapshotKey)
 }
 
-viper.server.scheduleSnapshot <- function (serverValues, svIndex) {
+viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex) {
 
   if (is.null(svIndex)) return()
 
@@ -170,7 +170,8 @@ viper.server.scheduleSnapshot <- function (serverValues, svIndex) {
 
   relatedCallsIndices <- unlist(serverValues$filteredData[svIndex, "relatedCalls"])
   relatedCalls <- viper.global.analysisData[relatedCallsIndices,]
-  sample       <- relatedCalls[1, "sample"]
+
+  sample <- unique(relatedCalls$sample)[sampleIndex]
 
   snapshotKey <- viper.server.getSnapshotKey(id, sample)
 
@@ -186,9 +187,10 @@ viper.server.scheduleSnapshot <- function (serverValues, svIndex) {
   )
 
   viper.global.igvWorker$snapshot(sprintf("%s/%s.bam", viper.global.alignmentDir, sample), imageFile, chr, pos, snapshotKey)
+
 }
 
-viper.server.scheduleSnapshots <- function (serverValues, svIndex) {
+viper.server.scheduleSnapshots <- function (serverValues, svIndex, sampleIndex) {
 
   if (is.null(svIndex)) return()
 
@@ -198,14 +200,14 @@ viper.server.scheduleSnapshots <- function (serverValues, svIndex) {
   endIndex <- math.clamp(startIndex + snapshotsAhead, startIndex, nrow(serverValues$filteredData))
 
   for (i in seq(startIndex, endIndex)) {
-    viper.server.scheduleSnapshot(serverValues, i)
+    viper.server.scheduleSnapshot(serverValues, i, sampleIndex)
   }
 }
 
-viper.server.getBreakpointImageFile <- function (serverValues) {
+viper.server.getBreakpointImageFile <- function (serverValues, sampleIndex) {
 
   id <- serverValues$currentFilteredCall$id
-  sample <- serverValues$currentAnalysisCalls$sample[1]
+  sample <- serverValues$currentAnalysisCalls$sample[sampleIndex]
 
   snapshotKey <- viper.server.getSnapshotKey(id, sample)
   scheduledSnapshot <- serverValues$schedule[[snapshotKey]]
@@ -229,9 +231,9 @@ viper.server.updateSnapshotStatus <- function (serverValues) {
   }
 }
 
-viper.server.updateBreakpointImageFile <- function (serverValues) {
+viper.server.updateBreakpointImageFile <- function (serverValues, sampleIndex) {
 
-  imageFile <- viper.server.getBreakpointImageFile(serverValues)
+  imageFile <- viper.server.getBreakpointImageFile(serverValues, sampleIndex)
 
   if (serverValues$breakpointImageFile != imageFile) {
     serverValues$breakpointImageFile <- imageFile
@@ -277,7 +279,7 @@ shinyServer(function(input, output, session) {
   }, deleteFile = FALSE)
 
   output$bp2  <- renderImage({
-    list(src = viper.server.getBPImageFile (serverValues, input$currentSampleIndex, "BP2"),
+    list(src = viper.server.getBPImageFile (serverValues, input$sampleIndex, "BP2"),
          width = session$clientData$output_bp2_width)
   }, deleteFile = FALSE)
 
@@ -285,7 +287,7 @@ shinyServer(function(input, output, session) {
 
   output$igvBrowser <- renderUI({
     htmlTemplate("html/igv.tpl.html",
-                                      sample    = viper.server.getAlignmentUrlString(serverValues, input$currentSampleIndex),
+                                      sample    = viper.server.getAlignmentUrlString(serverValues, input$sampleIndex),
                                       locus     = viper.server.getLocusString(serverValues),
                                       reference = viper.server.getGenomeReferencePath())
     })
@@ -302,7 +304,7 @@ shinyServer(function(input, output, session) {
 
   output$sampleChoice <- renderUI({ viper.server.renderSampleChoice(serverValues) })
 
-  output$currentSample <- renderText({ unique(serverValues$currentAnalysisCalls$sample)[input$currentSampleChoice] })
+  output$currentSample <- renderText({ unique(serverValues$currentAnalysisCalls$sample)[input$sampleIndex] })
 
   output$filteredDataDT <- DT::renderDataTable(viper.server.getFilteredDataTable(serverValues))
 
@@ -314,8 +316,8 @@ shinyServer(function(input, output, session) {
 
   observe({ serverValues$filteredData <- viper.server.applyFilters(input) })
   observe({ viper.server.updateCurrentVariantSelection(serverValues, input$svIndex)})
-  observe({ viper.server.updateBreakpointImageFile(serverValues) })
-  observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex) },           priority = -2)
+  observe({ viper.server.updateBreakpointImageFile(serverValues, input$sampleIndex) })
+  observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex, input$sampleIndex) },           priority = -2)
   observe({ viper.server.updateSnapshotStatus(serverValues); invalidateLater(1000)}, priority = -1)
 
   session$onSessionEnded(function (...) {viper.global.igvWorker$stop() })
