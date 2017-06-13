@@ -4,18 +4,6 @@ library(uuid)
 
 source("util/math.R")
 
-# BP may either be 'bp1' or 'bp2'
-viper.server.getBPImageFile <- function (serverValues, currentlySelectedSample, bp) {
-
-  sample <- serverValues$currentAnalysisCalls$sample[currentlySelectedSample]
-  svId <- serverValues$currentFilteredCall$id
-  imageFile <- paste(sample, "png", sep = ".")
-
-  filename <- paste(viper.global.workDir, "visualization", svId , bp, imageFile, sep = "/")
-
-  return(filename)
-}
-
 viper.server.getAlignmentUrlString <- function (serverValues, currentlySelectedSample) {
 
   sample <- serverValues$currentAnalysisCalls$sample[currentlySelectedSample]
@@ -155,14 +143,14 @@ viper.server.handleXLSXExportClick <- function (serverValues) {
   showModal(modalDialog(title = "Info", "Your file was saved."))
 }
 
-viper.server.getSnapshotKey <- function (id, sample) {
+viper.server.getSnapshotKey <- function (id, sample, breakpointIndex) {
 
-  snapshotKey <- paste(id, sample, sep = "-")
+  snapshotKey <- paste(id, sample, breakpointIndex, sep = "-")
 
   return(snapshotKey)
 }
 
-viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex) {
+viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex, breakpointIndex) {
 
   if (is.null(svIndex)) return()
 
@@ -173,12 +161,12 @@ viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex) {
 
   sample <- unique(relatedCalls$sample)[sampleIndex]
 
-  snapshotKey <- viper.server.getSnapshotKey(id, sample)
+  snapshotKey <- viper.server.getSnapshotKey(id, sample, breakpointIndex)
 
   if (snapshotKey %in% names(serverValues$schedule)) return()
 
-  chr         <- relatedCalls[1, "chr1"]
-  pos         <- relatedCalls[1, "bp1"]
+  chr         <- relatedCalls[1, sprintf("chr%i", breakpointIndex)]
+  pos         <- relatedCalls[1, sprintf("bp%i", breakpointIndex)]
   imageFile   <- sprintf("/tmp/%s.png", snapshotKey)
 
   serverValues$schedule[[snapshotKey]] <- list(
@@ -200,16 +188,17 @@ viper.server.scheduleSnapshots <- function (serverValues, svIndex, sampleIndex) 
   endIndex <- math.clamp(startIndex + snapshotsAhead, startIndex, nrow(serverValues$filteredData))
 
   for (i in seq(startIndex, endIndex)) {
-    viper.server.scheduleSnapshot(serverValues, i, sampleIndex)
+    viper.server.scheduleSnapshot(serverValues, i, sampleIndex, 1)
+    viper.server.scheduleSnapshot(serverValues, i, sampleIndex, 2)
   }
 }
 
-viper.server.getBreakpointImageFile <- function (serverValues, sampleIndex) {
+viper.server.getBreakpointImageFile <- function (serverValues, sampleIndex, breakpointIndex) {
 
   id <- serverValues$currentFilteredCall$id
   sample <- serverValues$currentAnalysisCalls$sample[sampleIndex]
 
-  snapshotKey <- viper.server.getSnapshotKey(id, sample)
+  snapshotKey <- viper.server.getSnapshotKey(id, sample, breakpointIndex)
   scheduledSnapshot <- serverValues$schedule[[snapshotKey]]
 
   if (!is.null(scheduledSnapshot) && scheduledSnapshot$complete) {
@@ -235,10 +224,15 @@ viper.server.updateSnapshotStatus <- function (serverValues) {
 
 viper.server.updateBreakpointImageFile <- function (serverValues, sampleIndex) {
 
-  imageFile <- viper.server.getBreakpointImageFile(serverValues, sampleIndex)
+  imageFile1 <- viper.server.getBreakpointImageFile(serverValues, sampleIndex, 1)
+  imageFile2 <- viper.server.getBreakpointImageFile(serverValues, sampleIndex, 2)
 
-  if (serverValues$breakpointImageFile != imageFile) {
-    serverValues$breakpointImageFile <- imageFile
+  if (serverValues$breakpointImageFile1 != imageFile1) {
+    serverValues$breakpointImageFile1 <- imageFile1
+  }
+
+  if (serverValues$breakpointImageFile2 != imageFile2) {
+    serverValues$breakpointImageFile2 <- imageFile2
   }
 }
 
@@ -264,7 +258,8 @@ shinyServer(function(input, output, session) {
     currentFilteredCall    = viper.global.clusteredData[1,],
     currentAnalysisCalls   = viper.global.analysisData[unlist(viper.global.clusteredData[1,"relatedCalls"]),],
 
-    breakpointImageFile = "www/images/loading.svg",
+    breakpointImageFile1 = "www/images/loading.svg",
+    breakpointImageFile2 = "www/images/loading.svg",
 
     igvIdle = FALSE
   )
@@ -278,12 +273,12 @@ shinyServer(function(input, output, session) {
   })
 
   output$bp1  <- renderImage({
-    list(src = serverValues$breakpointImageFile,
+    list(src = serverValues$breakpointImageFile1,
        width = session$clientData$output_bp1_width)
   }, deleteFile = FALSE)
 
   output$bp2  <- renderImage({
-    list(src = viper.server.getBPImageFile (serverValues, input$sampleIndex, "BP2"),
+    list(src = serverValues$breakpointImageFile2,
          width = session$clientData$output_bp2_width)
   }, deleteFile = FALSE)
 
@@ -329,8 +324,9 @@ shinyServer(function(input, output, session) {
   observe({ serverValues$filteredData <- viper.server.applyFilters(input) })
   observe({ viper.server.updateCurrentVariantSelection(serverValues, input$svIndex)})
   observe({ viper.server.updateBreakpointImageFile(serverValues, input$sampleIndex) })
-  observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex, input$sampleIndex) },           priority = -2)
-  observe({ viper.server.updateSnapshotStatus(serverValues); invalidateLater(1000)}, priority = -1)
+  observe({ viper.server.updateSnapshotStatus(serverValues); invalidateLater(1000)},          priority = -1)
+  observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex, input$sampleIndex) }, priority = -2)
+
 
   session$onSessionEnded(function (...) {viper.global.igvWorker$stop() })
 
