@@ -229,6 +229,22 @@ viper.server.updateSnapshotStatus <- function (serverValues) {
   }
 }
 
+viper.server.updateBreakpointImageFile <- function (serverValues) {
+
+  imageFile <- viper.server.getBreakpointImageFile(serverValues)
+
+  if (serverValues$breakpointImageFile != imageFile) {
+    serverValues$breakpointImageFile <- imageFile
+  }
+}
+
+viper.server.updateCurrentVariantSelection <- function (serverValues, svIndex) {
+  if (is.null(svIndex)) return()
+
+  serverValues$currentFilteredCall  <- serverValues$filteredData[svIndex,]
+  serverValues$currentAnalysisCalls <- viper.global.analysisData[unlist(serverValues$currentFilteredCall$relatedCalls),]
+}
+
 # Define server logic required to summarize and view the selected
 # dataset
 shinyServer(function(input, output, session) {
@@ -242,16 +258,10 @@ shinyServer(function(input, output, session) {
     schedule           = list(),
 
     currentFilteredCall    = viper.global.clusteredData[1,],
-    currentAnalysisCalls   = viper.global.analysisData[unlist(viper.global.clusteredData[1,"relatedCalls"]),]
+    currentAnalysisCalls   = viper.global.analysisData[unlist(viper.global.clusteredData[1,"relatedCalls"]),],
+
+    breakpointImageFile = "www/images/loading.svg"
   )
-
-  observe({ serverValues$filteredData <- viper.server.applyFilters(input) })
-  observe({
-    if (is.null(input$svIndex)) return()
-
-    serverValues$currentFilteredCall  <- serverValues$filteredData[input$svIndex,]
-    serverValues$currentAnalysisCalls <- viper.global.analysisData[unlist(serverValues$currentFilteredCall$relatedCalls),]
-  })
 
   output$svChoice <- renderUI({
     numericInput("svIndex",
@@ -262,7 +272,7 @@ shinyServer(function(input, output, session) {
   })
 
   output$bp1  <- renderImage({
-    list(src = viper.server.getBreakpointImageFile(serverValues),
+    list(src = serverValues$breakpointImageFile,
        width = session$clientData$output_bp1_width)
   }, deleteFile = FALSE)
 
@@ -302,8 +312,12 @@ shinyServer(function(input, output, session) {
   observeEvent(input$saveSVs,   { viper.server.handleSVSaveButtonClick(serverValues) })
   observeEvent(input$saveXLSX,  { viper.server.handleXLSXExportClick(serverValues) })
 
-  session$onSessionEnded(function (...) {viper.global.igvWorker$stop() })
-
+  observe({ serverValues$filteredData <- viper.server.applyFilters(input) })
+  observe({ viper.server.updateCurrentVariantSelection(serverValues, input$svIndex)})
+  observe({ viper.server.updateBreakpointImageFile(serverValues) })
   observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex) },           priority = -2)
   observe({ viper.server.updateSnapshotStatus(serverValues); invalidateLater(1000)}, priority = -1)
+
+  session$onSessionEnded(function (...) {viper.global.igvWorker$stop() })
+
 })
