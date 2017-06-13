@@ -229,6 +229,8 @@ viper.server.updateSnapshotStatus <- function (serverValues) {
 
     serverValues$schedule[[snapshotKey]]$complete <- TRUE
   }
+
+  serverValues$igvIdle <- viper.global.igvWorker$isIdle()
 }
 
 viper.server.updateBreakpointImageFile <- function (serverValues, sampleIndex) {
@@ -262,7 +264,9 @@ shinyServer(function(input, output, session) {
     currentFilteredCall    = viper.global.clusteredData[1,],
     currentAnalysisCalls   = viper.global.analysisData[unlist(viper.global.clusteredData[1,"relatedCalls"]),],
 
-    breakpointImageFile = "www/images/loading.svg"
+    breakpointImageFile = "www/images/loading.svg",
+
+    igvIdle = FALSE
   )
 
   output$svChoice <- renderUI({
@@ -307,6 +311,14 @@ shinyServer(function(input, output, session) {
   output$currentSample <- renderText({ unique(serverValues$currentAnalysisCalls$sample)[input$sampleIndex] })
 
   output$filteredDataDT <- DT::renderDataTable(viper.server.getFilteredDataTable(serverValues))
+  output$igvIdleState <- renderUI({
+    if (serverValues$igvIdle) {
+      return(icon("ok", lib = "glyphicon"))
+    } else {
+      return(icon("refresh", lib = "glyphicon"))
+    }
+  })
+
 
   observeEvent(input$declineSV, { viper.server.handleSVDecisionButtonClick(serverValues, input, "declined", session) })
   observeEvent(input$maybeSV,   { viper.server.handleSVDecisionButtonClick(serverValues, input, "maybe"   , session) })

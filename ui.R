@@ -122,7 +122,7 @@ shinyUI(navbarPage(
 
         tabsetPanel(
 
-          tabPanel("IGV BPs", fluidRow(
+          tabPanel(span("Breakpoints", uiOutput("igvIdleState", inline = TRUE)), fluidRow(
 
             column(6,
               h3("First breakpoint:"),
@@ -136,7 +136,7 @@ shinyUI(navbarPage(
 
           tabPanel("Related Analysis Calls", tableOutput("relatedCalls")),
 
-          tabPanel("IGV Browser", htmlOutput("igvBrowser"))
+          tabPanel("Interactive Browser", htmlOutput("igvBrowser"))
         )
       , width = 9)
     )
