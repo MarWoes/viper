@@ -213,7 +213,7 @@ viper.server.getBreakpointImageFile <- function (serverValues) {
   if (!is.null(scheduledSnapshot) && scheduledSnapshot$complete) {
     return(scheduledSnapshot$file)
   } else {
-    return("www/images/clock.svg")
+    return("www/images/loading.svg")
   }
 }
 
