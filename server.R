@@ -33,7 +33,7 @@ viper.server.getGenomeReferencePath <- function () {
   return(escapedPath)
 }
 
-viper.server.getCurrentSVTable <- function (serverValues) {
+viper.server.getCurrentVariantTable <- function (serverValues) {
 
   values <- serverValues$currentFilteredCall
   numericValues <- sapply(as.list(values), function (v) is.numeric(v))
@@ -64,7 +64,7 @@ viper.server.renderSampleChoice <- function (serverValues) {
   sliderInput("sampleIndex", label = "Sample:", value = 1, min = 1, max = length(relatedSamples), step = 1)
 }
 
-viper.server.handleSVDecisionButtonClick <- function (serverValues, input, decision, session) {
+viper.server.handleVariantDecisionButtonClick <- function (serverValues, input, decision, session) {
   index <- input$svIndex
 
   selectedId <- serverValues$filteredData[index, "id"]
@@ -76,7 +76,7 @@ viper.server.handleSVDecisionButtonClick <- function (serverValues, input, decis
   serverValues$filteredData <- viper.server.applyFilters(input)
 
   updateNumericInput(session, "svIndex",
-                     label = "SV number",
+                     label = "Variant number",
                      value = math.clamp(index + 1, 1, nrow(serverValues$filteredData)),
                      min = 1,
                      max = nrow(serverValues$filteredData))
@@ -88,7 +88,7 @@ viper.server.saveCallData <- function (unifiedData, fileName) {
   unification.write(writtenData, util.fileInDir(viper.global.workDir, fileName), header = TRUE)
 }
 
-viper.server.handleSVSaveButtonClick <- function (serverValues) {
+viper.server.handleVariantSaveButtonClick <- function (serverValues) {
 
   viper.server.saveCallData(serverValues$filteredData,  "all_filtered.csv")
   viper.server.saveCallData(viper.global.clusteredData, "all_clustered.csv")
@@ -266,7 +266,7 @@ shinyServer(function(input, output, session) {
 
   output$svChoice <- renderUI({
     numericInput("svIndex",
-                 label = "SV number",
+                 label = "Variant number",
                  value = 1,
                  min = 1,
                  max = nrow(serverValues$filteredData))
@@ -293,8 +293,8 @@ shinyServer(function(input, output, session) {
 
   output$progress <- renderText({ paste("Progress:", input$svIndex, "/", nrow(serverValues$filteredData)) })
 
-  output$currentSVRow <- renderTable({
-    viper.server.getCurrentSVTable(serverValues)
+  output$currentVariantRow <- renderTable({
+    viper.server.getCurrentVariantTable(serverValues)
   }, bordered = TRUE, striped = TRUE, align = "lr")
 
   output$relatedCalls <- renderTable({
@@ -315,10 +315,10 @@ shinyServer(function(input, output, session) {
   })
 
 
-  observeEvent(input$declineSV, { viper.server.handleSVDecisionButtonClick(serverValues, input, "declined", session) })
-  observeEvent(input$maybeSV,   { viper.server.handleSVDecisionButtonClick(serverValues, input, "maybe"   , session) })
-  observeEvent(input$approveSV, { viper.server.handleSVDecisionButtonClick(serverValues, input, "approved", session) })
-  observeEvent(input$saveSVs,   { viper.server.handleSVSaveButtonClick(serverValues) })
+  observeEvent(input$declineVariant, { viper.server.handleVariantDecisionButtonClick(serverValues, input, "declined", session) })
+  observeEvent(input$maybeVariant,   { viper.server.handleVariantDecisionButtonClick(serverValues, input, "maybe"   , session) })
+  observeEvent(input$approveVariant, { viper.server.handleVariantDecisionButtonClick(serverValues, input, "approved", session) })
+  observeEvent(input$saveVariants,   { viper.server.handleVariantSaveButtonClick(serverValues) })
   observeEvent(input$saveXLSX,  { viper.server.handleXLSXExportClick(serverValues) })
 
   observe({ serverValues$filteredData <- viper.server.applyFilters(input) })

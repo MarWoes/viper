@@ -32,7 +32,7 @@ viper.clustering.generateIDs <- function (numberOfSvs) {
   svIndices     <- as.character(seq_len(numberOfSvs))
   padWidth      <- max(nchar(svIndices))
   paddedIndices <- str_pad(svIndices, padWidth, pad = "0")
-  finalIDs      <- paste("IMISV", paddedIndices, sep = "")
+  finalIDs      <- paste("VAR", paddedIndices, sep = "")
 
   return(finalIDs)
 }

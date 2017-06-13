@@ -98,14 +98,14 @@ shinyUI(navbarPage(
         uiOutput("svChoice"),
 
         fluidRow(
-          column(4, bsButton("declineSV", label = "Decline", style = "danger",  block = TRUE)),
-          column(4, bsButton("maybeSV", label = "Undecided", style = "warning", block = TRUE)),
-          column(4, bsButton("approveSV", label = "Approve", style = "success", block = TRUE))
+          column(4, bsButton("declineVariant", label = "Decline", style = "danger",  block = TRUE)),
+          column(4, bsButton("maybeVariant", label = "Undecided", style = "warning", block = TRUE)),
+          column(4, bsButton("approveVariant", label = "Approve", style = "success", block = TRUE))
         ),
 
         textOutput("progress"),
 
-        bsButton("saveSVs", label = "Save"),
+        bsButton("saveVariants", label = "Save"),
 
         hr(),
 
@@ -113,8 +113,8 @@ shinyUI(navbarPage(
         uiOutput("sampleChoice"),
 
         hr(),
-        h5("SV details:"),
-        tableOutput("currentSVRow")
+        h5("Variant details:"),
+        tableOutput("currentVariantRow")
 
       , width = 3),
 
@@ -136,7 +136,7 @@ shinyUI(navbarPage(
 
           tabPanel("Related Analysis Calls", tableOutput("relatedCalls")),
 
-          tabPanel("Interactive Browser", htmlOutput("igvBrowser"))
+          tabPanel("BAM Browser", htmlOutput("igvBrowser"))
         )
       , width = 9)
     )
