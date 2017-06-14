@@ -133,15 +133,15 @@ viper.server.applyFilters <- function (input) {
   return(filteredData)
 }
 
-viper.server.handleXLSXExportClick <- function (serverValues) {
-  filteredFile <- util.fileInDir(viper.global.workDir, "all_filtered.csv")
-  xlsxFile <- util.fileInDir(viper.global.workDir, "all_filtered.xlsx")
-
-  viper.server.saveCallData(serverValues$filteredData, "all_filtered.csv")
-
-  system(paste("python", "visualization/xlsx.py", filteredFile, viper.global.analysisDataFile, xlsxFile))
-  showModal(modalDialog(title = "Info", "Your file was saved."))
-}
+# viper.server.handleXLSXExportClick <- function (serverValues) {
+#   filteredFile <- util.fileInDir(viper.global.workDir, "all_filtered.csv")
+#   xlsxFile <- util.fileInDir(viper.global.workDir, "all_filtered.xlsx")
+#
+#   viper.server.saveCallData(serverValues$filteredData, "all_filtered.csv")
+#
+#   system(paste("python", "visualization/xlsx.py", filteredFile, viper.global.analysisDataFile, xlsxFile))
+#   showModal(modalDialog(title = "Info", "Your file was saved."))
+# }
 
 viper.server.getSnapshotKey <- function (id, sample, breakpointIndex) {
 
@@ -319,7 +319,7 @@ shinyServer(function(input, output, session) {
   observeEvent(input$maybeVariant,   { viper.server.handleVariantDecisionButtonClick(serverValues, input, "maybe"   , session) })
   observeEvent(input$approveVariant, { viper.server.handleVariantDecisionButtonClick(serverValues, input, "approved", session) })
   observeEvent(input$saveVariants,   { viper.server.handleVariantSaveButtonClick(serverValues) })
-  observeEvent(input$saveXLSX,  { viper.server.handleXLSXExportClick(serverValues) })
+  # observeEvent(input$saveXLSX,  { viper.server.handleXLSXExportClick(serverValues) })
 
   observe({ serverValues$filteredData <- viper.server.applyFilters(input) })
   observe({ viper.server.updateCurrentVariantSelection(serverValues, input$svIndex)})

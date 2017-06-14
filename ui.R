@@ -153,9 +153,9 @@ shinyUI(navbarPage(
 
            hr(),
 
-           h4("Export as .xlsx file:"),
+           h4("Export as .xlsx file:")
 
-           bsButton("saveXLSX", label = "Save as XLSX", style = "success")
+           # bsButton("saveXLSX", label = "Save as XLSX", style = "success")
   )
 
 ))
