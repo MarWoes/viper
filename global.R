@@ -26,6 +26,10 @@ viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysi
 
 viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvPort)
 
+# Wait for server to start
+viper.global.igvWorker$start()
+viper.global.igvWorker$stop()
+
 viper.global.filters <- list(
   tool = list(
     type      = "checkboxes",
