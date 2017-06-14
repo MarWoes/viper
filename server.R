@@ -190,13 +190,16 @@ viper.server.scheduleSnapshots <- function (serverValues, svIndex, sampleIndex) 
   if (is.null(svIndex)) return()
 
   # TODO: replace by configuration
-  snapshotsAhead <- 3
+  snapshotsAhead <- 10
   startIndex <- math.clamp(svIndex, 1, nrow(serverValues$filteredData))
   endIndex <- math.clamp(startIndex + snapshotsAhead, startIndex, nrow(serverValues$filteredData))
 
   for (i in seq(startIndex, endIndex)) {
-    viper.server.scheduleSnapshot(serverValues, i, sampleIndex, 1)
-    viper.server.scheduleSnapshot(serverValues, i, sampleIndex, 2)
+    # Only precompute images for the first sample index
+    adjustedSampleIndex <- ifelse(i == startIndex, sampleIndex, 1)
+
+    viper.server.scheduleSnapshot(serverValues, i, adjustedSampleIndex, 1)
+    viper.server.scheduleSnapshot(serverValues, i, adjustedSampleIndex, 2)
   }
 }
 
