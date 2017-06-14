@@ -65,21 +65,28 @@ viper.server.renderSampleChoice <- function (serverValues) {
 }
 
 viper.server.handleVariantDecisionButtonClick <- function (serverValues, input, decision, session) {
+
   index <- input$svIndex
 
-  selectedId <- serverValues$filteredData[index, "id"]
-  serverValues$filteredData[index, "decision"] <- decision
+  selectedId <- serverValues$currentFilteredCall$id
 
   # This is ugly. Can we improve this?
+  serverValues$filteredData[index, "decision"] <- decision
   viper.global.clusteredData[viper.global.clusteredData$id == selectedId, "decision"] <<- decision
 
-  serverValues$filteredData <- viper.server.applyFilters(input)
+  preFilterSize <- nrow(serverValues$filteredData)
+
+  serverValues$filteredData <- viper.server.applyFilters(input, viper.global.filters["decision"])
+
+  postFilterSize <- nrow(serverValues$filteredData)
+
+  svIndexShift <- ifelse(preFilterSize == postFilterSize, 1, 0)
 
   updateNumericInput(session, "svIndex",
                      label = "Variant number",
-                     value = math.clamp(index + 1, 1, nrow(serverValues$filteredData)),
+                     value = math.clamp(index + svIndexShift, 1, postFilterSize),
                      min = 1,
-                     max = nrow(serverValues$filteredData))
+                     max = postFilterSize)
 }
 
 viper.server.saveCallData <- function (unifiedData, fileName) {
@@ -111,15 +118,15 @@ viper.server.applyFilter <- function (filterInput, filterNAInput, filterColumn, 
   return(filterInfo$filterFn(filterColumn,filterInput) | naFilter )
 }
 
-viper.server.applyFilters <- function (input) {
+viper.server.applyFilters <- function (input, filters = viper.global.filters) {
 
   unfilteredData <- viper.global.clusteredData
 
   # Create a matrix with each row representing a call from the unfiltered data.
   # Every column is the result of a single filter being applied to a specific column
-  filterMatrix <- sapply(names(viper.global.filters), function (filterColumn) {
+  filterMatrix <- sapply(names(filters), function (filterColumn) {
 
-    filterInfo    <- viper.global.filters[[filterColumn]]
+    filterInfo    <- filters[[filterColumn]]
     filterInput   <- input[[paste(filterColumn, "Filter", sep = "")]]
     filterNAInput <- input[[paste(filterColumn, "NAFilter", sep = "")]]
 
@@ -183,8 +190,8 @@ viper.server.scheduleSnapshots <- function (serverValues, svIndex, sampleIndex) 
   if (is.null(svIndex)) return()
 
   # TODO: replace by configuration
-  snapshotsAhead <- 10
-  startIndex <- svIndex
+  snapshotsAhead <- 3
+  startIndex <- math.clamp(svIndex, 1, nrow(serverValues$filteredData))
   endIndex <- math.clamp(startIndex + snapshotsAhead, startIndex, nrow(serverValues$filteredData))
 
   for (i in seq(startIndex, endIndex)) {
