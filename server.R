@@ -92,15 +92,31 @@ viper.server.handleVariantDecisionButtonClick <- function (serverValues, input, 
 viper.server.saveCallData <- function (unifiedData, fileName) {
   writtenData <- unifiedData
   writtenData$relatedCalls <- sapply(writtenData$relatedCalls, function (callIndices) paste(callIndices, collapse = ","))
-  unification.write(writtenData, util.fileInDir(viper.global.workDir, fileName), header = TRUE)
+  write.table(writtenData, util.fileInDir(viper.global.workDir, fileName), row.names = FALSE)
+}
+
+viper.server.loadExistingDecisions <- function () {
+
+  existingFile <- util.fileInDir(viper.global.workDir, paste("clustered", viper.global.analysisHash, "csv", sep = "."))
+
+  if (!file.exists(existingFile)) return()
+
+  decisions <- fread(existingFile)$decision
+
+  viper.global.clusteredData$decision <<- decisions
+
+  showModal(modalDialog(
+    title = "Welcome back!",
+    paste(sum(!is.na(decisions)), "decision(s) loaded from previous ratings.")
+  ))
 }
 
 viper.server.handleVariantSaveButtonClick <- function (serverValues) {
 
-  viper.server.saveCallData(serverValues$filteredData,  "all_filtered.csv")
-  viper.server.saveCallData(viper.global.clusteredData, "all_clustered.csv")
+  viper.server.saveCallData(serverValues$filteredData,  paste("filtered", viper.global.analysisHash, "csv", sep = "."))
+  viper.server.saveCallData(viper.global.clusteredData, paste("clustered", viper.global.analysisHash, "csv", sep = "."))
 
-  showModal(modalDialog(title = "Info", "Your file was saved. You may now safely close the browser."))
+  showModal(modalDialog(title = "Info", paste("Your files were saved. You may now safely close the browser.")))
 }
 
 viper.server.getFilteredDataTable <- function (serverValues) {
@@ -268,6 +284,8 @@ shinyServer(function(input, output, session) {
 
   viper.global.igvWorker$start()
   viper.global.igvWorker$setupViewer()
+
+  viper.server.loadExistingDecisions()
 
   serverValues <- reactiveValues(
 

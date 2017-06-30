@@ -1,5 +1,6 @@
 library("DT")
 library("data.table")
+library("digest")
 
 source("util/util.R")
 source("staticHandlingHack.R")
@@ -27,6 +28,7 @@ viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysi
 viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvPort)
 
 viper.global.loadingImagePath <- "www/images/loading.svg"
+viper.global.analysisHash <- digest(viper.global.analysisData$bp1)
 
 # Wait for server to start
 viper.global.igvWorker$start()
