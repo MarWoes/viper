@@ -8,7 +8,7 @@ source("igv/igv.R")
 
 options(scipen = 10)
 
-if (!exists("VIPER_ARGS")) stop("No shiny config found. Make sure you define SHINY_INPUT with correct values.")
+if (!exists("VIPER_ARGS")) stop("No viper config found. Make sure you feed VIPER_ARGS with correct values.")
 
 # Is there a better way to do things?
 config <- VIPER_ARGS
@@ -22,9 +22,11 @@ viper.global.fastaRefDir  <- dirname(viper.global.fastaRef)
 viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
 viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)
-viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysisData, 5)
+viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysisData, 2)
 
 viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvPort)
+
+viper.global.loadingImagePath <- "www/images/loading.svg"
 
 # Wait for server to start
 viper.global.igvWorker$start()

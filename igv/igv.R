@@ -146,7 +146,7 @@ viper.igv.RemoteIGV <-
           )
   )
 
-viper.igv.startWorker <- function (igvJar, igvPort, fastaRef) {
+viper.igv.startWorker <- function (igvJar, igvPort, fastaRef, ignoreOutput = FALSE) {
 
   command <- paste(
     "xvfb-run",
@@ -159,6 +159,6 @@ viper.igv.startWorker <- function (igvJar, igvPort, fastaRef) {
   # This deferral to futures is necessary since xvfb-run (which needs xauth) does not work
   # from system calls within rstudio's console for some reason
   process %<-% {
-    system(command)
+    system(command, ignore.stdout = ignoreOutput)
   }
 }

@@ -10,7 +10,7 @@ viper.clustering.findOverlapIndices <- function(analysisData, maxGap) {
   analysisData[swapIndices, c("chr1", "chr2", "bp1", "bp2")] <- analysisData[swapIndices, c("chr2", "chr1", "bp2", "bp1")]
 
   query <- GRanges(
-    seqnames = paste(analysisData$type, analysisData$chr1, analysisData$chr2, sep = "-"),
+    seqnames = paste(analysisData$svType, analysisData$chr1, analysisData$chr2, sep = "-"),
     ranges   = IRanges(
       start = analysisData$bp1,
       end   = analysisData$bp2
@@ -41,7 +41,7 @@ viper.clustering.summarizeVariantCalls <- function (analysisData, clusteringIndi
 
   clusteredData <- data.frame(
     id = viper.clustering.generateIDs(length(clusteringIndices)),
-    numCalls = sapply(clusteringIndices, function (indices) length(indices))
+    numCalls = sapply(clusteringIndices, function (indices) length(unique(analysisData[indices, "sample"])))
   )
 
   for (column in colnames(analysisData)) {
@@ -60,10 +60,6 @@ viper.clustering.summarizeVariantCalls <- function (analysisData, clusteringIndi
     } else if (is.numeric(analysisData[[column]])) {
 
       summarizeFunction <- function (values) median(values, na.rm = TRUE)
-
-    } else if (column == "sample") {
-
-      next
 
     }
 

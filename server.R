@@ -59,7 +59,7 @@ viper.server.getRelatedCallTable <- function (serverValues) {
 
 viper.server.renderSampleChoice <- function (serverValues) {
 
-  relatedSamples <- serverValues$currentAnalysisCalls$sample
+  relatedSamples <- unique(serverValues$currentAnalysisCalls$sample)
 
   sliderInput("sampleIndex", label = "Sample:", value = 1, min = 1, max = length(relatedSamples), step = 1)
 }
@@ -206,7 +206,7 @@ viper.server.scheduleSnapshots <- function (serverValues, svIndex, sampleIndex) 
 viper.server.getBreakpointImageFile <- function (serverValues, sampleIndex, breakpointIndex) {
 
   id <- serverValues$currentFilteredCall$id
-  sample <- serverValues$currentAnalysisCalls$sample[sampleIndex]
+  sample <- unique(serverValues$currentAnalysisCalls$sample)[sampleIndex]
 
   snapshotKey <- viper.server.getSnapshotKey(id, sample, breakpointIndex)
   scheduledSnapshot <- serverValues$schedule[[snapshotKey]]
@@ -253,6 +253,15 @@ viper.server.updateCurrentVariantSelection <- function (serverValues, svIndex) {
   serverValues$currentAnalysisCalls <- viper.global.analysisData[unlist(serverValues$currentFilteredCall$relatedCalls),]
 }
 
+viper.server.cleanup <- function (serverValues) {
+
+  # close igv socket
+  viper.global.igvWorker$stop()
+
+  # remove all temporary image files
+  system("rm /tmp/VAR*.png")
+}
+
 # Define server logic required to summarize and view the selected
 # dataset
 shinyServer(function(input, output, session) {
@@ -268,8 +277,8 @@ shinyServer(function(input, output, session) {
     currentFilteredCall    = viper.global.clusteredData[1,],
     currentAnalysisCalls   = viper.global.analysisData[unlist(viper.global.clusteredData[1,"relatedCalls"]),],
 
-    breakpointImageFile1 = "www/images/loading.svg",
-    breakpointImageFile2 = "www/images/loading.svg",
+    breakpointImageFile1 = viper.global.loadingImagePath,
+    breakpointImageFile2 = viper.global.loadingImagePath,
 
     igvIdle = FALSE
   )
@@ -338,6 +347,6 @@ shinyServer(function(input, output, session) {
   observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex, input$sampleIndex) }, priority = -2)
 
 
-  session$onSessionEnded(function (...) {viper.global.igvWorker$stop() })
+  session$onSessionEnded(function (...) { viper.server.cleanup(serverValues) })
 
 })
