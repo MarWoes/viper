@@ -80,7 +80,7 @@ viper.igv.RemoteIGV <-
                 "setSleepInterval 0"
               ),
 
-            snapshot = function (bamFile, snapshotFileName, chr, pos, snapshotKey = UUIDgenerate(), viewRange = 15) {
+            snapshot = function (bamFile, snapshotFileName, chr, pos, snapshotKey = UUIDgenerate(), viewRange = 25) {
 
               self$sendCommands(c(
                       "new",

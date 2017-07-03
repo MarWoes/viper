@@ -3,6 +3,45 @@
 library(GenomicRanges)
 library(stringr)
 
+
+viper.clustering.reduceToTransitivity <- function (overlapIndices) {
+
+  adjustedIndices <- overlapIndices
+
+  # break upon transitivity completion
+  repeat {
+
+    lengthSeq <- seq_len(length(adjustedIndices))
+
+    transitivityIndices <- lapply(lengthSeq, function (...) integer(0))
+
+    for (i in lengthSeq) {
+
+      indices <- adjustedIndices[[i]]
+
+      transitivityIndices[indices] <- lapply(transitivityIndices[indices], c, i)
+    }
+
+    nonTransitiveIndices <- sapply(transitivityIndices, length) > 1
+
+    if (!any(nonTransitiveIndices)) break
+
+    expansionIndices <- transitivityIndices[nonTransitiveIndices]
+
+    for (indices in expansionIndices) {
+
+      mergedIndices <- sort(unique(unlist(adjustedIndices[indices])))
+      adjustedIndices[indices] <- lapply(length(indices), function (...) mergedIndices)
+
+    }
+
+    adjustedIndices <- unique(adjustedIndices)
+  }
+
+
+  return(adjustedIndices)
+}
+
 # Analysis data is an arbitrary data frame that has at least the columns 'sample', 'chr1', 'bp1', 'chr2', 'bp2'
 viper.clustering.findOverlapIndices <- function(analysisData, maxGap) {
 
@@ -22,6 +61,8 @@ viper.clustering.findOverlapIndices <- function(analysisData, maxGap) {
   # overlapIndices contains duplicates, we remove them by sorting indices and leaving only unique calls
   overlapIndices <- lapply(overlapIndices, function (indices) sort(indices))
   overlapIndices <- unique(overlapIndices)
+
+  overlapIndices <- viper.clustering.reduceToTransitivity(overlapIndices)
 
   return(overlapIndices)
 }
