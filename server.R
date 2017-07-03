@@ -184,6 +184,10 @@ viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex, b
 
   sample <- unique(relatedCalls$sample)[sampleIndex]
 
+  # When changing current sv without changing the sample index first, a sample index is chosen that leads to an NA sample.
+  # ih this case, no snapshot is scheduled.
+  if (is.na(sample)) return()
+
   snapshotKey <- viper.server.getSnapshotKey(id, sample, breakpointIndex)
 
   if (snapshotKey %in% names(serverValues$schedule)) return()
