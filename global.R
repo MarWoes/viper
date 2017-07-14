@@ -14,25 +14,27 @@ if (!exists("VIPER_ARGS")) stop("No viper config found. Make sure you feed VIPER
 # Is there a better way to do things?
 config <- VIPER_ARGS
 
-viper.global.workDir          <- config$workDir
-viper.global.alignmentDir     <- config$alignmentDir
-viper.global.fastaRef         <- config$fastaRef
-viper.global.analysisDataFile <- config$variantsFile
+viper.global.workDir           <- config$workDir
+viper.global.alignmentDir      <- config$alignmentDir
+viper.global.fastaRef          <- config$fastaRef
+viper.global.analysisDataFile  <- config$variantsFile
+viper.global.maxScheduleSize   <- 200
+viper.global.scheduleKeepIndex <- 100
 
 viper.global.fastaRefDir  <- dirname(viper.global.fastaRef)
 viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
+viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvJar, config$igvPort, config$fastaRef)
+
 viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)
 viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysisData, 3)
-
-viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvPort)
 
 viper.global.loadingImagePath <- "www/images/loading.svg"
 viper.global.analysisHash <- digest(viper.global.analysisData$bp1)
 
 # Wait for server to start
 viper.global.igvWorker$start()
-viper.global.igvWorker$stop()
+viper.global.igvWorker$setupViewer()
 
 viper.global.filters <- list(
   tool = list(

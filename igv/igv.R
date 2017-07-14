@@ -11,9 +11,11 @@ viper.igv.RemoteIGV <-
 
           public = list(
 
-            initialize = function (igvPort) {
+            initialize = function (igvJar, igvPort, fastaRef) {
 
+              private$igvJar   <- igvJar
               private$igvPort  <- igvPort
+              private$fastaRef <- fastaRef
 
             },
 
@@ -21,15 +23,34 @@ viper.igv.RemoteIGV <-
 
               if (!is.null(private$igvSocket)) return(warning("[WARNING] IGV socket connection has already been established"))
 
+              private$startWorker()
               private$establishSocketConnection()
             },
 
-            stop = function () {
+            stop = function (attempts = 120) {
 
               if (is.null(private$igvSocket)) return(warning("[WARNING] IGV socket connection has not been established."))
 
-              close(private$igvSocket)
-              private$igvSocket <- NULL
+              self$sendCommands("exit")
+
+              attempt <- 0
+              while (!is.null(private$igvSocket)) {
+
+                attempt <- attempt + 1
+
+                if (attempt > attempts) {
+                  warning("[WARNING] IGV did not shutdown in time, quitting anyway.")
+                  break
+                }
+
+
+                private$igvSocket <- private$openSocket()
+                Sys.sleep(1)
+
+                if (!is.null(private$igvSocket)) {
+                  close(private$igvSocket)
+                }
+              }
 
             },
 
@@ -96,6 +117,8 @@ viper.igv.RemoteIGV <-
           private = list(
             igvPort   = NULL,
             igvSocket = NULL,
+            igvJar    = NULL,
+            fastaRef  = NULL,
 
             pendingCommands = list(),
 
@@ -142,23 +165,23 @@ viper.igv.RemoteIGV <-
               if (length(firstExitCommand) == 0) return(length(commands))
 
               return(firstExitCommand - 1)
+            },
+
+            startWorker = function (ignoreOutput = FALSE) {
+
+              command <- paste(
+                "xvfb-run",
+                "-a --server-args=\"-screen 0, 1280x1680x24\" java -jar",
+                private$igvJar,
+                "-p", private$igvPort,
+                "-g", private$fastaRef,
+                "-o", "igv/igv.properties")
+
+              # This deferral to futures is necessary since xvfb-run (which needs xauth) does not work
+              # from system calls within rstudio's console for some reason
+              process %<-% {
+                system(command, ignore.stdout = ignoreOutput)
+              }
             }
           )
   )
-
-viper.igv.startWorker <- function (igvJar, igvPort, fastaRef, ignoreOutput = FALSE) {
-
-  command <- paste(
-    "xvfb-run",
-    "-a --server-args=\"-screen 0, 1280x1680x24\" java -jar",
-    igvJar,
-    "-p", igvPort,
-    "-g", fastaRef,
-    "-o", "igv/igv.properties")
-
-  # This deferral to futures is necessary since xvfb-run (which needs xauth) does not work
-  # from system calls within rstudio's console for some reason
-  process %<-% {
-    system(command, ignore.stdout = ignoreOutput)
-  }
-}

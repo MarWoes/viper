@@ -91,7 +91,7 @@ viper.server.handleVariantDecisionButtonClick <- function (serverValues, input, 
 
 viper.server.saveCallData <- function (unifiedData, fileName) {
   writtenData <- unifiedData
-  writtenData$relatedCalls <- sapply(writtenData$relatedCalls, function (callIndices) paste(callIndices, collapse = ","))
+  writtenData$relatedCalls <- sapply(writtenData$relatedCalls, toString)
   write.table(writtenData, util.fileInDir(viper.global.workDir, fileName), row.names = FALSE)
 }
 
@@ -250,6 +250,13 @@ viper.server.updateSnapshotStatus <- function (serverValues) {
   }
 
   serverValues$igvIdle <- viper.global.igvWorker$isIdle()
+
+   # Limit schedule size to speedup scheduling and the likes
+   if (length(serverValues$schedule) > viper.global.maxScheduleSize) {
+
+     serverValues$schedule <- serverValues$schedule[-(1:viper.global.scheduleKeepIndex)]
+
+   }
 }
 
 viper.server.updateBreakpointImageFile <- function (serverValues, sampleIndex) {
@@ -275,6 +282,9 @@ viper.server.updateCurrentVariantSelection <- function (serverValues, svIndex) {
 
 viper.server.cleanup <- function (serverValues) {
 
+  # close igv
+  viper.global.igvWorker$sendCommands("exit")
+
   # close igv socket
   viper.global.igvWorker$stop()
 
@@ -286,8 +296,6 @@ viper.server.cleanup <- function (serverValues) {
 # dataset
 shinyServer(function(input, output, session) {
 
-  viper.global.igvWorker$start()
-  viper.global.igvWorker$setupViewer()
 
   viper.server.loadExistingDecisions()
 
@@ -369,6 +377,5 @@ shinyServer(function(input, output, session) {
   observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex, input$sampleIndex) }, priority = -2)
 
 
-  session$onSessionEnded(function (...) { viper.server.cleanup(serverValues) })
-
+  session$onSessionEnded(function (...) { viper.server.cleanup(serverValues); stopApp()})
 })
