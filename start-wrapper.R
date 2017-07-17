@@ -14,7 +14,6 @@ viper.startWrapper.startViper <- function () {
   on.exit({
     # remove all temporary image files
     system("rm /tmp/VAR*.png")
-    print("exit")
 
     # stop igv
     if (exists("viper.global.igvWorker")) viper.global.igvWorker$stop()

@@ -166,14 +166,14 @@ viper.server.applyFilters <- function (input, filters = viper.global.filters) {
 #   showModal(modalDialog(title = "Info", "Your file was saved."))
 # }
 
-viper.server.getSnapshotKey <- function (id, sample, breakpointIndex) {
+viper.server.getSnapshotKey <- function (id, sample, breakpointIndex, sessionId) {
 
-  snapshotKey <- paste(id, sample, breakpointIndex, sep = "-")
+  snapshotKey <- paste(id, sample, breakpointIndex, sessionId, sep = "-")
 
   return(snapshotKey)
 }
 
-viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex, breakpointIndex) {
+viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex, breakpointIndex, sessionId) {
 
   if (is.null(svIndex)) return()
 
@@ -188,7 +188,7 @@ viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex, b
   # ih this case, no snapshot is scheduled.
   if (is.na(sample)) return()
 
-  snapshotKey <- viper.server.getSnapshotKey(id, sample, breakpointIndex)
+  snapshotKey <- viper.server.getSnapshotKey(id, sample, breakpointIndex, sessionId)
 
   if (snapshotKey %in% names(serverValues$schedule)) return()
 
@@ -205,7 +205,7 @@ viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex, b
 
 }
 
-viper.server.scheduleSnapshots <- function (serverValues, svIndex, sampleIndex) {
+viper.server.scheduleSnapshots <- function (serverValues, svIndex, sampleIndex, sessionId) {
 
   if (is.null(svIndex)) return()
 
@@ -218,17 +218,17 @@ viper.server.scheduleSnapshots <- function (serverValues, svIndex, sampleIndex) 
     # Only precompute images for the first sample index
     adjustedSampleIndex <- ifelse(i == startIndex, sampleIndex, 1)
 
-    viper.server.scheduleSnapshot(serverValues, i, adjustedSampleIndex, 1)
-    viper.server.scheduleSnapshot(serverValues, i, adjustedSampleIndex, 2)
+    viper.server.scheduleSnapshot(serverValues, i, adjustedSampleIndex, 1, sessionId)
+    viper.server.scheduleSnapshot(serverValues, i, adjustedSampleIndex, 2, sessionId)
   }
 }
 
-viper.server.getBreakpointImageFile <- function (serverValues, sampleIndex, breakpointIndex) {
+viper.server.getBreakpointImageFile <- function (serverValues, sampleIndex, breakpointIndex, sessionId) {
 
   id <- serverValues$currentFilteredCall$id
   sample <- unique(serverValues$currentAnalysisCalls$sample)[sampleIndex]
 
-  snapshotKey <- viper.server.getSnapshotKey(id, sample, breakpointIndex)
+  snapshotKey <- viper.server.getSnapshotKey(id, sample, breakpointIndex, sessionId)
   scheduledSnapshot <- serverValues$schedule[[snapshotKey]]
 
   if (!is.null(scheduledSnapshot) && scheduledSnapshot$complete) {
@@ -259,10 +259,10 @@ viper.server.updateSnapshotStatus <- function (serverValues) {
    }
 }
 
-viper.server.updateBreakpointImageFile <- function (serverValues, sampleIndex) {
+viper.server.updateBreakpointImageFile <- function (serverValues, sampleIndex, sessionId) {
 
-  imageFile1 <- viper.server.getBreakpointImageFile(serverValues, sampleIndex, 1)
-  imageFile2 <- viper.server.getBreakpointImageFile(serverValues, sampleIndex, 2)
+  imageFile1 <- viper.server.getBreakpointImageFile(serverValues, sampleIndex, 1, sessionId)
+  imageFile2 <- viper.server.getBreakpointImageFile(serverValues, sampleIndex, 2, sessionId)
 
   if (serverValues$breakpointImageFile1 != imageFile1) {
     serverValues$breakpointImageFile1 <- imageFile1
@@ -283,6 +283,8 @@ viper.server.updateCurrentVariantSelection <- function (serverValues, svIndex) {
 # Define server logic required to summarize and view the selected
 # dataset
 shinyServer(function(input, output, session) {
+
+  sessionId <- UUIDgenerate()
 
   viper.server.loadExistingDecisions()
 
@@ -359,8 +361,8 @@ shinyServer(function(input, output, session) {
 
   observe({ serverValues$filteredData <- viper.server.applyFilters(input) })
   observe({ viper.server.updateCurrentVariantSelection(serverValues, input$svIndex)})
-  observe({ viper.server.updateBreakpointImageFile(serverValues, input$sampleIndex) })
-  observe({ viper.server.updateSnapshotStatus(serverValues); invalidateLater(1000)},          priority = -1)
-  observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex, input$sampleIndex) }, priority = -2)
+  observe({ viper.server.updateBreakpointImageFile(serverValues, input$sampleIndex, sessionId) })
+  observe({ viper.server.updateSnapshotStatus(serverValues); invalidateLater(1000)},                     priority = -1)
+  observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex, input$sampleIndex, sessionId) }, priority = -2)
 
 })
