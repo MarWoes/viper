@@ -280,22 +280,9 @@ viper.server.updateCurrentVariantSelection <- function (serverValues, svIndex) {
   serverValues$currentAnalysisCalls <- viper.global.analysisData[unlist(serverValues$currentFilteredCall$relatedCalls),]
 }
 
-viper.server.cleanup <- function (serverValues) {
-
-  # close igv
-  viper.global.igvWorker$sendCommands("exit")
-
-  # close igv socket
-  viper.global.igvWorker$stop()
-
-  # remove all temporary image files
-  system("rm /tmp/VAR*.png")
-}
-
 # Define server logic required to summarize and view the selected
 # dataset
 shinyServer(function(input, output, session) {
-
 
   viper.server.loadExistingDecisions()
 
@@ -376,6 +363,4 @@ shinyServer(function(input, output, session) {
   observe({ viper.server.updateSnapshotStatus(serverValues); invalidateLater(1000)},          priority = -1)
   observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex, input$sampleIndex) }, priority = -2)
 
-
-  session$onSessionEnded(function (...) { viper.server.cleanup(serverValues); stopApp()})
 })

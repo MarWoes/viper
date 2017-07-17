@@ -1,6 +1,7 @@
 library("DT")
 library("data.table")
 library("digest")
+library("subprocess")
 
 source("util/util.R")
 source("staticHandlingHack.R")
@@ -24,6 +25,7 @@ viper.global.scheduleKeepIndex <- 100
 viper.global.fastaRefDir  <- dirname(viper.global.fastaRef)
 viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
+viper.global.xvfbWorker    <- spawn_process("/usr/bin/Xvfb", arguments = c(":4347", "-screen", "0,", "1280x1680x24"))
 viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvJar, config$igvPort, config$fastaRef)
 
 viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)

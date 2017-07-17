@@ -1,21 +1,20 @@
 # Generate an IGV batch script from filtered sv calls
 suppressPackageStartupMessages(library(Biostrings))
 suppressPackageStartupMessages(library(R6))
-suppressPackageStartupMessages(library(future))
 suppressPackageStartupMessages(library(uuid))
-
-plan(multiprocess)
+suppressPackageStartupMessages(library(subprocess))
 
 viper.igv.RemoteIGV <-
   R6Class("viper.igv.RemoteIGV",
 
           public = list(
 
-            initialize = function (igvJar, igvPort, fastaRef) {
+            initialize = function (igvJar, igvPort, fastaRef, xvfbDisplay = 4347) {
 
               private$igvJar   <- igvJar
               private$igvPort  <- igvPort
               private$fastaRef <- fastaRef
+              private$xvfbDisplay <- xvfbDisplay
 
             },
 
@@ -27,31 +26,29 @@ viper.igv.RemoteIGV <-
               private$establishSocketConnection()
             },
 
-            stop = function (attempts = 120) {
+            stop = function () {
 
-              if (is.null(private$igvSocket)) return(warning("[WARNING] IGV socket connection has not been established."))
+              if (is.null(private$igvSocket)) {
 
-              self$sendCommands("exit")
+                warning("[WARNING] IGV socket connection has not been established.")
 
-              attempt <- 0
-              while (!is.null(private$igvSocket)) {
+              } else {
 
-                attempt <- attempt + 1
+                close(private$igvSocket)
+                private$igvSocket <- NULL
 
-                if (attempt > attempts) {
-                  warning("[WARNING] IGV did not shutdown in time, quitting anyway.")
-                  break
-                }
-
-
-                private$igvSocket <- private$openSocket()
-                Sys.sleep(1)
-
-                if (!is.null(private$igvSocket)) {
-                  close(private$igvSocket)
-                }
               }
 
+              if (is.null(private$igvHandle)) {
+
+                warning("[WARNING] IGV process has not been started.")
+
+              } else {
+
+                process_terminate(private$igvHandle)
+                private$igvHandle <- NULL
+
+              }
             },
 
             isIdle = function () {
@@ -61,6 +58,8 @@ viper.igv.RemoteIGV <-
             updatePendingCommands = function () {
 
               if (self$isIdle()) return(character(0))
+
+              cat(process_read(private$igvHandle)$stderr)
 
               igvResponse <- readLines(con = private$igvSocket)
               commandsExecuted <- length(igvResponse)
@@ -116,9 +115,11 @@ viper.igv.RemoteIGV <-
 
           private = list(
             igvPort   = NULL,
+            igvHandle = NULL,
             igvSocket = NULL,
             igvJar    = NULL,
             fastaRef  = NULL,
+            xvfbDisplay = NULL,
 
             pendingCommands = list(),
 
@@ -169,19 +170,12 @@ viper.igv.RemoteIGV <-
 
             startWorker = function (ignoreOutput = FALSE) {
 
-              command <- paste(
-                "xvfb-run",
-                "-a --server-args=\"-screen 0, 1280x1680x24\" java -jar",
-                private$igvJar,
-                "-p", private$igvPort,
-                "-g", private$fastaRef,
-                "-o", "igv/igv.properties")
-
-              # This deferral to futures is necessary since xvfb-run (which needs xauth) does not work
-              # from system calls within rstudio's console for some reason
-              process %<-% {
-                system(command, ignore.stdout = ignoreOutput)
-              }
+              private$igvHandle <- spawn_process("/usr/bin/java", arguments = c(
+                "-jar", private$igvJar,
+                "-p",   private$igvPort,
+                "-g",   private$fastaRef,
+                "-o",   "igv/igv.properties"
+              ), workdir = getwd(), environment = sprintf("DISPLAY=:%i", private$xvfbDisplay))
             }
           )
   )
