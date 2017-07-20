@@ -7,8 +7,9 @@ viper.startWrapper.startViper <- function () {
     alignmentDir = "/mnt/home2/share/Analyses/Nijmegen_MDS_sequencing/MDS-Triage/Netherlands_illumina_1/alignment2/alignment/",
     fastaRef = "/mnt/home2/share/Genomes/Homo_sapiens.GRCh37.67/Homo_sapiens.GRCh37.67.dna.chromosome.all.fasta",
     igvJar = "/mnt/home2/marw/igv/igv.jar",
-    variantsFile = "/mnt/home2/marw/results/all_analysis.csv",
-    igvPort = 9090
+    variantsFile = "/mnt/home2/marw/results-unit-test/all_analysis.csv",
+    igvPort = 9090,
+    igvWorkerPort = 9091
   )
 
   on.exit({
@@ -16,7 +17,10 @@ viper.startWrapper.startViper <- function () {
     system("rm /tmp/VAR*.png")
 
     # stop igv
-    if (exists("viper.global.igvWorker")) viper.global.igvWorker$stop()
+    if (exists("viper.global.igvWorker")) {
+      evalServer(viper.global.igvWorker, viper.igv.backgroundWorker$stop())
+      close(viper.global.igvWorker)
+    }
 
     # stop xvfb
     if (exists("viper.global.xvfbWorker")) process_terminate(viper.global.xvfbWorker)

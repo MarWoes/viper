@@ -201,7 +201,14 @@ viper.server.scheduleSnapshot <- function (serverValues, svIndex, sampleIndex, b
     complete  = FALSE
   )
 
-  viper.global.igvWorker$snapshot(sprintf("%s/%s.bam", viper.global.alignmentDir, sample), imageFile, chr, pos, snapshotKey)
+  evalServer(viper.global.igvWorker, bamFile, sprintf("%s/%s.bam", viper.global.alignmentDir, sample))
+  evalServer(viper.global.igvWorker, imageFile, imageFile)
+  evalServer(viper.global.igvWorker, chr, chr)
+  evalServer(viper.global.igvWorker, pos, pos)
+  evalServer(viper.global.igvWorker, snapshotKey, snapshotKey)
+
+  evalServer(viper.global.igvWorker, viper.igv.backgroundWorker$snapshot(bamFile, imageFile, chr, pos, snapshotKey))
+
 
 }
 
@@ -240,7 +247,7 @@ viper.server.getBreakpointImageFile <- function (serverValues, sampleIndex, brea
 
 viper.server.updateSnapshotStatus <- function (serverValues) {
 
-  snapshotKeys <- viper.global.igvWorker$updatePendingCommands()
+  snapshotKeys <- evalServer(viper.global.igvWorker, viper.igv.backgroundWorker$updateCommandQueue())
 
   for (snapshotKey in snapshotKeys) {
 
@@ -249,9 +256,9 @@ viper.server.updateSnapshotStatus <- function (serverValues) {
     serverValues$schedule[[snapshotKey]]$complete <- TRUE
   }
 
-  serverValues$igvIdle <- viper.global.igvWorker$isIdle()
+  serverValues$igvIdle <- evalServer(viper.global.igvWorker, viper.igv.backgroundWorker$isIdle())
 
-   # Limit schedule size to speedup scheduling and the likes
+   #Limit schedule size to speedup scheduling and the likes
    if (length(serverValues$schedule) > viper.global.maxScheduleSize) {
 
      serverValues$schedule <- serverValues$schedule[-(1:viper.global.scheduleKeepIndex)]

@@ -26,7 +26,6 @@ viper.global.fastaRefDir  <- dirname(viper.global.fastaRef)
 viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
 viper.global.xvfbWorker    <- spawn_process("/usr/bin/Xvfb", arguments = c(":4347", "-screen", "0,", "1280x1680x24"))
-viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvJar, config$igvPort, config$fastaRef)
 
 viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)
 viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysisData, 3)
@@ -34,9 +33,7 @@ viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysi
 viper.global.loadingImagePath <- "www/images/loading.svg"
 viper.global.analysisHash <- digest(viper.global.analysisData$bp1)
 
-# Wait for server to start
-viper.global.igvWorker$start()
-viper.global.igvWorker$setupViewer()
+viper.global.igvWorker     <- viper.igv.startAsBackgroundServer(config)
 
 viper.global.filters <- list(
   tool = list(
