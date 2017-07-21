@@ -19,7 +19,6 @@ viper.ui.rangeInput <- function (filterCol, caption, columnValues) {
 
   lower <- floor(min(columnValues))
   upper <- ceiling(max(columnValues))
-
   uiElement <- sliderInput(paste(filterCol, "Filter", sep = ""),
                            min = lower,
                            max = upper,

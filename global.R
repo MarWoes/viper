@@ -27,7 +27,7 @@ viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
 viper.global.xvfbWorker    <- spawn_process("/usr/bin/Xvfb", arguments = c(":4347", "-screen", "0,", "1280x1680x24"))
 viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvJar, config$igvPort, config$fastaRef)
-viper.global.igvWorker$startWorker()
+viper.global.igvWorker$startWorker(TRUE)
 
 viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)
 viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysisData, 3)
@@ -38,8 +38,44 @@ viper.global.igvWorker$setupViewer()
 viper.global.loadingImagePath <- "www/images/loading.svg"
 viper.global.analysisHash <- digest(viper.global.analysisData$bp1)
 
+viper.global.filters <- lapply(colnames(viper.global.analysisData), function (columnName) {
 
-viper.global.filters <- list(
+  if (columnName %in% c("sample", "svType", "chr1", "chr2", "bp1", "bp2")) return(NULL)
+
+  columnValues <- unique(na.omit(viper.global.analysisData[[columnName]]))
+  containsNA <- any(is.na(columnValues))
+
+  label <- paste(columnName, ":", sep = "")
+
+  if (is.numeric(columnValues)) {
+    return(list(
+      type      = "range",
+      includeNA = containsNA,
+      label     = label,
+      values    = columnValues,
+      filterFn  = util.isInInterval
+    ))
+  }
+
+  if (is.character(columnValues)) {
+
+    return(list(
+      type      = "checkboxes",
+      includeNA = containsNA,
+      label     = label,
+      values    = unique(na.omit(unlist(strsplit(columnValues, ",")))),
+      filterFn  = function (column, selected) grepl(paste(selected, collapse = "|"), column)
+    ))
+
+  }
+
+  return(NULL)
+})
+
+names(viper.global.filters) <- colnames(viper.global.analysisData)
+viper.global.filters <- viper.global.filters[!sapply(viper.global.filters, function (filter) is.null(filter))]
+
+list(
   tool = list(
     type      = "checkboxes",
     label     = "Tools:",
