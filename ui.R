@@ -69,7 +69,17 @@ viper.ui.filteringCriteriaInputs <- function () {
     return(uiElements)
   })
 
-  return(filterUIElements)
+  numCols <- 3
+  # show 3 columns for filters
+  splitElements <- split(filterUIElements, ceiling(numCols * seq_along(filterUIElements) / length(filterUIElements) ))
+
+  columnElements <- fluidRow(
+    column(4, splitElements[[1]]),
+    column(4, splitElements[[2]]),
+    column(4, splitElements[[3]])
+  )
+
+  return(columnElements)
 }
 
 # Define UI for dataset viewer application
@@ -113,6 +123,7 @@ shinyUI(navbarPage(
         uiOutput("sampleChoice"),
 
         hr(),
+
         h5("Variant details:"),
         tableOutput("currentVariantRow")
 
@@ -142,18 +153,19 @@ shinyUI(navbarPage(
     )
   ),
   tabPanel("Filtering",
-           h3("Filtering Criteria:"),
-           hr(),
-
-           viper.ui.filteringCriteriaInputs(),
-
-           hr(),
 
            DT::dataTableOutput("filteredDataDT"),
 
            hr(),
 
-           h4("Export as .xlsx file:")
+           h3("Filtering Criteria:"),
+           br(),
+
+           viper.ui.filteringCriteriaInputs(),
+
+           hr()
+
+           #h4("Export as .xlsx file:")
 
            # bsButton("saveXLSX", label = "Save as XLSX", style = "success")
   )
