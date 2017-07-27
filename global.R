@@ -69,7 +69,9 @@ viper.global.filters <- lapply(colnames(viper.global.analysisData), function (co
   if (is.character(columnValues)) {
 
     filter$values   <- unique(na.omit(unlist(strsplit(columnValues, viper.global.columnSep))))
+
     filter$type     <- ifelse(length(filter$values) > viper.global.selectizeThreshhold, "selectize", "checkboxes")
+
     filter$filterFn <- function (column, selected) {
 
       if (is.null(selected)) return(rep(TRUE, length(column)))
@@ -84,61 +86,14 @@ viper.global.filters <- lapply(colnames(viper.global.analysisData), function (co
 })
 
 names(viper.global.filters) <- colnames(viper.global.analysisData)
-viper.global.filters <- viper.global.filters[!sapply(viper.global.filters, function (filter) is.null(filter))]
-
-list(
-  tool = list(
-    type      = "checkboxes",
-    label     = "Tools:",
-    filterFn  = function (column, selected) grepl(paste(selected, collapse = "|"), column),
-    values    = unique(viper.global.analysisData$tool)
-  ),
-  svType = list(
-    type      = "checkboxes",
-    label     = "Types:",
-    filterFn  = `%in%`
-  ),
-  decision = list(
-    type      = "checkboxes",
-    includeNA = TRUE,
-    label     = "Decision:",
-    values    = c("maybe", "approved", "declined"),
-    filterFn  = `%in%`
-  ),
-  supporting = list(
-    type      = "range",
-    includeNA = TRUE,
-    label     = "Supporting:",
-    filterFn  = util.isInInterval
-  ),
-  maxBaseBalance = list(
-    type      = "range",
-    label     = "Max Base balance:",
-    filterFn  = util.isInInterval
-  ),
-  numCalls = list(
-    type      = "range",
-    label     = "No. Samples:",
-    filterFn  = util.isInInterval
-  ),
-  cov1 = list(
-    type   = "range",
-    label  = "Coverage (bp1):" ,
-    filterFn = util.isInInterval
-  ),
-  cov2 = list(
-    type   = "range",
-    label  = "Coverage (bp2):" ,
-    filterFn = util.isInInterval
-  ),
-  genes = list(
-    type      = "selectize",
-    label     = "Genes:",
-    includeNA = TRUE,
-    values    = unique(na.omit(unlist(strsplit(viper.global.analysisData$genes, ",")))),
-    filterFn  = function (column, selected) is.null(selected) | grepl(paste(selected, collapse = "|"), column)
-  )
+viper.global.filters$decision <- list(
+  type      = "checkboxes",
+  includeNA = TRUE,
+  label     = "decision:",
+  values    = c("maybe", "approved", "declined"),
+  filterFn  = `%in%`
 )
+viper.global.filters <- viper.global.filters[!sapply(viper.global.filters, function (filter) is.null(filter))]
 
 addResourcePath("alignment", viper.global.alignmentDir)
 addResourcePath("genomes", viper.global.fastaRefDir)
