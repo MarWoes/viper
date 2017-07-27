@@ -115,6 +115,7 @@ shinyUI(navbarPage(
         textOutput("progress"),
 
         bsButton("saveVariants", label = "Save"),
+        bsButton("debugBrowser", label = "Call browser()"),
 
         hr(),
 

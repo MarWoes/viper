@@ -32,7 +32,8 @@ viper.igv.RemoteIGV <-
                       "-p",   private$igvPort,
                       "-g",   private$fastaRef,
                       "-o",   "igv/igv.properties"),
-                wait = FALSE
+                wait = FALSE,
+                ignore.stdout = ignoreOutput
               )
 
             },

@@ -358,11 +358,12 @@ shinyServer(function(input, output, session) {
   observeEvent(input$maybeVariant,   { viper.server.handleVariantDecisionButtonClick(serverValues, input, "maybe"   , session) })
   observeEvent(input$approveVariant, { viper.server.handleVariantDecisionButtonClick(serverValues, input, "approved", session) })
   observeEvent(input$saveVariants,   { viper.server.handleVariantSaveButtonClick(serverValues) })
+  observeEvent(input$debugBrowser,   { browser() })
   # observeEvent(input$saveXLSX,  { viper.server.handleXLSXExportClick(serverValues) })
 
   observe({ serverValues$filteredData <- viper.server.applyFilters(input) })
-  observe({ viper.server.updateCurrentVariantSelection(serverValues, input$svIndex)})
-  observe({ viper.server.updateBreakpointImageFile(serverValues, input$sampleIndex, sessionId) })
+  observe({ viper.server.updateCurrentVariantSelection(serverValues, input$svIndex)},                    priority =  1)
+  observe({ viper.server.updateBreakpointImageFile(serverValues, input$sampleIndex, sessionId) },        priority =  1)
   observe({ viper.server.updateSnapshotStatus(serverValues); invalidateLater(1000)},                     priority = -1)
   observe({ viper.server.scheduleSnapshots(serverValues, input$svIndex, input$sampleIndex, sessionId) }, priority = -2)
 

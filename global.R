@@ -21,6 +21,7 @@ viper.global.fastaRef          <- config$fastaRef
 viper.global.analysisDataFile  <- config$variantsFile
 viper.global.maxScheduleSize   <- 200
 viper.global.scheduleKeepIndex <- 100
+viper.global.selectizeThreshhold <- 10
 
 viper.global.fastaRefDir  <- dirname(viper.global.fastaRef)
 viper.global.fastaRefBase <- basename(viper.global.fastaRef)
@@ -32,6 +33,8 @@ viper.global.igvWorker$startWorker(TRUE)
 viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)
 viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysisData, 3)
 
+viper.global.columnSep <- ","
+
 viper.global.igvWorker$start()
 viper.global.igvWorker$setupViewer()
 
@@ -40,36 +43,44 @@ viper.global.analysisHash <- digest(viper.global.analysisData$bp1)
 
 viper.global.filters <- lapply(colnames(viper.global.analysisData), function (columnName) {
 
-  if (columnName %in% c("sample", "svType", "chr1", "chr2", "bp1", "bp2")) return(NULL)
+  columnValues <- viper.global.analysisData[[columnName]]
 
-  columnValues <- unique(na.omit(viper.global.analysisData[[columnName]]))
+  if (all(is.na(columnValues))) return(NULL)
+
   containsNA <- any(is.na(columnValues))
+
+  columnValues <- unique(na.omit(columnValues))
 
   label <- paste(columnName, ":", sep = "")
 
+  filter <- list(
+    includeNA = containsNA,
+    label     = label
+  )
+
   if (is.numeric(columnValues)) {
-    return(list(
-      type      = "range",
-      includeNA = containsNA,
-      label     = label,
-      values    = columnValues,
-      filterFn  = util.isInInterval
-    ))
+
+    filter$type     <- "range"
+    filter$values   <- columnValues
+    filter$filterFn <- util.isInInterval
+
   }
 
   if (is.character(columnValues)) {
 
-    return(list(
-      type      = "checkboxes",
-      includeNA = containsNA,
-      label     = label,
-      values    = unique(na.omit(unlist(strsplit(columnValues, ",")))),
-      filterFn  = function (column, selected) grepl(paste(selected, collapse = "|"), column)
-    ))
+    filter$values   <- unique(na.omit(unlist(strsplit(columnValues, viper.global.columnSep))))
+    filter$type     <- ifelse(length(filter$values) > viper.global.selectizeThreshhold, "selectize", "checkboxes")
+    filter$filterFn <- function (column, selected) {
+
+      if (is.null(selected)) return(rep(TRUE, length(column)))
+
+      splitValues <- strsplit(column, viper.global.columnSep)
+      return(sapply(splitValues, function (vals) any(vals %in% selected)))
+    }
 
   }
 
-  return(NULL)
+  return(filter)
 })
 
 names(viper.global.filters) <- colnames(viper.global.analysisData)
