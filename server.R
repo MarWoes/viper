@@ -76,7 +76,7 @@ viper.server.handleVariantDecisionButtonClick <- function (serverValues, input, 
 
   preFilterSize <- nrow(serverValues$filteredData)
 
-  serverValues$filteredData <- viper.server.applyFilters(input, viper.global.filters["decision"])
+  serverValues$filteredData <- viper.server.applyFilters(input, viper.global.filters["decision"], serverValues$filteredData)
 
   postFilterSize <- nrow(serverValues$filteredData)
 
@@ -134,9 +134,7 @@ viper.server.applyFilter <- function (filterInput, filterNAInput, filterColumn, 
   return(filterInfo$filterFn(filterColumn,filterInput) | naFilter )
 }
 
-viper.server.applyFilters <- function (input, filters = viper.global.filters) {
-
-  unfilteredData <- viper.global.clusteredData
+viper.server.applyFilters <- function (input, filters = viper.global.filters, unfilteredData = viper.global.clusteredData) {
 
   # Create a matrix with each row representing a call from the unfiltered data.
   # Every column is the result of a single filter being applied to a specific column

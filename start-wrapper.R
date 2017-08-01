@@ -4,10 +4,10 @@ viper.startWrapper.startViper <- function () {
 
   VIPER_ARGS <<- list(
     workDir = "/mnt/home2/marw/results/",
-    alignmentDir = "/mnt/home2/share/Analyses/Nijmegen_MDS_sequencing/MDS-Triage/Netherlands_illumina_1/alignment2/alignment/",
+    alignmentDir = "/mnt/ssd/marw/mtdna/",
     fastaRef = "/mnt/home2/share/Genomes/Homo_sapiens.GRCh37.67/Homo_sapiens.GRCh37.67.dna.chromosome.all.fasta",
     igvJar = "/mnt/home2/marw/igv/igv.jar",
-    variantsFile = "/mnt/home2/marw/results/all_analysis.csv",
+    variantsFile = "/mnt/home2/marw/results-mtdna/all_analysis.bkp.csv",
     igvPort = 9090
   )
 

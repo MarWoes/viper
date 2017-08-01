@@ -28,7 +28,7 @@ viper.global.fastaRefBase <- basename(viper.global.fastaRef)
 
 viper.global.xvfbWorker    <- spawn_process("/usr/bin/Xvfb", arguments = c(":4347", "-screen", "0,", "1280x1680x24"))
 viper.global.igvWorker     <- viper.igv.RemoteIGV$new(config$igvJar, config$igvPort, config$fastaRef)
-viper.global.igvWorker$startWorker(TRUE)
+viper.global.igvWorker$startWorker()
 
 viper.global.analysisData  <- fread(viper.global.analysisDataFile, data.table = FALSE, stringsAsFactors = FALSE)
 viper.global.clusteredData <- viper.clustering.clusterInput(viper.global.analysisData, 3)
@@ -58,6 +58,12 @@ viper.global.filters <- lapply(colnames(viper.global.analysisData), function (co
     label     = label
   )
 
+  if (is.logical(columnValues)) {
+    filter$type     <- "checkboxes"
+    filter$values   <- columnValues
+    filter$filterFn <- `%in%`
+  }
+
   if (is.numeric(columnValues)) {
 
     filter$type     <- "range"
@@ -79,7 +85,6 @@ viper.global.filters <- lapply(colnames(viper.global.analysisData), function (co
       splitValues <- strsplit(column, viper.global.columnSep)
       return(sapply(splitValues, function (vals) any(vals %in% selected)))
     }
-
   }
 
   return(filter)
@@ -92,6 +97,12 @@ viper.global.filters$decision <- list(
   label     = "decision:",
   values    = c("maybe", "approved", "declined"),
   filterFn  = `%in%`
+)
+viper.global.filters$numCalls <- list(
+  type      = "range",
+  label     = "numCalls:",
+  values    = unique(viper.global.clusteredData$numCalls),
+  filterFn  = util.isInInterval
 )
 viper.global.filters <- viper.global.filters[!sapply(viper.global.filters, function (filter) is.null(filter))]
 
