@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+/.nb-gradle/
+/.gradle/
+/build/
+/public/bower_components

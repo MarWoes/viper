@@ -1,0 +1,7 @@
+/* see https://angular-ui.github.io/bootstrap/ */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+#viper-logo {
+  margin-top: -10px;
+  margin-left: -10px;
+}
