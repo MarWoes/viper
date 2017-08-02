@@ -23,6 +23,9 @@
 
 package de.imi.marw.main;
 
+import de.imi.marw.variants.table.CsvTableReader;
+import de.imi.marw.variants.table.VariantTable;
+
 
 public class ViperMain {
 
@@ -30,6 +33,14 @@ public class ViperMain {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+        CsvTableReader rd = new CsvTableReader("/home/marius/workspace/sftp/results/all_analysis.csv", ';', ",");
+
+        VariantTable tab = rd.readTable();
+        System.out.println(System.currentTimeMillis() - start);
+        System.out.println(tab.getCall(0));
+
+
 //        port(8090);
 //
 //        staticFiles.externalLocation("public");

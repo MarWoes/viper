@@ -24,6 +24,7 @@ package de.imi.marw.variants;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  *
@@ -49,6 +50,36 @@ public class VariantCall {
         return filters
                 .stream()
                 .allMatch((filter) -> filter.isPassing(this));
+    }
+
+    @Override
+    public String toString() {
+        return properties.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + Objects.hashCode(this.properties);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final VariantCall other = (VariantCall) obj;
+        if (!Objects.equals(this.properties, other.properties)) {
+            return false;
+        }
+        return true;
     }
 
 }

@@ -20,18 +20,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants;
+package de.imi.marw.variants.table;
 
 /**
  *
  * @author marius
  */
-public enum VariantPropertyType {
-
-    STRING,
-    NUMERIC,
-
-    STRING_COLLECTION,
-    NUMERIC_COLLECTION
-
+public interface TableReader {
+    VariantTable readTable();
 }

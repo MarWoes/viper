@@ -23,6 +23,7 @@
 package de.imi.marw.variants;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  *
@@ -63,12 +64,6 @@ public final class VariantProperty {
 
     public void setValue(Object newValue) {
         switch (type) {
-            case BOOLEAN:
-                checkCorrectType(newValue, Boolean.class);
-                break;
-            case BOOLEAN_COLLECTION:
-                checkCorrectCollectionType(newValue, Boolean.class);
-                break;
             case STRING:
                 checkCorrectType(newValue, String.class);
                 break;
@@ -86,5 +81,39 @@ public final class VariantProperty {
         }
 
         this.propertyValue = newValue;
+    }
+
+    @Override
+    public String toString() {
+        return propertyValue.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + Objects.hashCode(this.type);
+        hash = 47 * hash + Objects.hashCode(this.propertyValue);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final VariantProperty other = (VariantProperty) obj;
+        if (this.type != other.type) {
+            return false;
+        }
+        if (!Objects.equals(this.propertyValue, other.propertyValue)) {
+            return false;
+        }
+        return true;
     }
 }
