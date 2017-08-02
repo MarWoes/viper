@@ -19,21 +19,36 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
-*/
+ */
+package de.imi.marw.variants;
 
-package de.imi.marw.main;
+import java.util.Collection;
+import java.util.Map;
 
+/**
+ *
+ * @author marius
+ */
+public class VariantCall {
 
-public class ViperMain {
+    private final Map<String, VariantProperty> properties;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-//        port(8090);
-//
-//        staticFiles.externalLocation("public");
-//
-//        init();
+    public VariantCall(Map<String, VariantProperty> properties) {
+        this.properties = properties;
     }
+
+    public Map<String, VariantProperty> getProperties() {
+        return properties;
+    }
+
+    public VariantProperty getProperty(String propertyName) {
+        return properties.get(propertyName);
+    }
+
+    public boolean isPassingFilters(Collection<VariantCallFilter> filters) {
+        return filters
+                .stream()
+                .allMatch((filter) -> filter.isPassing(this));
+    }
+
 }

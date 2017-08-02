@@ -19,21 +19,15 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
-*/
+ */
+package de.imi.marw.variants;
 
-package de.imi.marw.main;
+/**
+ *
+ * @author marius
+ */
+public interface VariantCallFilter {
 
+    boolean isPassing(VariantCall call);
 
-public class ViperMain {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-//        port(8090);
-//
-//        staticFiles.externalLocation("public");
-//
-//        init();
-    }
 }

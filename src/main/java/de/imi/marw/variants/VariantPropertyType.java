@@ -19,21 +19,21 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
-*/
+ */
+package de.imi.marw.variants;
 
-package de.imi.marw.main;
+/**
+ *
+ * @author marius
+ */
+public enum VariantPropertyType {
 
+    STRING,
+    NUMERIC,
+    BOOLEAN,
 
-public class ViperMain {
+    STRING_COLLECTION,
+    NUMERIC_COLLECTION,
+    BOOLEAN_COLLECTION
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-//        port(8090);
-//
-//        staticFiles.externalLocation("public");
-//
-//        init();
-    }
 }
