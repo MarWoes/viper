@@ -56,17 +56,20 @@ public class CsvTableReader implements TableReader {
 
     private VariantPropertyType determineType(List<String> columnValues) {
 
+        String doubleRegex = "(NA|(" + Util.FP_REGEX + "))";
+        
         boolean isNumericColumn = columnValues.stream()
-                .allMatch((str) -> str.matches(Util.FP_REGEX));
+                .allMatch((str) -> str.matches(doubleRegex));
 
         if (isNumericColumn) {
             return VariantPropertyType.NUMERIC;
         }
 
-        String numericCollectionRegex = "(" + Util.FP_REGEX + ")" + this.propertyDelimiter + "(" + Util.FP_REGEX + ")*";
+        String numericCollectionRegex = doubleRegex + "(" + this.propertyDelimiter + "\\s*" + doubleRegex + ")*";
 
         boolean isNumericCollectionColumn = columnValues.stream()
                 .allMatch((str) -> str.matches(numericCollectionRegex));
+
 
         if (isNumericCollectionColumn) {
             return VariantPropertyType.NUMERIC_COLLECTION;
@@ -84,11 +87,11 @@ public class CsvTableReader implements TableReader {
 
     private VariantPropertyType[] determineTypes(List<String[]> stringTable) {
 
-        VariantPropertyType[] types = IntStream.range(0, stringTable.size()).boxed()
+        VariantPropertyType[] types = IntStream.range(0, stringTable.get(0).length).boxed()
                 .map((i) -> {
 
                     List<String> singlePropertyValues = stringTable.stream()
-                            .map((rowValues) -> i >= rowValues.length ? "" : rowValues[i])
+                            .map((rowValues) -> rowValues[i])
                             .collect(Collectors.toList());
 
                     return singlePropertyValues;
@@ -98,17 +101,25 @@ public class CsvTableReader implements TableReader {
 
         return types;
     }
+    
+    private Double parseDouble (String str) {
+        if (str.equals("NA")) {
+            return Double.NaN;
+        } else {
+            return Double.parseDouble(str);
+        }
+    }
 
     private Object parseProperty(VariantPropertyType type, String rawValue) {
         switch (type) {
             case NUMERIC:
-                return (Double.parseDouble(rawValue));
+                return parseDouble(rawValue);
             case STRING:
                 return rawValue;
             case NUMERIC_COLLECTION:
 
                 Collection<Double> numbers = Arrays.stream(rawValue.split(this.propertyDelimiter))
-                        .map(Double::parseDouble)
+                        .map(this::parseDouble)
                         .collect(Collectors.toList());
 
                 return (numbers);
@@ -136,7 +147,7 @@ public class CsvTableReader implements TableReader {
 
     private List<VariantCall> parseVariantCalls(String[] colNames, List<String[]> colValues) {
         VariantPropertyType[] types = determineTypes(colValues);
-
+        System.out.println(Arrays.toString(types));
         List<VariantCall> calls = colValues.stream()
                 .map((rowValues) -> parseVariantCall(colNames, rowValues, types))
                 .collect(Collectors.toList());
@@ -149,6 +160,7 @@ public class CsvTableReader implements TableReader {
         try (CSVReader reader = new CSVReader(new FileReader(this.fileName), this.csvDelimiter)) {
 
             String[] header = reader.readNext();
+            System.out.println(Arrays.toString(header));
             List<String[]> rawData = reader.readAll();
 
             List<VariantCall> parsedCalls = parseVariantCalls(header, rawData);

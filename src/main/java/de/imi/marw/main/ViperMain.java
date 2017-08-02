@@ -25,6 +25,7 @@ package de.imi.marw.main;
 
 import de.imi.marw.variants.table.CsvTableReader;
 import de.imi.marw.variants.table.VariantTable;
+import java.io.IOException;
 
 
 public class ViperMain {
@@ -32,10 +33,10 @@ public class ViperMain {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         long start = System.currentTimeMillis();
-        CsvTableReader rd = new CsvTableReader("/home/marius/workspace/sftp/results/all_analysis.csv", ';', ",");
-
+        CsvTableReader rd = new CsvTableReader("/home/marius/workspace/sftp/results-france1/all_analysis.csv", ';', ",");
+        System.in.read();
         VariantTable tab = rd.readTable();
         System.out.println(System.currentTimeMillis() - start);
         System.out.println(tab.getCall(0));
