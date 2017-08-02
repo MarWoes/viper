@@ -58,4 +58,5 @@ repositories {
 
 dependencies {
     compile "com.sparkjava:spark-core:2.6.0"
+    compile group: 'net.sf.opencsv', name: 'opencsv', version: '2.3'
 }

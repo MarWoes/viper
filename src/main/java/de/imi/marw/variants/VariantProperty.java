@@ -44,7 +44,7 @@ public final class VariantProperty {
         return this.type;
     }
 
-    public Object getPropertyValue() {
+    public Object getValue() {
         return propertyValue;
     }
 

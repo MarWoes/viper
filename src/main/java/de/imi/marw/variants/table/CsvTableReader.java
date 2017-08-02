@@ -57,7 +57,7 @@ public class CsvTableReader implements TableReader {
     private VariantPropertyType determineType(List<String> columnValues) {
 
         String doubleRegex = "(NA|(" + Util.FP_REGEX + "))";
-        
+
         boolean isNumericColumn = columnValues.stream()
                 .allMatch((str) -> str.matches(doubleRegex));
 
@@ -69,7 +69,6 @@ public class CsvTableReader implements TableReader {
 
         boolean isNumericCollectionColumn = columnValues.stream()
                 .allMatch((str) -> str.matches(numericCollectionRegex));
-
 
         if (isNumericCollectionColumn) {
             return VariantPropertyType.NUMERIC_COLLECTION;
@@ -101,8 +100,8 @@ public class CsvTableReader implements TableReader {
 
         return types;
     }
-    
-    private Double parseDouble (String str) {
+
+    private Double parseDouble(String str) {
         if (str.equals("NA")) {
             return Double.NaN;
         } else {
