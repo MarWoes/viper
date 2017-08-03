@@ -57,7 +57,7 @@ public final class VariantProperty {
     }
 
     private void checkCorrectType(Object value, Class someClass) {
-        if (!someClass.isInstance(value)) {
+        if (value != null && !someClass.isInstance(value)) {
             throw new IllegalPropertyValueException(type, value, someClass);
         }
     }
@@ -85,7 +85,7 @@ public final class VariantProperty {
 
     @Override
     public String toString() {
-        return propertyValue.toString();
+        return this.propertyValue == null ? "null" : propertyValue.toString();
     }
 
     @Override

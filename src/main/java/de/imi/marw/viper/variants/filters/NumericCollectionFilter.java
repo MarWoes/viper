@@ -36,11 +36,12 @@ public class NumericCollectionFilter extends SingleColumnFilter<Collection<Doubl
         super(columnName);
         this.min = min;
         this.max = max;
+        setNullAllowed(true);
     }
 
     @Override
     protected boolean isSingleValuePassing(Collection<Double> values) {
-        return values.stream().anyMatch((val) -> val >= min && val <= max);
+        return values.stream().anyMatch((val) -> (val == null && isNullAllowed()) || (val >= min && val <= max));
     }
 
     public double getMin() {

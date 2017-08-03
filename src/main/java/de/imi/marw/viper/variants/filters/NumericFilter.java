@@ -34,6 +34,7 @@ public class NumericFilter extends SingleColumnFilter<Double> {
         super(columnName);
         this.min = min;
         this.max = max;
+        setNullAllowed(true);
     }
 
     @Override

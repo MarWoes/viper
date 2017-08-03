@@ -32,6 +32,7 @@ import de.imi.marw.viper.variants.VariantCallFilter;
 public abstract class SingleColumnFilter<T> implements VariantCallFilter {
 
     private final String columnName;
+    private boolean nullAllowed = false;
 
     public SingleColumnFilter(String columnName) {
         this.columnName = columnName;
@@ -39,9 +40,17 @@ public abstract class SingleColumnFilter<T> implements VariantCallFilter {
 
     @Override
     public boolean isPassing(VariantCall call) {
-        return (isSingleValuePassing((T) call.getProperty(columnName).getValue()));
+        T value = (T) call.getProperty(columnName).getValue();
+        return ((value == null && nullAllowed) || isSingleValuePassing(value));
     }
 
     protected abstract boolean isSingleValuePassing(T value);
 
+    public boolean isNullAllowed() {
+        return nullAllowed;
+    }
+
+    public void setNullAllowed(boolean nullAllowed) {
+        this.nullAllowed = nullAllowed;
+    }
 }

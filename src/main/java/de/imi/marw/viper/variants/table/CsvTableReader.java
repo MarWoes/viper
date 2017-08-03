@@ -103,7 +103,7 @@ public class CsvTableReader implements TableReader {
 
     private Double parseDouble(String str) {
         if (str.equals("NA")) {
-            return Double.NaN;
+            return null;
         } else {
             return Double.parseDouble(str);
         }
