@@ -43,7 +43,7 @@ public class VariantTable {
         this.calls.addAll(calls);
     }
 
-    public VariantTable filter(Collection<VariantCallFilter> filters) {
+    public synchronized VariantTable filter(Collection<VariantCallFilter> filters) {
 
         Collection<VariantCall> callsAfterFiltering = this.calls.stream()
                 .filter((call) -> call.isPassingFilters(filters))
@@ -52,11 +52,11 @@ public class VariantTable {
         return new VariantTable(callsAfterFiltering);
     }
 
-    public VariantCall getCall(int rowIndex) {
+    public synchronized VariantCall getCall(int rowIndex) {
         return this.calls.get(rowIndex);
     }
 
-    public int getNumberOfCalls() {
+    public synchronized int getNumberOfCalls() {
         return this.calls.size();
     }
 }
