@@ -77,12 +77,16 @@ public class ViperServer {
 
             int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
 
-            if (queryIndex < 0 || queryIndex >= variantTable.getNumberOfCalls()) {
-                res.status(400);
-                return "";
-            } else {
-                return variantTable.getCall(queryIndex);
-            }
+            return variantTable.getCall(queryIndex);
+
+        }, gson::toJson);
+
+        get("/api/variant-table/rows", (req, res) -> {
+
+            int from = gson.fromJson(req.queryParams("from"), Integer.class);
+            int to = gson.fromJson(req.queryParams("to"), Integer.class);
+
+            return variantTable.getCallRange(from, to);
 
         }, gson::toJson);
 

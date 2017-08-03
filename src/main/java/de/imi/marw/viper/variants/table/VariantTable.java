@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  *
@@ -57,11 +58,19 @@ public class VariantTable {
         return this.calls.get(rowIndex);
     }
 
+    public synchronized List<VariantCall> getCallRange(int lower, int upper) {
+        return IntStream
+                .range(lower, upper)
+                .boxed()
+                .map((index) -> calls.get(index))
+                .collect(Collectors.toList());
+    }
+
     public synchronized int getNumberOfCalls() {
         return this.calls.size();
     }
 
-    public List<String> getColumnNames() {
+    public synchronized List<String> getColumnNames() {
         return columnNames;
     }
 }
