@@ -1,7 +1,7 @@
 var module = angular.module('de.imi.marw.viper.inspector', [
   'de.imi.marw.viper.variant-table.service'
 ])
-.controller('InspectorCtrl', function (VariantTableService) {
+.controller('InspectorPageCtrl', function (VariantTableService) {
 
   var Ctrl = this;
 
@@ -11,7 +11,7 @@ var module = angular.module('de.imi.marw.viper.inspector', [
 
   Ctrl.init = init;
   Ctrl.onIndexChange = onIndexChange;
-  Ctrl.variantPropertyToString = variantPropertyToString;
+  Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
 
   Ctrl.init();
 
@@ -36,20 +36,6 @@ var module = angular.module('de.imi.marw.viper.inspector', [
 
   }
 
-  function variantPropertyToString (property) {
 
-    if (property.propertyValue == null) return "N/A";
-
-    if (Array.isArray(property.propertyValue)) {
-
-      var adjustedArray = property.propertyValue.map(function (value) {
-        return value == null ? "N/A" : value
-      })
-
-      return adjustedArray.join(", ");
-    }
-
-    return property.propertyValue;
-  }
 
 })

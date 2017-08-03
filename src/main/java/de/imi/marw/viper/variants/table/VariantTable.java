@@ -36,10 +36,11 @@ import java.util.stream.Collectors;
 public class VariantTable {
 
     private final List<VariantCall> calls;
+    private final List<String> columnNames;
 
-    public VariantTable(Collection<VariantCall> calls) {
+    public VariantTable(Collection<VariantCall> calls, List<String> columnNames) {
         this.calls = new ArrayList<>();
-
+        this.columnNames = columnNames;
         this.calls.addAll(calls);
     }
 
@@ -49,7 +50,7 @@ public class VariantTable {
                 .filter((call) -> call.isPassingFilters(filters))
                 .collect(Collectors.toList());
 
-        return new VariantTable(callsAfterFiltering);
+        return new VariantTable(callsAfterFiltering, columnNames);
     }
 
     public synchronized VariantCall getCall(int rowIndex) {
@@ -58,5 +59,9 @@ public class VariantTable {
 
     public synchronized int getNumberOfCalls() {
         return this.calls.size();
+    }
+
+    public List<String> getColumnNames() {
+        return columnNames;
     }
 }

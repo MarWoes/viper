@@ -29,7 +29,7 @@ package de.imi.marw.viper.api;
 public class ViperServerConfig {
 
     private String analysisCsvFile;
-    private int portNumber = 8099;
+    private int portNumber = 8090;
     private char csvDelimiter = ';';
     private String propertyCollectionDelimiter = ",";
 

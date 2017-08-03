@@ -85,6 +85,8 @@ public class ViperServer {
             }
 
         }, gson::toJson);
+
+        get("/api/variant-table/column-names", (req, res) -> variantTable.getColumnNames(), gson::toJson);
     }
 
 }

@@ -164,7 +164,7 @@ public class CsvTableReader implements TableReader {
 
             List<VariantCall> parsedCalls = parseVariantCalls(header, rawData);
 
-            return new VariantTable(parsedCalls);
+            return new VariantTable(parsedCalls, Arrays.asList(header));
 
         } catch (FileNotFoundException ex) {
             System.out.println("[ERROR] File " + this.fileName + " not found!");
