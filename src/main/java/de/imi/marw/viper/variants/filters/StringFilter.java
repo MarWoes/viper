@@ -20,43 +20,33 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants.filters;
+package de.imi.marw.viper.variants.filters;
 
-import java.util.Collection;
+import java.util.Set;
 
 /**
  *
  * @author marius
  */
-public class NumericCollectionFilter extends SingleColumnFilter<Collection<Double>> {
+public class StringFilter extends SingleColumnFilter<String> {
 
-    private double min, max;
+    private Set<String> allowedValues;
 
-    public NumericCollectionFilter(String columnName, double min, double max) {
+    public StringFilter(String columnName, Set<String> allowedValues) {
         super(columnName);
-        this.min = min;
-        this.max = max;
+        this.allowedValues = allowedValues;
     }
 
     @Override
-    protected boolean isSingleValuePassing(Collection<Double> values) {
-        return values.stream().anyMatch((val) -> val >= min && val <= max);
+    protected boolean isSingleValuePassing(String value) {
+        return allowedValues.isEmpty() || allowedValues.contains(value);
     }
 
-    public double getMin() {
-        return min;
+    public Set<String> getAllowedValues() {
+        return allowedValues;
     }
 
-    public void setMin(double min) {
-        this.min = min;
+    public void setAllowedValues(Set<String> allowedValues) {
+        this.allowedValues = allowedValues;
     }
-
-    public double getMax() {
-        return max;
-    }
-
-    public void setMax(double max) {
-        this.max = max;
-    }
-
 }

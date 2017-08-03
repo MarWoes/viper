@@ -20,19 +20,18 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants;
+package de.imi.marw.viper.variants;
 
 /**
  *
  * @author marius
  */
-public class IllegalPropertyValueException extends RuntimeException {
+public enum VariantPropertyType {
 
-    IllegalPropertyValueException(VariantPropertyType type, Object value, Class someClass) {
-        super("Illegal Object property, expected " + type
-                + " with class " + someClass.getCanonicalName()
-                + ", but found " + value.getClass().getCanonicalName());
-    }
-    // marker class
+    STRING,
+    NUMERIC,
+
+    STRING_COLLECTION,
+    NUMERIC_COLLECTION
 
 }

@@ -20,13 +20,13 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants.table;
+package de.imi.marw.viper.variants.table;
 
 import au.com.bytecode.opencsv.CSVReader;
-import de.imi.marw.util.Util;
-import de.imi.marw.variants.VariantCall;
-import de.imi.marw.variants.VariantProperty;
-import de.imi.marw.variants.VariantPropertyType;
+import de.imi.marw.viper.util.Util;
+import de.imi.marw.viper.variants.VariantCall;
+import de.imi.marw.viper.variants.VariantProperty;
+import de.imi.marw.viper.variants.VariantPropertyType;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;

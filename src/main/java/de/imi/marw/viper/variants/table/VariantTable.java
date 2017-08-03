@@ -20,12 +20,43 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants.table;
+package de.imi.marw.viper.variants.table;
+
+import de.imi.marw.viper.variants.VariantCall;
+import de.imi.marw.viper.variants.VariantCallFilter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author marius
  */
-public interface TableReader {
-    VariantTable readTable();
+public class VariantTable {
+
+    private final List<VariantCall> calls;
+
+    public VariantTable(Collection<VariantCall> calls) {
+        this.calls = new ArrayList<>();
+
+        this.calls.addAll(calls);
+    }
+
+    public VariantTable filter(Collection<VariantCallFilter> filters) {
+
+        Collection<VariantCall> callsAfterFiltering = this.calls.stream()
+                .filter((call) -> call.isPassingFilters(filters))
+                .collect(Collectors.toList());
+
+        return new VariantTable(callsAfterFiltering);
+    }
+
+    public VariantCall getCall(int rowIndex) {
+        return this.calls.get(rowIndex);
+    }
+
+    public int getNumberOfCalls() {
+        return this.calls.size();
+    }
 }

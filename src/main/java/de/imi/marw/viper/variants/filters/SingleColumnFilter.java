@@ -20,18 +20,28 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants;
+package de.imi.marw.viper.variants.filters;
+
+import de.imi.marw.viper.variants.VariantCall;
+import de.imi.marw.viper.variants.VariantCallFilter;
 
 /**
  *
  * @author marius
  */
-public enum VariantPropertyType {
+public abstract class SingleColumnFilter<T> implements VariantCallFilter {
 
-    STRING,
-    NUMERIC,
+    private final String columnName;
 
-    STRING_COLLECTION,
-    NUMERIC_COLLECTION
+    public SingleColumnFilter(String columnName) {
+        this.columnName = columnName;
+    }
+
+    @Override
+    public boolean isPassing(VariantCall call) {
+        return (isSingleValuePassing((T) call.getProperty(columnName).getValue()));
+    }
+
+    protected abstract boolean isSingleValuePassing(T value);
 
 }

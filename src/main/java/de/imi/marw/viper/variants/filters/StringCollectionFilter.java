@@ -20,7 +20,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants.filters;
+package de.imi.marw.viper.variants.filters;
 
 import java.util.Collection;
 import java.util.Set;

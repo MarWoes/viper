@@ -20,14 +20,19 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants;
+package de.imi.marw.viper.variants;
 
 /**
  *
  * @author marius
  */
-public interface VariantCallFilter {
+public class IllegalPropertyValueException extends RuntimeException {
 
-    boolean isPassing(VariantCall call);
+    IllegalPropertyValueException(VariantPropertyType type, Object value, Class someClass) {
+        super("Illegal Object property, expected " + type
+                + " with class " + someClass.getCanonicalName()
+                + ", but found " + value.getClass().getCanonicalName());
+    }
+    // marker class
 
 }

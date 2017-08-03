@@ -20,41 +20,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants.filters;
+package de.imi.marw.viper.variants.table;
 
 /**
  *
  * @author marius
  */
-public class NumericFilter extends SingleColumnFilter<Double> {
-
-    private double min, max;
-
-    public NumericFilter(String columnName, double min, double max) {
-        super(columnName);
-        this.min = min;
-        this.max = max;
-    }
-
-    @Override
-    protected boolean isSingleValuePassing(Double value) {
-        return value >= min && value <= max;
-    }
-
-    public double getMin() {
-        return min;
-    }
-
-    public void setMin(double min) {
-        this.min = min;
-    }
-
-    public double getMax() {
-        return max;
-    }
-
-    public void setMax(double max) {
-        this.max = max;
-    }
-
+public interface TableReader {
+    VariantTable readTable();
 }

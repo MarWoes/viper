@@ -20,28 +20,43 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.variants.filters;
+package de.imi.marw.viper.variants.filters;
 
-import de.imi.marw.variants.VariantCall;
-import de.imi.marw.variants.VariantCallFilter;
+import java.util.Collection;
 
 /**
  *
  * @author marius
  */
-public abstract class SingleColumnFilter<T> implements VariantCallFilter {
+public class NumericCollectionFilter extends SingleColumnFilter<Collection<Double>> {
 
-    private final String columnName;
+    private double min, max;
 
-    public SingleColumnFilter(String columnName) {
-        this.columnName = columnName;
+    public NumericCollectionFilter(String columnName, double min, double max) {
+        super(columnName);
+        this.min = min;
+        this.max = max;
     }
 
     @Override
-    public boolean isPassing(VariantCall call) {
-        return (isSingleValuePassing((T) call.getProperty(columnName).getValue()));
+    protected boolean isSingleValuePassing(Collection<Double> values) {
+        return values.stream().anyMatch((val) -> val >= min && val <= max);
     }
 
-    protected abstract boolean isSingleValuePassing(T value);
+    public double getMin() {
+        return min;
+    }
+
+    public void setMin(double min) {
+        this.min = min;
+    }
+
+    public double getMax() {
+        return max;
+    }
+
+    public void setMax(double max) {
+        this.max = max;
+    }
 
 }

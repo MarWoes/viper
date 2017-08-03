@@ -34,14 +34,14 @@ sourceCompatibility = '1.8'
 // prefer. In this case NetBeans will not add these tasks but you may rely on
 // your own implementation.
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'de.imi.marw.main.ViperMain'
+    ext.mainClass = 'de.imi.marw.viper.main.Main'
 }
 
 //create a single Jar with all dependencies
 task fatJar(type: Jar) {
     manifest {
-        attributes 'Implementation-Title': 'ViperMain',
-            'Main-Class': 'de.imi.marw.main.ViperMain'
+        attributes 'Implementation-Title': 'Main',
+            'Main-Class': 'de.imi.marw.viper.main.Main'
     }
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -59,4 +59,5 @@ repositories {
 dependencies {
     compile "com.sparkjava:spark-core:2.6.0"
     compile group: 'net.sf.opencsv', name: 'opencsv', version: '2.3'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
 }
