@@ -1,5 +1,6 @@
 var module = angular.module('de.imi.marw.viper',
   [
+    'de.imi.marw.viper.inspector',
     'ngRoute',
     'ui.bootstrap'
   ]
@@ -13,11 +14,13 @@ var module = angular.module('de.imi.marw.viper',
 })
 .config(function ($routeProvider, $locationProvider) {
   $routeProvider
-    .when("/inspector", {
-      templateUrl : "viper/pages/inspector/inspector.html"
+    .when('/inspector', {
+      templateUrl : 'viper/pages/inspector/inspector.html',
+      controller: 'InspectorCtrl',
+      controllerAs: 'inspectorCtrl'
     })
-    .when("/filtering", {
-      templateUrl : "viper/pages/filtering/filtering.html"
+    .when('/filtering', {
+      templateUrl : 'viper/pages/filtering/filtering.html'
     })
     .otherwise({redirectTo : '/inspector'})
 });

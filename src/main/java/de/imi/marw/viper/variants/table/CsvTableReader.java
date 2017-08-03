@@ -146,7 +146,7 @@ public class CsvTableReader implements TableReader {
 
     private List<VariantCall> parseVariantCalls(String[] colNames, List<String[]> colValues) {
         VariantPropertyType[] types = determineTypes(colValues);
-        System.out.println(Arrays.toString(types));
+
         List<VariantCall> calls = colValues.stream()
                 .map((rowValues) -> parseVariantCall(colNames, rowValues, types))
                 .collect(Collectors.toList());
@@ -159,7 +159,7 @@ public class CsvTableReader implements TableReader {
         try (CSVReader reader = new CSVReader(new FileReader(this.fileName), this.csvDelimiter)) {
 
             String[] header = reader.readNext();
-            System.out.println(Arrays.toString(header));
+
             List<String[]> rawData = reader.readAll();
 
             List<VariantCall> parsedCalls = parseVariantCalls(header, rawData);
