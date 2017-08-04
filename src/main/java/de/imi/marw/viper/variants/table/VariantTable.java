@@ -62,7 +62,7 @@ public class VariantTable {
         return IntStream
                 .range(lower, upper)
                 .boxed()
-                .map((index) -> calls.get(index))
+                .map((index) -> this.calls.get(index))
                 .collect(Collectors.toList());
     }
 

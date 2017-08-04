@@ -7,6 +7,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
   Service.getColumnNames = getColumnNames;
   Service.getSize = getSize;
+  Service.getTableRange = getTableRange;
   Service.getTableRow = getTableRow;
   Service.variantPropertyToString = variantPropertyToString;
 
@@ -38,20 +39,45 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
     return promise;
   }
 
+  function getTableRange (fromIndex, toIndex) {
+
+    var promise = $http.get('/api/variant-table/rows', {
+      params: { from: fromIndex, to: toIndex }
+    }).then(function (res) {
+      return res.data;
+    })
+
+    return promise;
+  }
+
+  function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
+
+  function formatNumber(n) {
+    return n.toLocaleString(undefined, { maximumFractionDigits: 2})
+  }
+
   function variantPropertyToString (property) {
 
-    if (property.propertyValue == null) return "NA";
+    var propertyValue = property.propertyValue;
 
-    if (Array.isArray(property.propertyValue)) {
+    if (propertyValue == null) return "NA";
 
-      var adjustedArray = property.propertyValue.map(function (value) {
-        return value == null ? "NA" : value
+    if (Array.isArray(propertyValue)) {
+
+      var adjustedArray = propertyValue.map(function (value) {
+        if (value == null) return "NA";
+        if (isNumeric(value)) formatNumber(value);
+        return value;
       })
 
       return adjustedArray.join(", ");
     }
 
-    return property.propertyValue;
+    if (isNumeric(propertyValue)) return formatNumber(propertyValue);
+
+    return propertyValue;
   }
 
   return Service;
