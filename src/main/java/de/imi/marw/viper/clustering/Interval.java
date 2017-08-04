@@ -20,47 +20,39 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.viper.variants;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+package de.imi.marw.viper.clustering;
 
 /**
  *
  * @author marius
  */
-public class VariantCall {
+public class Interval {
 
-    private final Map<String, VariantProperty> properties;
+    private final int start, end;
 
-    public VariantCall(Map<String, VariantProperty> properties) {
-        this.properties = properties;
+    public Interval(int start, int end) {
+        this.start = start;
+        this.end = end;
     }
 
-    public Map<String, VariantProperty> getProperties() {
-        return properties;
+    public int getStart() {
+        return start;
     }
 
-    public VariantProperty getProperty(String propertyName) {
-        return properties.get(propertyName);
-    }
-
-    public boolean isPassingFilters(Collection<VariantCallFilter> filters) {
-        return filters
-                .stream()
-                .allMatch((filter) -> filter.isPassing(this));
+    public int getEnd() {
+        return end;
     }
 
     @Override
     public String toString() {
-        return properties.toString();
+        return "[" + start + "," + end + "]";
     }
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 23 * hash + Objects.hashCode(this.properties);
+        int hash = 7;
+        hash = 79 * hash + this.start;
+        hash = 79 * hash + this.end;
         return hash;
     }
 
@@ -75,8 +67,11 @@ public class VariantCall {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final VariantCall other = (VariantCall) obj;
-        return Objects.equals(this.properties, other.properties);
+        final Interval other = (Interval) obj;
+        if (this.start != other.start) {
+            return false;
+        }
+        return this.end == other.end;
     }
 
 }

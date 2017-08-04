@@ -111,9 +111,6 @@ public final class VariantProperty {
         if (this.type != other.type) {
             return false;
         }
-        if (!Objects.equals(this.propertyValue, other.propertyValue)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.propertyValue, other.propertyValue);
     }
 }
