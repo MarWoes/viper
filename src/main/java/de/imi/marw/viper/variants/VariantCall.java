@@ -22,6 +22,7 @@
  */
 package de.imi.marw.viper.variants;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -32,10 +33,28 @@ import java.util.Objects;
  */
 public class VariantCall {
 
+    public static final String TYPE_COLUMN_NAME = "svType";
+    public static final String SAMPLE_COLUMN_NAME = "sample";
+    public static final String CHR1_COLUMN_NAME = "chr1";
+    public static final String CHR2_COLUMN_NAME = "chr2";
+    public static final String BP1_COLUMN_NAME = "bp1";
+    public static final String BP2_COLUMN_NAME = "bp2";
+
+    private static final String[] MANDATORY_FIELDS = {
+        TYPE_COLUMN_NAME,
+        SAMPLE_COLUMN_NAME,
+        CHR1_COLUMN_NAME,
+        CHR2_COLUMN_NAME,
+        BP1_COLUMN_NAME,
+        BP2_COLUMN_NAME
+    };
+
     private final Map<String, VariantProperty> properties;
 
     public VariantCall(Map<String, VariantProperty> properties) {
         this.properties = properties;
+
+        checkMandatoryFields();
     }
 
     public Map<String, VariantProperty> getProperties() {
@@ -50,6 +69,15 @@ public class VariantCall {
         return filters
                 .stream()
                 .allMatch((filter) -> filter.isPassing(this));
+    }
+
+    private void checkMandatoryFields() {
+        boolean allFieldsFound = Arrays.stream(MANDATORY_FIELDS)
+                .allMatch((field) -> this.properties.containsKey(field));
+
+        if (!allFieldsFound) {
+            throw new IllegalArgumentException("Error creating VariantCall, not all mandatory fields were found.");
+        }
     }
 
     @Override
@@ -78,5 +106,4 @@ public class VariantCall {
         final VariantCall other = (VariantCall) obj;
         return Objects.equals(this.properties, other.properties);
     }
-
 }
