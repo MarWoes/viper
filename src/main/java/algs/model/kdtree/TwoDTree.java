@@ -152,7 +152,8 @@ public class TwoDTree {
 		root = node;
 	}
 	
-	
+
+	// EDIT MARIUS WÖSTE., 09.08.17: use manhattan distance instead
 	/**
 	 * Return the Euclidean distance between the given two points.
 	 * 
@@ -161,10 +162,10 @@ public class TwoDTree {
 	 * @return     Euclidean distance between given points.
 	 */
 	static double distance (IPoint p1, IPoint p2) {
-		return Math.sqrt((p1.getX()-p2.getX())*(p1.getX()-p2.getX()) +
-				(p1.getY()-p2.getY())*(p1.getY()-p2.getY()));
+		return Math.abs(p1.getX() - p2.getX()) + Math.abs(p1.getY() - p2.getY());
 	}
-	
+
+	// END EDIT MARIUS WÖSTE., 09.08.17: use manhattan distance instead
 	/**
 	 * Find the nearest point in the TwoDtree to the given point.
 	 * <p>

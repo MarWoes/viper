@@ -22,9 +22,17 @@
  */
 package de.imi.marw.viper.clustering;
 
+import algs.model.IPoint;
+import algs.model.IRectangle;
+import algs.model.kdtree.TwoDTree;
+import algs.model.twod.TwoDPoint;
+import algs.model.twod.TwoDRectangle;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -51,56 +59,122 @@ public class IntervalClusterBuilder {
         this.tolerance = tolerance;
     }
 
-    private boolean areIntervalsClose(Interval i1, Interval i2) {
-        return Math.abs(i1.getStart() - i2.getStart()) <= tolerance
-                && Math.abs(i1.getEnd() - i2.getEnd()) <= tolerance;
+    private List<IndexContainingPoint> findPointsInRange(IndexContainingPoint point, TwoDTree tree) {
+
+        IRectangle searchArea = new TwoDRectangle(
+                point.getX() - tolerance,
+                point.getY() - tolerance,
+                point.getX() + tolerance,
+                point.getY() + tolerance
+        );
+
+        Iterator<IPoint> pointsInRangeIterator = tree.range(searchArea);
+
+        List<IndexContainingPoint> pointsInRange = new ArrayList<>();
+        pointsInRangeIterator.forEachRemaining((pointInRange) -> pointsInRange.add((IndexContainingPoint) pointInRange));
+
+        return pointsInRange;
     }
 
-    //TODO: this is slow currently, maybe revisit this so users don't need
-    //to wait too long
+    private void updateClusters(IndexContainingPoint point, List<IndexContainingPoint> pointsInRange, int[] clusterIndices, List<Collection<Integer>> clusters) {
+
+        int[] otherClusterIndices = pointsInRange.stream()
+                .mapToInt((pointInRange) -> clusterIndices[pointInRange.getIndex()])
+                .distinct()
+                .toArray();
+
+        if (otherClusterIndices.length == 1) {
+
+            int otherClusterIndex = otherClusterIndices[0];
+            clusters.get(clusterIndices[otherClusterIndex]).add(point.getIndex());
+            clusterIndices[point.getIndex()] = clusterIndices[otherClusterIndex];
+
+        } else {
+
+            Set<Integer> newCluster = new HashSet<>();
+
+            clusterIndices[point.getIndex()] = clusters.size();
+            for (IndexContainingPoint pointInRange : pointsInRange) {
+                clusterIndices[pointInRange.getIndex()] = clusters.size();
+            }
+
+            newCluster.add(point.getIndex());
+            for (int otherCluster : otherClusterIndices) {
+
+                newCluster.addAll(clusters.get(otherCluster));
+                clusters.get(otherCluster).clear();
+
+            }
+
+            clusters.add(newCluster);
+        }
+
+    }
+
     public List<Collection<Integer>> clusterIntervals(List<Interval> intervals) {
 
         List<Collection<Integer>> clusters = new ArrayList<>();
+        int[] clusterIndices = IntStream.range(0, intervals.size())
+                .map((i) -> -1)
+                .toArray();
 
-        List<Integer> indicesLeft = IntStream.range(0, intervals.size())
+        IndexContainingPoint[] points = IntStream.range(0, intervals.size())
                 .boxed()
-                .collect(Collectors.toList());
+                .map((index) -> new IndexContainingPoint(intervals.get(index).getStart(), intervals.get(index).getEnd(), index))
+                .toArray(IndexContainingPoint[]::new);
 
-        while (!indicesLeft.isEmpty()) {
+        TwoDTree tree = new TwoDTree();
 
-            int nextElement = indicesLeft.remove(0);
+        for (IndexContainingPoint point : points) {
 
-            Collection<Integer> cluster = new ArrayList<>();
+            List<IndexContainingPoint> pointsInRange = findPointsInRange(point, tree);
 
-            Collection<Integer> inspectedElements = new ArrayList<>();
-            inspectedElements.add(nextElement);
+            updateClusters(point, pointsInRange, clusterIndices, clusters);
 
-            while (!inspectedElements.isEmpty()) {
-
-                Collection<Integer> similarIntervalIndices = inspectedElements.stream()
-                        .map((index) -> {
-                            Interval source = intervals.get(index);
-
-                            Collection<Integer> similar = indicesLeft.stream()
-                                    .filter((otherIndex) -> areIntervalsClose(source, intervals.get(otherIndex)))
-                                    .collect(Collectors.toList());
-
-                            return similar;
-                        })
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toList());
-
-                cluster.addAll(inspectedElements);
-                inspectedElements.clear();
-                inspectedElements.addAll(similarIntervalIndices);
-
-                indicesLeft.removeAll(similarIntervalIndices);
-            }
-
-            clusters.add(cluster);
+            tree.insert(point);
         }
+
+        clusters = clusters.stream()
+                .filter((cluster) -> !cluster.isEmpty())
+                .collect(Collectors.toList());
 
         return clusters;
     }
 
+    private static class IndexContainingPoint extends TwoDPoint {
+
+        private final int index;
+
+        public IndexContainingPoint(double x, double y, int intervalIndex) {
+            super(x, y);
+            this.index = intervalIndex;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 31 * hash + this.index;
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final IndexContainingPoint other = (IndexContainingPoint) obj;
+            return this.index == other.index;
+        }
+
+    }
 }
