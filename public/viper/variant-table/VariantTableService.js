@@ -1,7 +1,7 @@
 var module = angular.module('de.imi.marw.viper.variant-table.service', [
-
+  'de.imi.marw.viper.util.NumeralService'
 ])
-.factory('VariantTableService', function ($http) {
+.factory('VariantTableService', function ($http, NumeralService) {
 
   var Service = { };
 
@@ -69,7 +69,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
       var propertyCollectionCount = propertyValue
         .map(function (value) {
           if (value == null) return "NA";
-          if (isNumeric(value)) formatNumber(value);
+          if (isNumeric(value)) NumeralService.formatNumber(value);
           return value;
         })
         .reduce(function (acc, curr) {
@@ -80,22 +80,11 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
       var keys = Object.keys(propertyCollectionCount)
 
-      if (keys.length === 1) return keys[0];
-
-      var numValueArray = keys.map(function (key) {
-
-        var count = propertyCollectionCount[key];
-
-        if (count == 1) return key;
-
-        return key + "<span class = \"text-muted\">(" + count + ")</span>";
-      });
-
-      return numValueArray.join(", ");
+      return keys.join(", ");
 
     }
 
-    if (isNumeric(propertyValue)) return formatNumber(propertyValue);
+    if (isNumeric(propertyValue)) return NumeralService.formatNumber(propertyValue);
 
     return propertyValue;
   }
