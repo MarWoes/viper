@@ -23,6 +23,8 @@
 package de.imi.marw.viper.api;
 
 import com.google.gson.Gson;
+import de.imi.marw.viper.variants.VariantClusterBuilder;
+import de.imi.marw.viper.variants.VariantTableCluster;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
 
@@ -36,26 +38,30 @@ public class ViperServer {
 
     private final ViperServerConfig config;
     private final Gson gson;
-    private VariantTable variantTable;
+    private final VariantClusterBuilder clusterer;
+    private VariantTableCluster variantTableCluster;
 
     public ViperServer(ViperServerConfig config) {
 
         this.config = config;
         this.gson = new Gson();
-
+        this.clusterer = new VariantClusterBuilder();
     }
 
     public void start() {
 
-        this.variantTable = this.loadVariants();
+        this.variantTableCluster = this.loadVariants();
 
         this.setupRoutes();
     }
 
-    private VariantTable loadVariants() {
+    private VariantTableCluster loadVariants() {
         CsvTableReader reader = new CsvTableReader(config.getAnalysisCsvFile(), config.getCsvDelimiter(), config.getPropertyCollectionDelimiter());
 
-        return (reader.readTable());
+        VariantTable unclusteredTable = reader.readTable();
+        VariantTableCluster cluster = clusterer.clusterVariantTable(unclusteredTable);
+
+        return cluster;
     }
 
     private void setupRoutes() {
@@ -71,13 +77,13 @@ public class ViperServer {
 
     private void setupTableApi() {
 
-        get("/api/variant-table/size", (req, res) -> variantTable.getNumberOfCalls(), gson::toJson);
+        get("/api/variant-table/size", (req, res) -> variantTableCluster.getClusteredTable().getNumberOfCalls(), gson::toJson);
 
         get("/api/variant-table/row", (req, res) -> {
 
             int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
 
-            return variantTable.getCall(queryIndex);
+            return variantTableCluster.getClusteredTable().getCall(queryIndex);
 
         }, gson::toJson);
 
@@ -86,11 +92,11 @@ public class ViperServer {
             int from = gson.fromJson(req.queryParams("from"), Integer.class);
             int to = gson.fromJson(req.queryParams("to"), Integer.class);
 
-            return variantTable.getCallRange(from, to);
+            return variantTableCluster.getClusteredTable().getCallRange(from, to);
 
         }, gson::toJson);
 
-        get("/api/variant-table/column-names", (req, res) -> variantTable.getColumnNames(), gson::toJson);
+        get("/api/variant-table/column-names", (req, res) -> variantTableCluster.getClusteredTable().getColumnNames(), gson::toJson);
     }
 
 }

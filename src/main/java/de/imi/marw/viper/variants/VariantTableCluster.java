@@ -8,7 +8,6 @@ package de.imi.marw.viper.variants;
 import de.imi.marw.viper.variants.table.VariantTable;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -27,13 +26,18 @@ public class VariantTableCluster {
         this.rowMapCluster = rowMapCluster;
     }
 
-    public VariantCall getClusteredCall(int rowIndex) {
-        return clusteredTable.getCall(rowIndex);
-    }
-
     public List<VariantCall> getUnclusteredCalls(int clusteredRowIndex) {
         return rowMapCluster.get(clusteredRowIndex).stream()
                 .map((rowIndex) -> unclusteredTable.getCall(rowIndex))
                 .collect(Collectors.toList());
     }
+
+    public VariantTable getUnclusteredTable() {
+        return unclusteredTable;
+    }
+
+    public VariantTable getClusteredTable() {
+        return clusteredTable;
+    }
+
 }
