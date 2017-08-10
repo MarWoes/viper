@@ -146,7 +146,7 @@ public class VariantClusterBuilder {
     private String getClusterName(int index, int numClusters) {
         int maxIndexLength = ("" + numClusters).length();
 
-        return String.format("VAR%0" + maxIndexLength + "d", index);
+        return String.format("VAR%0" + maxIndexLength + "d", index + 1);
     }
 
     private VariantCall combineCalls(Collection<VariantCall> callCluster, Collection<String> keys, String clusterName) {
