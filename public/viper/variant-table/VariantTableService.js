@@ -66,13 +66,33 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
     if (Array.isArray(propertyValue)) {
 
-      var adjustedArray = propertyValue.map(function (value) {
-        if (value == null) return "NA";
-        if (isNumeric(value)) formatNumber(value);
-        return value;
-      })
+      var propertyCollectionCount = propertyValue
+        .map(function (value) {
+          if (value == null) return "NA";
+          if (isNumeric(value)) formatNumber(value);
+          return value;
+        })
+        .reduce(function (acc, curr) {
+          acc[curr] ? acc[curr]++ : acc[curr] = 1;
 
-      return adjustedArray.join(", ");
+          return acc;
+        }, { });
+
+      var keys = Object.keys(propertyCollectionCount)
+
+      if (keys.length === 1) return keys[0];
+
+      var numValueArray = keys.map(function (key) {
+
+        var count = propertyCollectionCount[key];
+
+        if (count == 1) return key;
+
+        return key + "<span class = \"text-muted\">(" + count + ")</span>";
+      });
+
+      return numValueArray.join(", ");
+
     }
 
     if (isNumeric(propertyValue)) return formatNumber(propertyValue);
