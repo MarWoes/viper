@@ -58,6 +58,10 @@ public class VariantTable {
         return this.calls.get(rowIndex);
     }
 
+    public synchronized List<VariantCall> getAllCalls() {
+        return this.calls;
+    }
+
     public synchronized List<VariantCall> getCallRange(int lower, int upper) {
         return IntStream
                 .range(lower, upper)

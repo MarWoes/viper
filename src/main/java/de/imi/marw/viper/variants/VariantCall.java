@@ -55,6 +55,7 @@ public class VariantCall {
         this.properties = properties;
 
         checkMandatoryFields();
+        ensureDataIntegrity();
     }
 
     public Map<String, VariantProperty> getProperties() {
@@ -77,6 +78,22 @@ public class VariantCall {
 
         if (!allFieldsFound) {
             throw new IllegalArgumentException("Error creating VariantCall, not all mandatory fields were found.");
+        }
+    }
+
+    private void ensureDataIntegrity() {
+        Double bp1 = (Double) this.properties.get(BP1_COLUMN_NAME).getValue();
+        Double bp2 = (Double) this.properties.get(BP2_COLUMN_NAME).getValue();
+
+        if (bp1 > bp2) {
+            Object chr1 = this.properties.get(CHR1_COLUMN_NAME).getValue();
+            Object chr2 = this.properties.get(CHR2_COLUMN_NAME).getValue();
+
+            this.properties.get(BP1_COLUMN_NAME).setValue(bp2);
+            this.properties.get(BP2_COLUMN_NAME).setValue(bp1);
+
+            this.properties.get(CHR1_COLUMN_NAME).setValue(chr2);
+            this.properties.get(CHR2_COLUMN_NAME).setValue(chr1);
         }
     }
 
