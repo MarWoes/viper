@@ -97,6 +97,15 @@ public class ViperServer {
         }, gson::toJson);
 
         get("/api/variant-table/column-names", (req, res) -> variantTableCluster.getClusteredTable().getColumnNames(), gson::toJson);
-    }
 
+        get("/api/variant-table/related-calls", (req, res) -> {
+
+            int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
+
+            return variantTableCluster.getUnclusteredCalls(queryIndex);
+
+        }, gson::toJson);
+
+        get("/api/variant-table/related-calls/column-names", (req, res) -> variantTableCluster.getUnclusteredTable().getColumnNames(), gson::toJson);
+    }
 }

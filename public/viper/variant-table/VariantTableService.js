@@ -6,6 +6,8 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   var Service = { };
 
   Service.getColumnNames = getColumnNames;
+  Service.getRelatedCalls = getRelatedCalls;
+  Service.getRelatedColumnNames = getRelatedColumnNames;
   Service.getSize = getSize;
   Service.getTableRange = getTableRange;
   Service.getTableRow = getTableRow;
@@ -24,6 +26,25 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
     var promise = $http.get('/api/variant-table/size').then(function (res) {
       return res.data;
     });
+
+    return promise;
+  }
+
+  function getRelatedColumnNames () {
+    var promise = $http.get('/api/variant-table/related-calls/column-names').then(function (res) {
+      return res.data;
+    })
+
+    return promise;
+  }
+
+  function getRelatedCalls (index) {
+
+    var promise = $http.get('/api/variant-table/related-calls', {
+      params: { index: index }
+    }).then(function (res) {
+      return res.data;
+    })
 
     return promise;
   }
@@ -52,10 +73,6 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
   function isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
-  }
-
-  function formatNumber(n) {
-    return n.toLocaleString(undefined, { maximumFractionDigits: 2})
   }
 
   function variantPropertyToString (property) {

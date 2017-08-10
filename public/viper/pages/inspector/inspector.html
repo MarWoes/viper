@@ -41,4 +41,36 @@
 
   </div>
 
+  <div class="col-sm-9">
+
+    <uib-tabset>
+      <uib-tab heading="breakpoints">
+        under construction
+      </uib-tab>
+      <uib-tab heading="related calls">
+
+        <table class = "table table-bordered table-condensed table-small-font">
+
+          <thead>
+            <tr>
+              <th ng-repeat="key in inspectorCtrl.columnNames">
+                {{ key }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="relatedVariant in inspectorCtrl.relatedVariants">
+              <td ng-repeat="key in inspectorCtrl.columnNames">
+                <span ng-bind-html="inspectorCtrl.variantPropertyToString(relatedVariant.properties[key])"></span>
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+
+      </uib-tab>
+    </uib-tabset>
+
+  </div>
+
 </div>
