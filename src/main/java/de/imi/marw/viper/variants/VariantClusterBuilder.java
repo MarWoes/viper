@@ -210,9 +210,9 @@ public class VariantClusterBuilder {
         clusteredColumnNames.add("viperId");
         clusteredColumnNames.addAll(unclustered.getColumnNames());
 
-        List<VariantPropertyType> clusteredTypes = new ArrayList<>();
-        clusteredTypes.add(VariantPropertyType.STRING);
-        clusteredTypes.addAll(unclustered.getTypes());
+        List<VariantPropertyType> clusteredTypes = getNewClusterTypes(unclustered.getTypes());
+        clusteredTypes.add(0, VariantPropertyType.STRING);
+
 
         VariantTable clusteredTable = new VariantTable(clusteredCalls, clusteredColumnNames, clusteredTypes);
         return new VariantTableCluster(unclustered, clusteredTable, indexClusters);

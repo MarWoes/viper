@@ -25,6 +25,7 @@ package de.imi.marw.viper.variants.table;
 import de.imi.marw.viper.variants.VariantCallFilter;
 import de.imi.marw.viper.variants.VariantPropertyType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -61,6 +62,7 @@ public class VariantTable {
     private final Map<String, Integer> indexMap;
 
     public VariantTable(Collection<List> calls, List<String> columnNames, List<VariantPropertyType> types) {
+
         this.indexMap = new HashMap<>();
         for (int i = 0; i < columnNames.size(); i++) {
             indexMap.put(columnNames.get(i), i);
@@ -69,6 +71,8 @@ public class VariantTable {
         this.columnNames = columnNames;
         this.rows.addAll(calls);
         this.types = types;
+
+        checkDataIntegrity();
     }
 
     public synchronized VariantTable filter(Collection<VariantCallFilter> filters) {
@@ -119,37 +123,60 @@ public class VariantTable {
     public synchronized List<VariantPropertyType> getTypes() {
         return types;
     }
-//    public void setValue(Object newValue) {
-//        switch (type) {
-//            case STRING:
-//                checkCorrectType(newValue, String.class);
-//                break;
-//            case STRING_COLLECTION:
-//                checkCorrectCollectionType(newValue, String.class);
-//                break;
-//            case NUMERIC:
-//                checkCorrectType(newValue, Double.class);
-//                break;
-//            case NUMERIC_COLLECTION:
-//                checkCorrectCollectionType(newValue, Double.class);
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected type " + type + "when setting variant value");
-//        }
-//
-//        this.propertyValue = newValue;
-//    }
-//    private void checkCorrectCollectionType(Object value, Class someClass) {
-//        if (value instanceof Collection) {
-//            ((Collection) value).stream().forEach((o) -> checkCorrectType(o, someClass));
-//        } else {
-//            throw new IllegalPropertyValueException(type, value, Collection.class);
-//        }
-//    }
-//
-//    private void checkCorrectType(Object value, Class someClass) {
-//        if (value != null && !someClass.isInstance(value)) {
-//            throw new IllegalPropertyValueException(type, value, someClass);
-//        }
-//    }
+
+    private void checkCorrectCollectionType(Object value, Class someClass) {
+        if (value instanceof Collection) {
+            ((Collection) value).stream().forEach((o) -> checkCorrectType(o, someClass));
+        } else {
+            throw new IllegalArgumentException("Variant table contained value "
+                    + value.toString() + " that could not be interpreted as a collection of "
+                    + someClass.getSimpleName() + ", is " + value.getClass().getSimpleName());
+        }
+    }
+
+    private void checkCorrectType(Object value, Class someClass) {
+        if (value != null && !someClass.isInstance(value)) {
+            throw new IllegalArgumentException("Variant table contained value "
+                    + value.toString() + " that could not be interpreted as "
+                    + someClass.getSimpleName() + ", is " + value.getClass().getSimpleName());
+        }
+    }
+
+    private void checkCorrectType(Object newValue, VariantPropertyType type) {
+        switch (type) {
+            case STRING:
+                checkCorrectType(newValue, String.class);
+                break;
+            case STRING_COLLECTION:
+                checkCorrectCollectionType(newValue, String.class);
+                break;
+            case NUMERIC:
+                checkCorrectType(newValue, Double.class);
+                break;
+            case NUMERIC_COLLECTION:
+                checkCorrectCollectionType(newValue, Double.class);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected type " + type + " when checking variant value");
+        }
+    }
+
+    private void checkDataIntegrity() {
+
+        if (Arrays.stream(MANDATORY_FIELDS).anyMatch((mandatory) -> !columnNames.contains(mandatory))) {
+            throw new IllegalArgumentException("Data must contain all mandatory columns");
+        }
+
+        if (types.size() != columnNames.size()) {
+            throw new IllegalArgumentException("Type and column names differ in length");
+        }
+
+        indexMap.forEach((key, value) -> {
+
+            this.rows.stream()
+                    .map((row) -> row.get(value))
+                    .forEach((property) -> checkCorrectType(property, types.get(value)));
+
+        });
+    }
 }
