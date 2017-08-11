@@ -32,7 +32,7 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        ViperServerConfig config = new ViperServerConfig("../results-france1/all_analysis.csv");
+        ViperServerConfig config = new ViperServerConfig("../results-unit-test/all_analysis.csv");
         ViperServer server = new ViperServer(config);
         server.start();
     }

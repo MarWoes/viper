@@ -124,6 +124,10 @@ public class VariantTable {
         return types;
     }
 
+    public synchronized VariantPropertyType getColumnType(String column) {
+        return types.get(indexMap.get(column));
+    }
+
     private void checkCorrectCollectionType(Object value, Class someClass) {
         if (value instanceof Collection) {
             ((Collection) value).stream().forEach((o) -> checkCorrectType(o, someClass));
@@ -161,6 +165,27 @@ public class VariantTable {
         }
     }
 
+    private String getSingleColumnValue(List call, String column) {
+
+        VariantPropertyType type = getColumnType(column);
+        Object value = call.get(indexMap.get(column));
+
+        switch (type) {
+            case STRING:
+                return (String) value;
+            case STRING_COLLECTION:
+                List<String> values = (List<String>) value;
+
+                if (values.size() != 1) {
+                    throw new IllegalStateException("multiple chromosomes found");
+                }
+
+                return values.get(0);
+            default:
+                throw new IllegalStateException("chr were no strings");
+        }
+    }
+
     private void checkDataIntegrity() {
 
         if (Arrays.stream(MANDATORY_FIELDS).anyMatch((mandatory) -> !columnNames.contains(mandatory))) {
@@ -177,6 +202,24 @@ public class VariantTable {
                     .map((row) -> row.get(value))
                     .forEach((property) -> checkCorrectType(property, types.get(value)));
 
+        });
+
+        // TODO: is it possible to do this a nicer way?
+        this.rows.forEach((call) -> {
+
+            String chr1 = getSingleColumnValue(call, CHR1_COLUMN_NAME);
+            String chr2 = getSingleColumnValue(call, CHR2_COLUMN_NAME);
+
+            Double bp1 = (Double) call.get(indexMap.get(VariantTable.BP1_COLUMN_NAME));
+            Double bp2 = (Double) call.get(indexMap.get(VariantTable.BP2_COLUMN_NAME));
+
+            if (bp1 > bp2) {
+                call.set(indexMap.get(CHR1_COLUMN_NAME), chr2);
+                call.set(indexMap.get(CHR2_COLUMN_NAME), chr1);
+
+                call.set(indexMap.get(BP1_COLUMN_NAME), bp2);
+                call.set(indexMap.get(BP2_COLUMN_NAME), bp1);
+            }
         });
     }
 }

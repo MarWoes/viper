@@ -104,7 +104,7 @@ public class VariantClusterBuilder {
     }
 
     private Object combineStrings(Collection<String> values) {
-        return values.stream().collect(Collectors.toList());
+        return values.stream().distinct().collect(Collectors.toList());
     }
 
     private Object combineNumeric(Collection<Double> values) {
