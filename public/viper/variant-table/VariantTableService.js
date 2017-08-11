@@ -72,7 +72,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   }
 
   function isNumeric(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+    return typeof n === "number";
   }
 
   function variantPropertyToString (propertyValue) {
