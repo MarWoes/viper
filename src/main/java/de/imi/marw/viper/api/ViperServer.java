@@ -98,6 +98,16 @@ public class ViperServer {
 
         get("/api/variant-table/column-names", (req, res) -> variantTableCluster.getClusteredTable().getColumnNames(), gson::toJson);
 
+        put("/api/variant-table/decision", (req, res) -> {
+
+            int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
+            String decision = req.queryParams("decision");
+
+            variantTableCluster.getClusteredTable().setCallProperty(queryIndex, VariantTable.DECISION_COLUMN_NAME, decision);
+
+            return "OK";
+        });
+
         get("/api/variant-table/related-calls", (req, res) -> {
 
             int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);

@@ -47,6 +47,9 @@ public class VariantTable {
     public static final String BP1_COLUMN_NAME = "bp1";
     public static final String BP2_COLUMN_NAME = "bp2";
 
+    public static final String DECISION_COLUMN_NAME = "viperDecision";
+    public static final String ID_COLUMN_NAME = "viperId";
+
     private static final String[] MANDATORY_FIELDS = {
         TYPE_COLUMN_NAME,
         SAMPLE_COLUMN_NAME,
@@ -126,6 +129,12 @@ public class VariantTable {
 
     public synchronized VariantPropertyType getColumnType(String column) {
         return types.get(indexMap.get(column));
+    }
+
+    public synchronized void setCallProperty(int rowIndex, String column, Object newValue) {
+        checkCorrectType(newValue, getColumnType(column));
+
+        this.rows.get(rowIndex).set(indexMap.get(column), newValue);
     }
 
     private void checkCorrectCollectionType(Object value, Class someClass) {

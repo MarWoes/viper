@@ -208,14 +208,17 @@ public class VariantClusterBuilder {
         }
 
         for (int i = 0; i < clusteredCalls.size(); i++) {
+            clusteredCalls.get(i).add(0, "NA");
             clusteredCalls.get(i).add(0, getClusterName(i, indexClusters.size()));
         }
 
         List<String> clusteredColumnNames = new ArrayList<>();
-        clusteredColumnNames.add("viperId");
+        clusteredColumnNames.add(VariantTable.ID_COLUMN_NAME);
+        clusteredColumnNames.add(VariantTable.DECISION_COLUMN_NAME);
         clusteredColumnNames.addAll(unclustered.getColumnNames());
 
         List<VariantPropertyType> clusteredTypes = getNewClusterTypes(unclustered.getTypes());
+        clusteredTypes.add(0, VariantPropertyType.STRING);
         clusteredTypes.add(0, VariantPropertyType.STRING);
 
         VariantTable clusteredTable = new VariantTable(clusteredCalls, clusteredColumnNames, clusteredTypes);
