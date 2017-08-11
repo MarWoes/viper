@@ -1,7 +1,7 @@
 var module = angular.module('de.imi.marw.viper.inspector', [
   'de.imi.marw.viper.variant-table.service'
 ])
-.controller('InspectorPageCtrl', function (VariantTableService, $q) {
+.controller('InspectorPageCtrl', function (VariantTableService, $q, $http) {
 
   var Ctrl = this;
 
@@ -14,6 +14,7 @@ var module = angular.module('de.imi.marw.viper.inspector', [
   Ctrl.init = init;
   Ctrl.onIndexChange = onIndexChange;
   Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
+  Ctrl.sendDecision = sendDecision;
 
   Ctrl.init();
 
@@ -36,6 +37,23 @@ var module = angular.module('de.imi.marw.viper.inspector', [
 
   }
 
+  function sendDecision (decision) {
+
+    var promise = $http.put('/api/variant-table/decision', {}, {
+      params: {
+        index: Ctrl.index,
+        decision: decision
+      }
+    });
+
+    if (Ctrl.index >= 0 && Ctrl.index < Ctrl.tableSize - 1) {
+      Ctrl.index++;
+      Ctrl.onIndexChange();
+    } else {
+      promise.then(Ctrl.onIndexChange);
+    }
+  }
+
   function onIndexChange () {
 
     $q.all([
@@ -47,7 +65,5 @@ var module = angular.module('de.imi.marw.viper.inspector', [
     });
 
   }
-
-
 
 })

@@ -4,7 +4,7 @@
 
     <div class="well">
 
-      <h3 class="variant-well-header">current variant:</h3>
+      <h3 class="variant-well-header">variants: {{ inspectorCtrl.tableSize }}</h3>
 
       <hr>
 
@@ -18,9 +18,15 @@
           max="{{inspectorCtrl.tableSize - 1}}">
       </div>
 
-      There are {{ inspectorCtrl.tableSize }} variants, index: {{ inspectorCtrl.index }}.
+      <div class="btn-group btn-group-justified">
+        <span class="btn btn-danger"  ng-click="inspectorCtrl.sendDecision('declined')">decline</span>
+        <span class="btn btn-warning" ng-click="inspectorCtrl.sendDecision('maybe')">undecided</span>
+        <span class="btn btn-success" ng-click="inspectorCtrl.sendDecision('approved')">approve</span>
+      </div>
 
-      <table class = "table table-bordered table-condensed">
+      <br>
+
+      <table class="table table-bordered table-condensed">
 
         <thead>
           <tr>
