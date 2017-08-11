@@ -22,12 +22,15 @@
  */
 package de.imi.marw.viper.variants;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  * @author marius
  */
 public interface VariantCallFilter {
 
-    boolean isPassing(VariantCall call);
+    boolean isPassing(List values, Map<String, Integer> indexMap);
 
 }

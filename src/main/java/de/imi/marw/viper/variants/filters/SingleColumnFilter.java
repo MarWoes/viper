@@ -22,8 +22,9 @@
  */
 package de.imi.marw.viper.variants.filters;
 
-import de.imi.marw.viper.variants.VariantCall;
 import de.imi.marw.viper.variants.VariantCallFilter;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -39,8 +40,8 @@ public abstract class SingleColumnFilter<T> implements VariantCallFilter {
     }
 
     @Override
-    public boolean isPassing(VariantCall call) {
-        T value = (T) call.getProperty(columnName).getValue();
+    public boolean isPassing(List values, Map<String, Integer> indexMap) {
+        T value = (T) values.get(indexMap.get(columnName));
         return ((value == null && nullAllowed) || isSingleValuePassing(value));
     }
 

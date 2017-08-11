@@ -27,7 +27,6 @@ import de.imi.marw.viper.clustering.IntervalClusterBuilder;
 import de.imi.marw.viper.variants.table.VariantTable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,10 +41,10 @@ public class VariantClusterBuilder {
     private final IntervalClusterBuilder intervalClusterer = new IntervalClusterBuilder();
 
     private Collection<String> getChromosomeKeys(VariantTable table) {
-        Collection<String> keys = table.getAllCalls().stream()
+        Collection<String> keys = table.getRawCalls().stream()
                 .map((variantCall) -> {
-                    String chr1 = variantCall.getProperty(variantCall.CHR1_COLUMN_NAME).getValue().toString();
-                    String chr2 = variantCall.getProperty(variantCall.CHR2_COLUMN_NAME).getValue().toString();
+                    String chr1 = variantCall.get(table.getColumnIndexMap().get(VariantTable.CHR1_COLUMN_NAME)).toString();
+                    String chr2 = variantCall.get(table.getColumnIndexMap().get(VariantTable.CHR2_COLUMN_NAME)).toString();
 
                     return chr1 + "-" + chr2;
                 })
@@ -56,16 +55,16 @@ public class VariantClusterBuilder {
     }
 
     private List<Collection<Integer>> clusterTableByKey(VariantTable unclustered, String chromosomeKey) {
+        List<List> rawCalls = unclustered.getRawCalls();
         List<Interval> matchingCalls = IntStream.range(0, unclustered.getNumberOfCalls())
                 .boxed()
                 .map((rowIndex) -> {
 
-                    VariantCall variantCall = unclustered.getCall(rowIndex);
-                    String chr1 = variantCall.getProperty(variantCall.CHR1_COLUMN_NAME).getValue().toString();
-                    String chr2 = variantCall.getProperty(variantCall.CHR2_COLUMN_NAME).getValue().toString();
+                    String chr1 = rawCalls.get(rowIndex).get(unclustered.getColumnIndexMap().get(VariantTable.CHR1_COLUMN_NAME)).toString();
+                    String chr2 = rawCalls.get(rowIndex).get(unclustered.getColumnIndexMap().get(VariantTable.CHR2_COLUMN_NAME)).toString();
 
-                    int bp1 = ((Double) variantCall.getProperty(variantCall.BP1_COLUMN_NAME).getValue()).intValue();
-                    int bp2 = ((Double) variantCall.getProperty(variantCall.BP2_COLUMN_NAME).getValue()).intValue();
+                    int bp1 = ((Double) rawCalls.get(rowIndex).get(unclustered.getColumnIndexMap().get(VariantTable.BP1_COLUMN_NAME))).intValue();
+                    int bp2 = ((Double) rawCalls.get(rowIndex).get(unclustered.getColumnIndexMap().get(VariantTable.BP2_COLUMN_NAME))).intValue();
 
                     return new VariantInterval(chr1 + "-" + chr2, bp1, bp2, rowIndex);
                 })
@@ -99,11 +98,11 @@ public class VariantClusterBuilder {
         return clusters;
     }
 
-    private VariantProperty combineStrings(Collection<String> values) {
-        return new VariantProperty(VariantPropertyType.STRING_COLLECTION, values);
+    private Object combineStrings(Collection<String> values) {
+        return values.stream().collect(Collectors.toList());
     }
 
-    private VariantProperty combineNumeric(Collection<Double> values) {
+    private Object combineNumeric(Collection<Double> values) {
         double[] sortedValues = values.stream()
                 .filter((d) -> d != null)
                 .sorted()
@@ -111,23 +110,19 @@ public class VariantClusterBuilder {
                 .toArray();
 
         Double val = sortedValues.length == 0 ? null : sortedValues[sortedValues.length / 2];
-        return new VariantProperty(VariantPropertyType.NUMERIC, val);
+        return val;
     }
 
-    private <T> VariantProperty combineCollection(Collection<Collection<T>> values, VariantPropertyType type) {
+    private <T> Object combineCollection(Collection<Collection<T>> values, VariantPropertyType type) {
 
         Collection<T> combinedCollection = values.stream()
                 .flatMap((collection) -> collection.stream())
                 .collect(Collectors.toList());
 
-        return new VariantProperty(type, combinedCollection);
+        return combinedCollection;
     }
 
-    private VariantProperty combineProperties(Collection<VariantProperty> properties, VariantPropertyType type) {
-
-        Collection values = properties.stream()
-                .map((property) -> property.getValue())
-                .collect(Collectors.toList());
+    private Object combineProperties(Collection values, VariantPropertyType type) {
 
         switch (type) {
             case STRING:
@@ -149,54 +144,77 @@ public class VariantClusterBuilder {
         return String.format("VAR%0" + maxIndexLength + "d", index + 1);
     }
 
-    private VariantCall combineCalls(Collection<VariantCall> callCluster, Collection<String> keys, String clusterName) {
-        Map<String, VariantProperty> combinedProperties = new HashMap<>();
+    private List combineCalls(Collection<List> callCluster, Map<String, Integer> indexMap, List<VariantPropertyType> types) {
 
-        combinedProperties.put("viperId", new VariantProperty(VariantPropertyType.STRING, clusterName));
+        Object[] combinedRow = new Object[indexMap.size()];
 
-        for (String key : keys) {
+        indexMap.forEach((key, value) -> {
 
-            VariantPropertyType type = callCluster.stream()
-                    .findAny()
-                    .get()
-                    .getProperty(key)
-                    .getType();
-
-            Collection<VariantProperty> properties = callCluster.stream()
-                    .map((call) -> call.getProperty(key))
+            Collection values = callCluster.stream()
+                    .map((call) -> call.get(value))
                     .collect(Collectors.toList());
 
-            VariantProperty combinedProperty = combineProperties(properties, type);
-            combinedProperties.put(key, combinedProperty);
+            combinedRow[value] = combineProperties(values, types.get(value));
+
+        });
+
+        List combinedCall = new ArrayList<>();
+        for (Object object : combinedRow) {
+            combinedCall.add(object);
         }
 
-        return new VariantCall(combinedProperties);
+        return combinedCall;
+    }
+
+    public List<VariantPropertyType> getNewClusterTypes(List<VariantPropertyType> unclusteredTypes) {
+        return unclusteredTypes.stream()
+                .map((type) -> {
+                    switch (type) {
+                        case NUMERIC:
+                            return VariantPropertyType.NUMERIC;
+                        case STRING:
+                            return VariantPropertyType.STRING_COLLECTION;
+                        case NUMERIC_COLLECTION:
+                        case STRING_COLLECTION:
+                            return type;
+                        default:
+                            throw new IllegalStateException("Unhandled type " + type);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public VariantTableCluster clusterVariantTable(VariantTable unclustered) {
 
         List<Collection<Integer>> indexClusters = computeClusterIndices(unclustered);
 
-        List<VariantCall> clusteredCalls = new ArrayList<>();
+        List<List> clusteredCalls = new ArrayList<>();
 
         for (int i = 0; i < indexClusters.size(); i++) {
 
             Collection<Integer> indexCluster = indexClusters.get(i);
 
-            Collection<VariantCall> callCluster = indexCluster.stream()
-                    .map((index) -> unclustered.getCall(index))
+            Collection<List> callCluster = indexCluster.stream()
+                    .map((index) -> unclustered.getRawCalls().get(index))
                     .collect(Collectors.toList());
 
-            String clusterName = getClusterName(i, indexClusters.size());
-            VariantCall combinedCall = combineCalls(callCluster, unclustered.getColumnNames(), clusterName);
+            List combinedCall = combineCalls(callCluster, unclustered.getColumnIndexMap(), unclustered.getTypes());
             clusteredCalls.add(combinedCall);
+        }
+
+        for (int i = 0; i < clusteredCalls.size(); i++) {
+            clusteredCalls.get(i).add(0, getClusterName(i, indexClusters.size()));
         }
 
         List<String> clusteredColumnNames = new ArrayList<>();
         clusteredColumnNames.add("viperId");
         clusteredColumnNames.addAll(unclustered.getColumnNames());
 
-        VariantTable clusteredTable = new VariantTable(clusteredCalls, clusteredColumnNames);
+        List<VariantPropertyType> clusteredTypes = new ArrayList<>();
+        clusteredTypes.add(VariantPropertyType.STRING);
+        clusteredTypes.addAll(unclustered.getTypes());
+
+        VariantTable clusteredTable = new VariantTable(clusteredCalls, clusteredColumnNames, clusteredTypes);
         return new VariantTableCluster(unclustered, clusteredTable, indexClusters);
     }
 

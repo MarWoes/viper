@@ -24,12 +24,11 @@ package de.imi.marw.viper.variants.table;
 
 import au.com.bytecode.opencsv.CSVReader;
 import de.imi.marw.viper.util.Util;
-import de.imi.marw.viper.variants.VariantCall;
-import de.imi.marw.viper.variants.VariantProperty;
 import de.imi.marw.viper.variants.VariantPropertyType;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -132,22 +131,21 @@ public class CsvTableReader implements TableReader {
         }
     }
 
-    private VariantCall parseVariantCall(String[] colNames, String[] colValues, VariantPropertyType[] types) {
-        Map<String, VariantProperty> propertyMap = new HashMap<>();
+    private List parseVariantCall(String[] colNames, String[] colValues, VariantPropertyType[] types) {
+        Object[] row = new Object[colNames.length];
 
         for (int i = 0; i < colNames.length; i++) {
             Object propertyValue = parseProperty(types[i], colValues[i]);
 
-            propertyMap.put(colNames[i], new VariantProperty(types[i], propertyValue));
+            row[i] = propertyValue;
         }
 
-        return new VariantCall(propertyMap);
+        return Arrays.asList(row);
     }
 
-    private List<VariantCall> parseVariantCalls(String[] colNames, List<String[]> colValues) {
-        VariantPropertyType[] types = determineTypes(colValues);
+    private List<List> parseVariantCalls(String[] colNames, List<String[]> colValues, VariantPropertyType[] types) {
 
-        List<VariantCall> calls = colValues.stream()
+        List<List> calls = colValues.stream()
                 .map((rowValues) -> parseVariantCall(colNames, rowValues, types))
                 .collect(Collectors.toList());
 
@@ -162,9 +160,11 @@ public class CsvTableReader implements TableReader {
 
             List<String[]> rawData = reader.readAll();
 
-            List<VariantCall> parsedCalls = parseVariantCalls(header, rawData);
+            VariantPropertyType[] types = determineTypes(rawData);
 
-            return new VariantTable(parsedCalls, Arrays.asList(header));
+            List<List> parsedCalls = parseVariantCalls(header, rawData, types);
+
+            return new VariantTable(parsedCalls, Arrays.asList(header), Arrays.asList(types));
 
         } catch (FileNotFoundException ex) {
             System.out.println("[ERROR] File " + this.fileName + " not found!");

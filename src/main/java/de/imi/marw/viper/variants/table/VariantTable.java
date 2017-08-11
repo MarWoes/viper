@@ -22,11 +22,14 @@
  */
 package de.imi.marw.viper.variants.table;
 
-import de.imi.marw.viper.variants.VariantCall;
 import de.imi.marw.viper.variants.VariantCallFilter;
+import de.imi.marw.viper.variants.VariantPropertyType;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,45 +39,117 @@ import java.util.stream.IntStream;
  */
 public class VariantTable {
 
-    private final List<VariantCall> calls;
-    private final List<String> columnNames;
+    public static final String TYPE_COLUMN_NAME = "svType";
+    public static final String SAMPLE_COLUMN_NAME = "sample";
+    public static final String CHR1_COLUMN_NAME = "chr1";
+    public static final String CHR2_COLUMN_NAME = "chr2";
+    public static final String BP1_COLUMN_NAME = "bp1";
+    public static final String BP2_COLUMN_NAME = "bp2";
 
-    public VariantTable(Collection<VariantCall> calls, List<String> columnNames) {
-        this.calls = new ArrayList<>();
+    private static final String[] MANDATORY_FIELDS = {
+        TYPE_COLUMN_NAME,
+        SAMPLE_COLUMN_NAME,
+        CHR1_COLUMN_NAME,
+        CHR2_COLUMN_NAME,
+        BP1_COLUMN_NAME,
+        BP2_COLUMN_NAME
+    };
+
+    private final List<List> rows;
+    private final List<String> columnNames;
+    private final List<VariantPropertyType> types;
+    private final Map<String, Integer> indexMap;
+
+    public VariantTable(Collection<List> calls, List<String> columnNames, List<VariantPropertyType> types) {
+        this.indexMap = new HashMap<>();
+        for (int i = 0; i < columnNames.size(); i++) {
+            indexMap.put(columnNames.get(i), i);
+        }
+        this.rows = new ArrayList<>();
         this.columnNames = columnNames;
-        this.calls.addAll(calls);
+        this.rows.addAll(calls);
+        this.types = types;
     }
 
     public synchronized VariantTable filter(Collection<VariantCallFilter> filters) {
 
-        Collection<VariantCall> callsAfterFiltering = this.calls.stream()
-                .filter((call) -> call.isPassingFilters(filters))
+        Collection<List> callsAfterFiltering = this.rows.stream()
+                .filter((call) -> filters.stream().allMatch((filter) -> filter.isPassing(call, indexMap)))
                 .collect(Collectors.toList());
 
-        return new VariantTable(callsAfterFiltering, columnNames);
+        return new VariantTable(callsAfterFiltering, columnNames, this.types);
     }
 
-    public synchronized VariantCall getCall(int rowIndex) {
-        return this.calls.get(rowIndex);
+    public synchronized Map<String, Object> getCall(int rowIndex) {
+
+        Map<String, Object> variantCall = new LinkedHashMap<>(columnNames.size());
+        List rawRow = this.rows.get(rowIndex);
+
+        for (int i = 0; i < columnNames.size(); i++) {
+            variantCall.put(this.columnNames.get(i), rawRow.get(i));
+        }
+
+        return variantCall;
     }
 
-    public synchronized List<VariantCall> getAllCalls() {
-        return this.calls;
+    public synchronized List<List> getRawCalls() {
+        return this.rows;
     }
 
-    public synchronized List<VariantCall> getCallRange(int lower, int upper) {
+    public synchronized List<Map<String, Object>> getCallRange(int lower, int upper) {
         return IntStream
                 .range(lower, upper)
                 .boxed()
-                .map((index) -> this.calls.get(index))
+                .map((index) -> getCall(index))
                 .collect(Collectors.toList());
     }
 
     public synchronized int getNumberOfCalls() {
-        return this.calls.size();
+        return this.rows.size();
     }
 
     public synchronized List<String> getColumnNames() {
         return columnNames;
     }
+
+    public synchronized Map<String, Integer> getColumnIndexMap() {
+        return indexMap;
+    }
+
+    public synchronized List<VariantPropertyType> getTypes() {
+        return types;
+    }
+//    public void setValue(Object newValue) {
+//        switch (type) {
+//            case STRING:
+//                checkCorrectType(newValue, String.class);
+//                break;
+//            case STRING_COLLECTION:
+//                checkCorrectCollectionType(newValue, String.class);
+//                break;
+//            case NUMERIC:
+//                checkCorrectType(newValue, Double.class);
+//                break;
+//            case NUMERIC_COLLECTION:
+//                checkCorrectCollectionType(newValue, Double.class);
+//                break;
+//            default:
+//                throw new IllegalStateException("Unexpected type " + type + "when setting variant value");
+//        }
+//
+//        this.propertyValue = newValue;
+//    }
+//    private void checkCorrectCollectionType(Object value, Class someClass) {
+//        if (value instanceof Collection) {
+//            ((Collection) value).stream().forEach((o) -> checkCorrectType(o, someClass));
+//        } else {
+//            throw new IllegalPropertyValueException(type, value, Collection.class);
+//        }
+//    }
+//
+//    private void checkCorrectType(Object value, Class someClass) {
+//        if (value != null && !someClass.isInstance(value)) {
+//            throw new IllegalPropertyValueException(type, value, someClass);
+//        }
+//    }
 }

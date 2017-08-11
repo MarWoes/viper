@@ -46,7 +46,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.viewer', [
       Ctrl.currentVariants = rawVariants.map(function (rawVariant) {
 
         return Ctrl.columnNames.map(function (columnName) {
-          return Ctrl.variantPropertyToString(rawVariant.properties[columnName]);
+          return Ctrl.variantPropertyToString(rawVariant[columnName]);
         })
       })
     })

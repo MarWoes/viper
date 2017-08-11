@@ -75,9 +75,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
 
-  function variantPropertyToString (property) {
-
-    var propertyValue = property.propertyValue;
+  function variantPropertyToString (propertyValue) {
 
     if (propertyValue == null) return "NA";
 
