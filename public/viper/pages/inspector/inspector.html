@@ -31,7 +31,8 @@
         <tbody>
           <tr ng-repeat="(key, value) in inspectorCtrl.currentVariant">
             <td>{{ key }}</td>
-            <td ng-bind-html="inspectorCtrl.variantPropertyToString(value)">
+            <td>
+              {{ inspectorCtrl.variantPropertyToString(value) }}
             </td>
           </tr>
         </tbody>
@@ -61,7 +62,7 @@
           <tbody>
             <tr ng-repeat="relatedVariant in inspectorCtrl.relatedVariants">
               <td ng-repeat="key in inspectorCtrl.columnNames">
-                <span ng-bind-html="inspectorCtrl.variantPropertyToString(relatedVariant[key])"></span>
+                {{ inspectorCtrl.variantPropertyToString(relatedVariant[key]) }}
               </td>
             </tr>
           </tbody>
