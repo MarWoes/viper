@@ -40,14 +40,18 @@ public class VariantClusterBuilder {
 
     private final IntervalClusterBuilder intervalClusterer = new IntervalClusterBuilder();
 
-    private Collection<String> getChromosomeKeys(VariantTable table) {
-        Collection<String> keys = table.getRawCalls().stream()
-                .map((variantCall) -> {
-                    String chr1 = variantCall.get(table.getColumnIndexMap().get(VariantTable.CHR1_COLUMN_NAME)).toString();
-                    String chr2 = variantCall.get(table.getColumnIndexMap().get(VariantTable.CHR2_COLUMN_NAME)).toString();
+    private String getSequenceKey(List variantCall, Map<String, Integer> indexMap) {
 
-                    return chr1 + "-" + chr2;
-                })
+        String chr1 = variantCall.get(indexMap.get(VariantTable.CHR1_COLUMN_NAME)).toString();
+        String chr2 = variantCall.get(indexMap.get(VariantTable.CHR2_COLUMN_NAME)).toString();
+        String type = variantCall.get(indexMap.get(VariantTable.TYPE_COLUMN_NAME)).toString();
+
+        return chr1 + "-" + chr2 + "-" + type;
+    }
+
+    private Collection<String> getSequenceKeys(VariantTable table) {
+        Collection<String> keys = table.getRawCalls().stream()
+                .map((variantCall) -> getSequenceKey(variantCall, table.getColumnIndexMap()))
                 .distinct()
                 .collect(Collectors.toList());
 
@@ -60,13 +64,14 @@ public class VariantClusterBuilder {
                 .boxed()
                 .map((rowIndex) -> {
 
-                    String chr1 = rawCalls.get(rowIndex).get(unclustered.getColumnIndexMap().get(VariantTable.CHR1_COLUMN_NAME)).toString();
-                    String chr2 = rawCalls.get(rowIndex).get(unclustered.getColumnIndexMap().get(VariantTable.CHR2_COLUMN_NAME)).toString();
+                    List call = rawCalls.get(rowIndex);
+                    Map<String, Integer> indexMap = unclustered.getColumnIndexMap();
 
-                    int bp1 = ((Double) rawCalls.get(rowIndex).get(unclustered.getColumnIndexMap().get(VariantTable.BP1_COLUMN_NAME))).intValue();
-                    int bp2 = ((Double) rawCalls.get(rowIndex).get(unclustered.getColumnIndexMap().get(VariantTable.BP2_COLUMN_NAME))).intValue();
+                    String sequenceKey = getSequenceKey(call, indexMap);
+                    int bp1 = ((Double) call.get(indexMap.get(VariantTable.BP1_COLUMN_NAME))).intValue();
+                    int bp2 = ((Double) call.get(indexMap.get(VariantTable.BP2_COLUMN_NAME))).intValue();
 
-                    return new VariantInterval(chr1 + "-" + chr2, bp1, bp2, rowIndex);
+                    return new VariantInterval(sequenceKey, bp1, bp2, rowIndex);
                 })
                 .filter((variantInterval) -> variantInterval.getChromosomeKey().equals(chromosomeKey))
                 .collect(Collectors.toList());
@@ -85,7 +90,7 @@ public class VariantClusterBuilder {
 
     private List<Collection<Integer>> computeClusterIndices(VariantTable unclustered) {
 
-        Collection<String> chromosomeKeys = getChromosomeKeys(unclustered);
+        Collection<String> chromosomeKeys = getSequenceKeys(unclustered);
 
         List<Collection<Integer>> clusters = new ArrayList<>();
 
@@ -212,7 +217,6 @@ public class VariantClusterBuilder {
 
         List<VariantPropertyType> clusteredTypes = getNewClusterTypes(unclustered.getTypes());
         clusteredTypes.add(0, VariantPropertyType.STRING);
-
 
         VariantTable clusteredTable = new VariantTable(clusteredCalls, clusteredColumnNames, clusteredTypes);
         return new VariantTableCluster(unclustered, clusteredTable, indexClusters);
