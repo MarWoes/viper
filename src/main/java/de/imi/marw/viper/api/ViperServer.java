@@ -23,10 +23,15 @@
 package de.imi.marw.viper.api;
 
 import com.google.gson.Gson;
+import de.imi.marw.viper.util.Util;
 import de.imi.marw.viper.variants.VariantClusterBuilder;
 import de.imi.marw.viper.variants.VariantTableCluster;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
+import de.imi.marw.viper.visualization.IGVVisualizer;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import static spark.Spark.*;
 
@@ -40,6 +45,7 @@ public class ViperServer {
     private final Gson gson;
     private final VariantClusterBuilder clusterer;
     private VariantTableCluster variantTableCluster;
+    private IGVVisualizer igv;
 
     public ViperServer(ViperServerConfig config) {
 
@@ -50,7 +56,12 @@ public class ViperServer {
 
     public void start() {
 
+        this.igv = this.setupIGV();
+        this.igv.start();
+
         this.variantTableCluster = this.loadVariants();
+
+        this.igv.awaitStartup();
 
         this.setupRoutes();
     }
@@ -66,9 +77,10 @@ public class ViperServer {
 
     private void setupRoutes() {
         ipAddress("127.0.0.1");
-        port(config.getPortNumber());
+        port(config.getViperPort());
 
         staticFiles.externalLocation("public");
+        staticFiles.externalLocation(this.config.getWorkDir());
 
         setupTableApi();
 
@@ -117,5 +129,41 @@ public class ViperServer {
         }, gson::toJson);
 
         get("/api/variant-table/related-calls/column-names", (req, res) -> variantTableCluster.getUnclusteredTable().getColumnNames(), gson::toJson);
+
+        post("/api/variant-table/snapshot", (req, res) -> {
+
+            int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
+            int maxIndex = Util.clamp(queryIndex + 10, 0, variantTableCluster.getClusteredTable().getNumberOfCalls());
+
+            for (int i = queryIndex; queryIndex < maxIndex; queryIndex++) {
+
+                List<Map<String, Object>> relatedCalls = variantTableCluster.getUnclusteredCalls(queryIndex);
+                
+                Map<String, Object> firstCall = relatedCalls.get(0);
+                
+                String sample = firstCall.get(VariantTable.SAMPLE_COLUMN_NAME).toString();
+                
+                String chr1 = firstCall.get(VariantTable.CHR1_COLUMN_NAME).toString();
+                String chr2 = firstCall.get(VariantTable.CHR2_COLUMN_NAME).toString();
+                
+                int bp1 = ((Double) firstCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
+                int bp2 = ((Double) firstCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
+                
+                this.igv.scheduleSnapshot(sample, chr1, bp1);
+                this.igv.scheduleSnapshot(sample, chr2, bp2);
+            }
+
+            return "OK";
+        });
+    }
+
+    private IGVVisualizer setupIGV() {
+        new File(this.config.getWorkDir()).mkdirs();
+
+        return new IGVVisualizer(this.config.getIgvJar(),
+                this.config.getFastaRef(),
+                this.config.getIgvPort(),
+                this.config.getWorkDir(),
+                this.config.getBamDir());
     }
 }

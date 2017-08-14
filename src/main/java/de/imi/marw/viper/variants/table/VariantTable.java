@@ -99,6 +99,10 @@ public class VariantTable {
         return variantCall;
     }
 
+    public synchronized Object getCallProperty(int index, String columnName) {
+        return this.rows.get(index).get(indexMap.get(columnName));
+    }
+
     public synchronized List<List> getRawCalls() {
         return this.rows;
     }

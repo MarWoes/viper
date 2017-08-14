@@ -29,9 +29,14 @@ package de.imi.marw.viper.api;
 public class ViperServerConfig {
 
     private String analysisCsvFile;
-    private int portNumber = 8090;
+    private int viperPort = 8090;
+    private int igvPort = 9090;
     private char csvDelimiter = ';';
     private String propertyCollectionDelimiter = ",";
+    private String workDir = "/tmp/viper";
+    private String fastaRef = "/tmp/ref.fa";
+    private String igvJar = "../igv/igv.jar";
+    private String bamDir = "/tmp/bam";
 
     public ViperServerConfig(String csvFile) {
         this.analysisCsvFile = csvFile;
@@ -53,12 +58,12 @@ public class ViperServerConfig {
         this.propertyCollectionDelimiter = propertyCollectionDelimiter;
     }
 
-    public int getPortNumber() {
-        return portNumber;
+    public int getViperPort() {
+        return viperPort;
     }
 
-    public void setPortNumber(int portNumber) {
-        this.portNumber = portNumber;
+    public void setViperPort(int viperPort) {
+        this.viperPort = viperPort;
     }
 
     public String getAnalysisCsvFile() {
@@ -67,5 +72,45 @@ public class ViperServerConfig {
 
     public void setAnalysisCsvFile(String analysisCsvFile) {
         this.analysisCsvFile = analysisCsvFile;
+    }
+
+    public String getWorkDir() {
+        return workDir;
+    }
+
+    public void setWorkDir(String workDir) {
+        this.workDir = workDir;
+    }
+
+    public String getFastaRef() {
+        return fastaRef;
+    }
+
+    public void setFastaRef(String fastaRef) {
+        this.fastaRef = fastaRef;
+    }
+
+    public String getIgvJar() {
+        return igvJar;
+    }
+
+    public void setIgvJar(String igvJar) {
+        this.igvJar = igvJar;
+    }
+
+    public int getIgvPort() {
+        return igvPort;
+    }
+
+    public void setIgvPort(int igvPort) {
+        this.igvPort = igvPort;
+    }
+
+    public String getBamDir() {
+        return bamDir;
+    }
+
+    public void setBamDir(String bamDir) {
+        this.bamDir = bamDir;
     }
 }

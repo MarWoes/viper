@@ -12,6 +12,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.getTableRange = getTableRange;
   Service.getTableRow = getTableRow;
   Service.variantPropertyToString = variantPropertyToString;
+  Service.scheduleSnapshot = scheduleSnapshot;
 
   function getColumnNames () {
     var promise = $http.get('/api/variant-table/column-names').then(function (res) {
@@ -73,6 +74,17 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
   function isNumeric(n) {
     return typeof n === "number";
+  }
+
+  function scheduleSnapshot(index) {
+
+    var promise = $http.post("/api/variant-table/snapshot", {}, {
+      params: {
+        index: index
+      }
+    });
+
+    return promise;
   }
 
   function variantPropertyToString (propertyValue) {
