@@ -180,16 +180,18 @@ public class VariantTable {
         Object value = call.get(indexMap.get(column));
 
         switch (type) {
+            case NUMERIC:
             case STRING:
-                return (String) value;
+                return value.toString();
+            case NUMERIC_COLLECTION:
             case STRING_COLLECTION:
-                List<String> values = (List<String>) value;
+                List values = (List) value;
 
                 if (values.size() != 1) {
                     throw new IllegalStateException("multiple chromosomes found");
                 }
 
-                return values.get(0);
+                return values.get(0).toString();
             default:
                 throw new IllegalStateException("chr were no strings");
         }
