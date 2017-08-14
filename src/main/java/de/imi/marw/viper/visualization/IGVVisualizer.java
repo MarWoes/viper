@@ -149,6 +149,10 @@ public class IGVVisualizer extends Thread {
         }
     }
 
+    public boolean isSnapshotDone(String key) {
+        return this.visualizedSet.contains(key);
+    }
+
     public void scheduleSnapshot(String sample, String chr, int bp) {
 
         String key = sample + "-" + chr + "-" + bp;

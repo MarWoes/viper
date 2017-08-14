@@ -30,8 +30,12 @@ import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.visualization.IGVVisualizer;
 import java.io.File;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
+import spark.Request;
+import spark.Response;
 
 import static spark.Spark.*;
 
@@ -130,31 +134,55 @@ public class ViperServer {
 
         get("/api/variant-table/related-calls/column-names", (req, res) -> variantTableCluster.getUnclusteredTable().getColumnNames(), gson::toJson);
 
-        post("/api/variant-table/snapshot", (req, res) -> {
+        post("/api/variant-table/snapshot", this::takeSnapshot);
+        get("/api/variant-table/is-snapshot-available", (req, res) -> {
 
-            int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
-            int maxIndex = Util.clamp(queryIndex + 10, 0, variantTableCluster.getClusteredTable().getNumberOfCalls());
+            String key = req.queryParams("key");
 
-            for (int i = queryIndex; queryIndex < maxIndex; queryIndex++) {
+            return igv.isSnapshotDone(key);
 
-                List<Map<String, Object>> relatedCalls = variantTableCluster.getUnclusteredCalls(queryIndex);
-                
-                Map<String, Object> firstCall = relatedCalls.get(0);
-                
-                String sample = firstCall.get(VariantTable.SAMPLE_COLUMN_NAME).toString();
-                
-                String chr1 = firstCall.get(VariantTable.CHR1_COLUMN_NAME).toString();
-                String chr2 = firstCall.get(VariantTable.CHR2_COLUMN_NAME).toString();
-                
-                int bp1 = ((Double) firstCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
-                int bp2 = ((Double) firstCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
-                
-                this.igv.scheduleSnapshot(sample, chr1, bp1);
-                this.igv.scheduleSnapshot(sample, chr2, bp2);
+        }, gson::toJson);
+
+        get("/api/variant-table/snapshot/:key", (req, res) -> {
+
+            String key = req.params("key");
+
+            res.raw().setContentType("image/png");
+
+            File image = new File(this.config.getWorkDir() + "/" + key + ".png");
+
+            try (OutputStream out = res.raw().getOutputStream()) {
+                ImageIO.write(ImageIO.read(image), "png", out);
             }
 
-            return "OK";
+            return res.raw();
+
         });
+    }
+
+    private Object takeSnapshot(Request req, Response res) {
+        int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
+        int maxIndex = Util.clamp(queryIndex + 10, 0, variantTableCluster.getClusteredTable().getNumberOfCalls());
+
+        for (int i = queryIndex; queryIndex < maxIndex; queryIndex++) {
+
+            List<Map<String, Object>> relatedCalls = variantTableCluster.getUnclusteredCalls(queryIndex);
+
+            Map<String, Object> firstCall = relatedCalls.get(0);
+
+            String sample = firstCall.get(VariantTable.SAMPLE_COLUMN_NAME).toString();
+
+            String chr1 = firstCall.get(VariantTable.CHR1_COLUMN_NAME).toString();
+            String chr2 = firstCall.get(VariantTable.CHR2_COLUMN_NAME).toString();
+
+            int bp1 = ((Double) firstCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
+            int bp2 = ((Double) firstCall.get(VariantTable.BP2_COLUMN_NAME)).intValue();
+
+            this.igv.scheduleSnapshot(sample, chr1, bp1);
+            this.igv.scheduleSnapshot(sample, chr2, bp2);
+        }
+
+        return "OK";
     }
 
     private IGVVisualizer setupIGV() {

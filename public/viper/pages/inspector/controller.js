@@ -1,4 +1,5 @@
 var module = angular.module('de.imi.marw.viper.inspector', [
+  'de.imi.marw.viper.igv.image',
   'de.imi.marw.viper.variant-table.service'
 ])
 .controller('InspectorPageCtrl', function (VariantTableService, $q, $http, $interval) {
