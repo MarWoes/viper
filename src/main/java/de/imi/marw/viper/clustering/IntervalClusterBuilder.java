@@ -87,8 +87,8 @@ public class IntervalClusterBuilder {
         if (otherClusterIndices.length == 1) {
 
             int otherClusterIndex = otherClusterIndices[0];
-            clusters.get(clusterIndices[otherClusterIndex]).add(point.getIndex());
-            clusterIndices[point.getIndex()] = clusterIndices[otherClusterIndex];
+            clusters.get(otherClusterIndex).add(point.getIndex());
+            clusterIndices[point.getIndex()] = otherClusterIndex;
 
         } else {
 
