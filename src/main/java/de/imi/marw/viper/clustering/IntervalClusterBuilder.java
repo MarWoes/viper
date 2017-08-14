@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -114,13 +115,21 @@ public class IntervalClusterBuilder {
     public List<Collection<Integer>> clusterIntervals(List<Interval> intervals) {
 
         List<Collection<Integer>> clusters = new ArrayList<>();
-        int[] clusterIndices = IntStream.range(0, intervals.size())
+
+        Map<Interval, List<Integer>> deduplicatedIntervalMap = IntStream.range(0, intervals.size())
+                .boxed()
+                .collect(Collectors.groupingBy(i -> intervals.get(i)));
+
+        List<Interval> deduplicatedIntervals = new ArrayList<>();
+        deduplicatedIntervals.addAll(deduplicatedIntervalMap.keySet());
+
+        int[] clusterIndices = IntStream.range(0, deduplicatedIntervals.size())
                 .map((i) -> -1)
                 .toArray();
 
-        IndexContainingPoint[] points = IntStream.range(0, intervals.size())
+        IndexContainingPoint[] points = IntStream.range(0, deduplicatedIntervals.size())
                 .boxed()
-                .map((index) -> new IndexContainingPoint(intervals.get(index).getStart(), intervals.get(index).getEnd(), index))
+                .map((index) -> new IndexContainingPoint(deduplicatedIntervals.get(index).getStart(), deduplicatedIntervals.get(index).getEnd(), index))
                 .toArray(IndexContainingPoint[]::new);
 
         TwoDTree tree = new TwoDTree();
@@ -136,6 +145,11 @@ public class IntervalClusterBuilder {
 
         clusters = clusters.stream()
                 .filter((cluster) -> !cluster.isEmpty())
+                .map(cluster -> {
+                    return cluster.stream()
+                            .flatMap(index -> deduplicatedIntervalMap.get(deduplicatedIntervals.get(index)).stream())
+                            .collect(Collectors.toList());
+                })
                 .collect(Collectors.toList());
 
         return clusters;
@@ -153,28 +167,5 @@ public class IntervalClusterBuilder {
         public int getIndex() {
             return index;
         }
-
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 31 * hash + this.index;
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final IndexContainingPoint other = (IndexContainingPoint) obj;
-            return this.index == other.index;
-        }
-
     }
 }

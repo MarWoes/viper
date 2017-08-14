@@ -58,7 +58,7 @@ public class VariantClusterBuilder {
         return keys;
     }
 
-    private List<Collection<Integer>> clusterTableByKey(VariantTable unclustered, String chromosomeKey) {
+    private List<Collection<Integer>> clusterTableByKey(VariantTable unclustered, String matchingSequenceKey) {
         List<List> rawCalls = unclustered.getRawCalls();
         List<Interval> matchingCalls = IntStream.range(0, unclustered.getNumberOfCalls())
                 .boxed()
@@ -73,7 +73,7 @@ public class VariantClusterBuilder {
 
                     return new VariantInterval(sequenceKey, bp1, bp2, rowIndex);
                 })
-                .filter((variantInterval) -> variantInterval.getChromosomeKey().equals(chromosomeKey))
+                .filter((variantInterval) -> variantInterval.getSequenceKey().equals(matchingSequenceKey))
                 .collect(Collectors.toList());
 
         List<Collection<Integer>> clusters = intervalClusterer.clusterIntervals(matchingCalls).stream()
@@ -90,12 +90,12 @@ public class VariantClusterBuilder {
 
     private List<Collection<Integer>> computeClusterIndices(VariantTable unclustered) {
 
-        Collection<String> chromosomeKeys = getSequenceKeys(unclustered);
+        Collection<String> sequenceKeys = getSequenceKeys(unclustered);
 
         List<Collection<Integer>> clusters = new ArrayList<>();
 
-        for (String chromosomeKey : chromosomeKeys) {
-            List<Collection<Integer>> keyClusters = clusterTableByKey(unclustered, chromosomeKey);
+        for (String sequenceKey : sequenceKeys) {
+            List<Collection<Integer>> keyClusters = clusterTableByKey(unclustered, sequenceKey);
 
             clusters.addAll(keyClusters);
         }
@@ -228,20 +228,20 @@ public class VariantClusterBuilder {
     private static final class VariantInterval extends Interval {
 
         private final int tableIndex;
-        private final String chromosomeKey;
+        private final String sequenceKey;
 
         public VariantInterval(String chromosomeKey, int start, int end, int tableIndex) {
             super(start, end);
             this.tableIndex = tableIndex;
-            this.chromosomeKey = chromosomeKey;
+            this.sequenceKey = chromosomeKey;
         }
 
         public int getTableIndex() {
             return tableIndex;
         }
 
-        public String getChromosomeKey() {
-            return chromosomeKey;
+        public String getSequenceKey() {
+            return sequenceKey;
         }
 
     }
