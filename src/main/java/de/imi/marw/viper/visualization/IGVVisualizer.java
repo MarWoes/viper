@@ -73,7 +73,7 @@ public class IGVVisualizer extends Thread {
     @Override
     public void run() {
         try {
-            Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
+            Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
             startIGVProcess();
             this.client = connectToIGV();
             this.setupViewer();
@@ -81,7 +81,7 @@ public class IGVVisualizer extends Thread {
             PrintWriter out = new PrintWriter(client.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-            while (this.igvProcess.isAlive()) {
+            while (this.igvProcess != null && this.igvProcess.isAlive()) {
 
                 IGVCommand nextCommand = this.commandQueue.poll(1, TimeUnit.SECONDS);
 
@@ -105,7 +105,7 @@ public class IGVVisualizer extends Thread {
             Logger.getLogger(IGVVisualizer.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
 
-            onShutdown();
+            shutdown();
         }
     }
 
@@ -198,10 +198,11 @@ public class IGVVisualizer extends Thread {
         }));
     }
 
-    private void onShutdown() {
+    public synchronized void shutdown() {
         if (this.client != null) {
             try {
                 this.client.close();
+                this.client = null;
             } catch (IOException ex) {
                 Logger.getLogger(IGVVisualizer.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -209,10 +210,12 @@ public class IGVVisualizer extends Thread {
 
         if (this.igvProcess != null) {
             this.igvProcess.destroy();
+            this.igvProcess = null;
         }
 
         if (this.xvfbServer != null) {
             this.xvfbServer.destroy();
+            this.xvfbServer = null;
         }
     }
 

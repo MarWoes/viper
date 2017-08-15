@@ -37,6 +37,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import spark.Request;
 import spark.Response;
+import spark.Spark;
 
 import static spark.Spark.*;
 
