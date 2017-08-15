@@ -30,6 +30,7 @@ import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -45,6 +46,9 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 public class IGVVisualizer extends Thread {
 
     private static final int VIEW_RANGE = 25;
+    private static final int XVFB_DISPLAY = 4499;
+    private static final int XVFB_WIDTH = 1280;
+    private static final int XVFB_HEIGHT = 1680;
 
     private final Set<String> visualizedSet;
     private final BlockingQueue<IGVCommand> commandQueue;
@@ -54,6 +58,7 @@ public class IGVVisualizer extends Thread {
     private final String workDir;
     private final String bamDir;
     private Process igvProcess;
+    private Process xvfbServer;
     private Socket client;
 
     public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir) {
@@ -69,7 +74,8 @@ public class IGVVisualizer extends Thread {
     @Override
     public void run() {
         try {
-            this.igvProcess = startIGVProcess();
+            Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
+            startIGVProcess();
             this.client = connectToIGV();
             this.setupViewer();
 
@@ -99,28 +105,32 @@ public class IGVVisualizer extends Thread {
         } catch (IOException | InterruptedException ex) {
             Logger.getLogger(IGVVisualizer.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            if (this.igvProcess != null) {
-                this.igvProcess.destroy();
-            }
 
-            if (this.client != null) {
-                try {
-                    this.client.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(IGVVisualizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            onShutdown();
         }
     }
 
-    private Process startIGVProcess() throws IOException {
+    private void startIGVProcess() throws IOException {
         ProcessBuilder builder = new ProcessBuilder("java", "-jar", this.igvJar,
                 "-p", "" + port,
                 "-g", this.fastaRef,
                 "-o", "igv.properties")
                 .inheritIO();
 
-        return builder.start();
+        if (isXvfbInstalled()) {
+            ProcessBuilder xvfbBuilder = new ProcessBuilder("Xvfb",
+                    ":" + XVFB_DISPLAY,
+                    "-screen", "0,", XVFB_WIDTH + "x" + XVFB_HEIGHT + "x24")
+                    .inheritIO();
+
+            this.xvfbServer = xvfbBuilder.start();
+
+            Map<String, String> igvEnv = builder.environment();
+            igvEnv.put("DISPLAY", ":" + XVFB_DISPLAY);
+        }
+
+        this.igvProcess = builder.start();
+
     }
 
     private Socket connectToIGV() {
@@ -185,6 +195,38 @@ public class IGVVisualizer extends Thread {
     private void setupViewer() {
         this.enqueueCommand(new IGVCommand(new String[]{"setSleepInterval 0"}, () -> {
         }));
+    }
+
+    private void onShutdown() {
+        if (this.client != null) {
+            try {
+                this.client.close();
+            } catch (IOException ex) {
+                Logger.getLogger(IGVVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        if (this.igvProcess != null) {
+            this.igvProcess.destroy();
+        }
+
+        if (this.xvfbServer != null) {
+            this.xvfbServer.destroy();
+        }
+    }
+
+    private boolean isXvfbInstalled() {
+        Runtime rt = Runtime.getRuntime();
+        Process proc;
+        try {
+            proc = rt.exec("Xvfb -help");
+            proc.waitFor();
+            int exitVal = proc.exitValue();
+
+            return exitVal == 0;
+        } catch (IOException | InterruptedException ex) {
+            return false;
+        }
     }
 
     private static final class IGVCommand {
