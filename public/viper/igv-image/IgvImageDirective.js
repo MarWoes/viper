@@ -1,42 +1,70 @@
 var module = angular.module('de.imi.marw.viper.igv.image', [
 ])
-.controller('IgvImageController', function ($scope, $interval, $http) {
+.controller('IgvImageController', function ($scope, $timeout, $http) {
   var Ctrl = this;
+
+  Ctrl.sleepMillis = 1000;
 
   Ctrl.variant      = null;
   Ctrl.chrColumn    = null;
   Ctrl.bpColumn     = null;
-  Ctrl.imagePromise = null;
   Ctrl.breakpointImageLink = null;
 
-  $scope.$watch(function() { return Ctrl.variant }, function (newVal, oldVal) {
+  Ctrl.getSnapshotKey = getSnapshotKey;
+  Ctrl.isSnapshotAvailable = isSnapshotAvailable;
+  Ctrl.onVariantChange = onVariantChange;
 
-    if (Ctrl.imagePromise != null) $interval.cancel(Ctrl.imagePromise);
+  Ctrl.init = init;
 
-    Ctrl.imagePromise = $interval(function () {
+  Ctrl.init();
 
-      var key = newVal['sample'] + '-' + newVal[Ctrl.chrColumn] + '-' + newVal[Ctrl.bpColumn];
-      $http.get('/api/variant-table/is-snapshot-available', {
-        params: { key: key }
-      })
-      .then(function (res) {
+  function init () {
 
-        if (res.data === 'true') {
+    $scope.$watch(function () { return Ctrl.variant}, Ctrl.onVariantChange);
 
-            if (Ctrl.imagePromise != null) $interval.cancel(Ctrl.imagePromise);
+  }
 
-            var currentKey = Ctrl.variant['sample'] + '-' + Ctrl.variant[Ctrl.chrColumn] + '-' + Ctrl.variant[Ctrl.bpColumn];
+  function onVariantChange (newVal, oldVal) {
 
-            if (currentKey === key) {
-              Ctrl.breakpointImageLink = '/api/variant-table/snapshot/' + currentKey;
-            }
-        }
+    var key = Ctrl.getSnapshotKey(newVal);
 
-      })
+    Ctrl.isSnapshotAvailable(key)
+    .then(function (res) {
 
-    }, 250);
+      var isAvailable = res.data;
 
-  })
+      var currentKey = Ctrl.getSnapshotKey(Ctrl.variant);
+
+      if (currentKey === key && res.data === 'true') {
+
+        Ctrl.breakpointImageLink = '/api/variant-table/snapshot/' + currentKey;
+
+      } else if (currentKey === key && res.data === 'false') {
+
+        Ctrl.breakpointImageLink = null;
+
+        $timeout(function () {
+          Ctrl.onVariantChange(newVal, oldVal);
+        }, Ctrl.sleepMillis);
+
+      }
+
+    })
+
+  }
+
+  function isSnapshotAvailable(snapshotKey) {
+    var promise = $http.get('/api/variant-table/is-snapshot-available', {
+      params: { key: snapshotKey }
+    });
+
+    return promise;
+  }
+
+  function getSnapshotKey(variant) {
+    return variant['sample'] + '-' + variant[Ctrl.chrColumn] + '-' + variant[Ctrl.bpColumn];
+  }
+
 })
 .directive('igvImage', function () {
   return {
