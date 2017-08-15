@@ -32,29 +32,32 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author marius
  */
-public class ViperProgressManager {
+public class ProgressManager {
 
     private final Path workDir;
 
-    public ViperProgressManager(String workDir) {
+    public ProgressManager(String workDir) {
         this.workDir = Paths.get(workDir);
     }
 
     public void saveProgress(VariantTableCluster cluster) {
 
-        List<String> decisions = Arrays.asList(getDecisions(cluster));
+        List<String> decisions = cluster.getClusteredTable().getColumn(VariantTable.DECISION_COLUMN_NAME).stream()
+                .map(decision -> (String) decision)
+                .collect(Collectors.toList());
 
         Path saveFilePath = getSavePath(cluster);
 
         try {
             Files.write(saveFilePath, decisions, Charset.forName("UTF-8"));
         } catch (IOException ex) {
-            Logger.getLogger(ViperProgressManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ProgressManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -74,27 +77,21 @@ public class ViperProgressManager {
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(ViperProgressManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ProgressManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private Path getSavePath(VariantTableCluster cluster) {
 
-        String[] decisions = getDecisions(cluster);
+        String[] bp1 = cluster.getClusteredTable().getColumn(VariantTable.BP1_COLUMN_NAME)
+                .stream()
+                .map(bp -> bp.toString())
+                .toArray(String[]::new);
 
-        int analysisHash = Arrays.hashCode(decisions);
+        int analysisHash = Arrays.hashCode(bp1);
         int size = cluster.getClusteredTable().getNumberOfCalls();
 
         String fileName = "progress." + analysisHash + "." + size + ".txt";
         return workDir.resolve(fileName);
     }
-
-    private String[] getDecisions(VariantTableCluster cluster) {
-        String[] decisions = cluster.getClusteredTable().getColumn(VariantTable.DECISION_COLUMN_NAME).stream()
-                .map(decision -> (String) decision)
-                .toArray(String[]::new);
-
-        return decisions;
-    }
-
 }

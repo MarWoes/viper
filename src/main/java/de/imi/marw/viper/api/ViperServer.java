@@ -28,6 +28,7 @@ import de.imi.marw.viper.variants.VariantClusterBuilder;
 import de.imi.marw.viper.variants.VariantTableCluster;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
+import de.imi.marw.viper.variants.table.ProgressManager;
 import de.imi.marw.viper.visualization.IGVVisualizer;
 import java.io.File;
 import java.io.OutputStream;
@@ -48,7 +49,9 @@ public class ViperServer {
     private final ViperServerConfig config;
     private final Gson gson;
     private final VariantClusterBuilder clusterer;
+    private final ProgressManager progressManager;
     private VariantTableCluster variantTableCluster;
+
     private IGVVisualizer igv;
 
     public ViperServer(ViperServerConfig config) {
@@ -56,6 +59,7 @@ public class ViperServer {
         this.config = config;
         this.gson = new Gson();
         this.clusterer = new VariantClusterBuilder();
+        this.progressManager = new ProgressManager(config.getWorkDir());
     }
 
     public void start() {
@@ -75,6 +79,8 @@ public class ViperServer {
 
         VariantTable unclusteredTable = reader.readTable();
         VariantTableCluster cluster = clusterer.clusterVariantTable(unclusteredTable);
+
+        progressManager.loadProgress(cluster);
 
         return cluster;
     }
@@ -157,6 +163,12 @@ public class ViperServer {
 
             return res.raw();
 
+        });
+
+        post("/api/variant-table/save", (req, res) -> {
+            progressManager.saveProgress(variantTableCluster);
+
+            return "OK";
         });
     }
 
