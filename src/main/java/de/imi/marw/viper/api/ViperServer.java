@@ -31,13 +31,12 @@ import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.variants.table.ProgressManager;
 import de.imi.marw.viper.visualization.IGVVisualizer;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-import javax.imageio.ImageIO;
 import spark.Request;
 import spark.Response;
-import spark.Spark;
 
 import static spark.Spark.*;
 
@@ -91,7 +90,6 @@ public class ViperServer {
         port(config.getViperPort());
 
         staticFiles.externalLocation("public");
-        staticFiles.externalLocation(this.config.getWorkDir());
 
         setupTableApi();
 
@@ -158,8 +156,15 @@ public class ViperServer {
 
             File image = new File(this.config.getWorkDir() + "/" + key + ".png");
 
-            try (OutputStream out = res.raw().getOutputStream()) {
-                ImageIO.write(ImageIO.read(image), "png", out);
+            try (
+                    OutputStream out = res.raw().getOutputStream();
+                    FileInputStream in = new FileInputStream(image);) {
+
+                byte[] buf = new byte[1024];
+                int count = 0;
+                while ((count = in.read(buf)) >= 0) {
+                    out.write(buf, 0, count);
+                }
             }
 
             return res.raw();
