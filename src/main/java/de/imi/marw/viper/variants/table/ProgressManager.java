@@ -46,7 +46,7 @@ public class ProgressManager {
         this.workDir = Paths.get(workDir);
     }
 
-    public void saveProgress(VariantTableCluster cluster) {
+    public boolean saveProgress(VariantTableCluster cluster) {
 
         List<String> decisions = cluster.getClusteredTable().getColumn(VariantTable.DECISION_COLUMN_NAME).stream()
                 .map(decision -> (String) decision)
@@ -56,8 +56,10 @@ public class ProgressManager {
 
         try {
             Files.write(saveFilePath, decisions, Charset.forName("UTF-8"));
+            return true;
         } catch (IOException ex) {
             Logger.getLogger(ProgressManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 

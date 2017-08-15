@@ -2,15 +2,28 @@ var module = angular.module('de.imi.marw.viper',
   [
     'de.imi.marw.viper.filtering',
     'de.imi.marw.viper.inspector',
+    'de.imi.marw.viper.variant-table.service',
     'ngRoute',
     'ui.bootstrap'
   ]
 )
-.controller('ViperMainController', function($location) {
+.controller('ViperMainController', function($location, VariantTableService) {
   var Ctrl = this;
 
-  Ctrl.getCurrentRoute = function () {
+  Ctrl.getCurrentRoute = getCurrentRoute;
+  Ctrl.saveProgress = saveProgress;
+
+  function getCurrentRoute() {
     return $location.path();
+  }
+
+  function saveProgress () {
+    VariantTableService.saveProgress()
+    .then(function (success) {
+      alert('Succesfully saved progress.');
+    }, function (error) {
+      alert('An error occurred during saving.');
+    })
   }
 })
 .config(function ($routeProvider, $locationProvider) {

@@ -55,8 +55,16 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       <div class="navbar-collapse">
         <ul class="nav navbar-nav ">
-          <li ng-class="{active: viperMainCtrl.getCurrentRoute() == '/inspector'}"><a href="#!inspector">Inspector</a></li>
-          <li ng-class="{active: viperMainCtrl.getCurrentRoute() == '/filtering'}"><a href="#!filtering">Filtering</a></li>
+          <li ng-class="{ active: viperMainCtrl.getCurrentRoute() == '/inspector' }"><a href="#!inspector">Inspector</a></li>
+          <li ng-class="{ active: viperMainCtrl.getCurrentRoute() == '/filtering' }"><a href="#!filtering">Filtering</a></li>
+        </ul>
+
+        <ul class="nav navbar-nav pull-right">
+          <li>
+              <button type="button" class="btn btn-primary btn-small navbar-btn btn-space" ng-click="viperMainCtrl.saveProgress()">
+                <span class="glyphicon glyphicon-floppy-disk"></span> save progress
+              </button>
+          </li>
         </ul>
       </div>
   </nav>

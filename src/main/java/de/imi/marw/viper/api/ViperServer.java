@@ -166,9 +166,15 @@ public class ViperServer {
         });
 
         post("/api/variant-table/save", (req, res) -> {
-            progressManager.saveProgress(variantTableCluster);
 
-            return "OK";
+            boolean success = progressManager.saveProgress(variantTableCluster);
+
+            if (success) {
+                return "OK";
+            } else {
+                res.status(500);
+                return "ERROR";
+            }
         });
     }
 
