@@ -13,3 +13,7 @@
 .table-small-font {
   font-size: 12px;
 }
+
+.breakpoint-image {
+  width: 100%;
+}
