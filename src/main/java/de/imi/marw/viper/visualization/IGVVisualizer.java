@@ -31,13 +31,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.eclipse.jetty.util.ConcurrentHashSet;
 
 /**
  *
@@ -50,7 +49,7 @@ public class IGVVisualizer extends Thread {
     private static final int XVFB_WIDTH = 1280;
     private static final int XVFB_HEIGHT = 1680;
 
-    private final Set<String> visualizedSet;
+    private final Map<String, Boolean> visualizationProgressMap;
     private final BlockingQueue<IGVCommand> commandQueue;
     private final int port;
     private final String fastaRef;
@@ -67,7 +66,7 @@ public class IGVVisualizer extends Thread {
         this.igvJar = igvJar;
         this.commandQueue = new LinkedBlockingQueue<>();
         this.workDir = workDir;
-        this.visualizedSet = new ConcurrentHashSet<>();
+        this.visualizationProgressMap = new ConcurrentHashMap<>();
         this.bamDir = bamDir;
     }
 
@@ -160,16 +159,18 @@ public class IGVVisualizer extends Thread {
     }
 
     public boolean isSnapshotDone(String key) {
-        return this.visualizedSet.contains(key);
+        return this.visualizationProgressMap.getOrDefault(key, false);
     }
 
     public void scheduleSnapshot(String sample, String chr, int bp) {
 
         String key = sample + "-" + chr + "-" + bp;
 
-        if (this.visualizedSet.contains(key)) {
+        if (this.visualizationProgressMap.containsKey(key)) {
             return;
         }
+
+        this.visualizationProgressMap.put(key, false);
 
         Path workdir = Paths.get(this.workDir);
         String imageFileName = workdir.resolve(key + ".png").toString();
@@ -185,7 +186,7 @@ public class IGVVisualizer extends Thread {
             "snapshot " + imageFileName
         };
 
-        this.enqueueCommand(new IGVCommand(subCommands, () -> this.visualizedSet.add(key)));
+        this.enqueueCommand(new IGVCommand(subCommands, () -> this.visualizationProgressMap.put(key, true)));
     }
 
     public void enqueueCommand(IGVCommand command) {
