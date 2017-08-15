@@ -59,12 +59,12 @@ public class VariantTable {
         BP2_COLUMN_NAME
     };
 
-    private final List<List> rows;
+    private final List<List<Object>> rows;
     private final List<String> columnNames;
     private final List<VariantPropertyType> types;
     private final Map<String, Integer> indexMap;
 
-    public VariantTable(Collection<List> calls, List<String> columnNames, List<VariantPropertyType> types) {
+    public VariantTable(Collection<List<Object>> calls, List<String> columnNames, List<VariantPropertyType> types) {
 
         this.indexMap = new HashMap<>();
         for (int i = 0; i < columnNames.size(); i++) {
@@ -80,7 +80,7 @@ public class VariantTable {
 
     public synchronized VariantTable filter(Collection<VariantCallFilter> filters) {
 
-        Collection<List> callsAfterFiltering = this.rows.stream()
+        Collection<List<Object>> callsAfterFiltering = this.rows.stream()
                 .filter((call) -> filters.stream().allMatch((filter) -> filter.isPassing(call, indexMap)))
                 .collect(Collectors.toList());
 
@@ -103,7 +103,7 @@ public class VariantTable {
         return this.rows.get(index).get(indexMap.get(columnName));
     }
 
-    public synchronized List<List> getRawCalls() {
+    public synchronized List<List<Object>> getRawCalls() {
         return this.rows;
     }
 
@@ -139,6 +139,14 @@ public class VariantTable {
         checkCorrectType(newValue, getColumnType(column));
 
         this.rows.get(rowIndex).set(indexMap.get(column), newValue);
+    }
+
+    public synchronized List<Object> getColumn(String columnName) {
+
+        return this.rows.stream()
+                .map(call -> call.get(indexMap.get(columnName)))
+                .collect(Collectors.toList());
+
     }
 
     private void checkCorrectCollectionType(Object value, Class someClass) {

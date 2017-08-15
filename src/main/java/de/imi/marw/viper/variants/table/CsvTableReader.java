@@ -128,7 +128,7 @@ public class CsvTableReader implements TableReader {
         }
     }
 
-    private List parseVariantCall(String[] colNames, String[] colValues, VariantPropertyType[] types) {
+    private List<Object> parseVariantCall(String[] colNames, String[] colValues, VariantPropertyType[] types) {
         Object[] row = new Object[colNames.length];
 
         for (int i = 0; i < colNames.length; i++) {
@@ -140,9 +140,9 @@ public class CsvTableReader implements TableReader {
         return Arrays.asList(row);
     }
 
-    private List<List> parseVariantCalls(String[] colNames, List<String[]> colValues, VariantPropertyType[] types) {
+    private List<List<Object>> parseVariantCalls(String[] colNames, List<String[]> colValues, VariantPropertyType[] types) {
 
-        List<List> calls = colValues.stream()
+        List<List<Object>> calls = colValues.stream()
                 .map((rowValues) -> parseVariantCall(colNames, rowValues, types))
                 .collect(Collectors.toList());
 
@@ -159,7 +159,7 @@ public class CsvTableReader implements TableReader {
 
             VariantPropertyType[] types = determineTypes(rawData);
 
-            List<List> parsedCalls = parseVariantCalls(header, rawData, types);
+            List<List<Object>> parsedCalls = parseVariantCalls(header, rawData, types);
 
             return new VariantTable(parsedCalls, Arrays.asList(header), Arrays.asList(types));
 

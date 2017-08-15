@@ -59,7 +59,7 @@ public class VariantClusterBuilder {
     }
 
     private List<Collection<Integer>> clusterTableByKey(VariantTable unclustered, String matchingSequenceKey) {
-        List<List> rawCalls = unclustered.getRawCalls();
+        List<List<Object>> rawCalls = unclustered.getRawCalls();
         List<Interval> matchingCalls = IntStream.range(0, unclustered.getNumberOfCalls())
                 .boxed()
                 .map((rowIndex) -> {
@@ -193,7 +193,7 @@ public class VariantClusterBuilder {
 
         List<Collection<Integer>> indexClusters = computeClusterIndices(unclustered);
 
-        List<List> clusteredCalls = new ArrayList<>();
+        List<List<Object>> clusteredCalls = new ArrayList<>();
 
         for (int i = 0; i < indexClusters.size(); i++) {
 
