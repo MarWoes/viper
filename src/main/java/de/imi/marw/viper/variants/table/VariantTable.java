@@ -63,6 +63,7 @@ public class VariantTable {
     private final List<String> columnNames;
     private final List<VariantPropertyType> types;
     private final Map<String, Integer> indexMap;
+    private int[] softFilter;
 
     public VariantTable(Collection<List<Object>> calls, List<String> columnNames, List<VariantPropertyType> types) {
 
@@ -74,23 +75,27 @@ public class VariantTable {
         this.columnNames = columnNames;
         this.rows.addAll(calls);
         this.types = types;
+        this.softFilter = IntStream.range(0, this.rows.size())
+                .toArray();
 
         checkDataIntegrity();
     }
 
-    public synchronized VariantTable filter(Collection<VariantCallFilter> filters) {
+    public synchronized void filter(Collection<VariantCallFilter> filters) {
 
-        Collection<List<Object>> callsAfterFiltering = this.rows.stream()
-                .filter((call) -> filters.stream().allMatch((filter) -> filter.isPassing(call, indexMap)))
-                .collect(Collectors.toList());
+        int[] callsAfterFiltering = IntStream.range(0, this.rows.size())
+                .boxed()
+                .filter((callIndex) -> filters.stream().allMatch((filter) -> filter.isPassing(this.rows.get(callIndex), indexMap)))
+                .mapToInt(i -> i)
+                .toArray();
 
-        return new VariantTable(callsAfterFiltering, columnNames, this.types);
+        this.softFilter = callsAfterFiltering;
     }
 
     public synchronized Map<String, Object> getCall(int rowIndex) {
 
         Map<String, Object> variantCall = new LinkedHashMap<>(columnNames.size());
-        List rawRow = this.rows.get(rowIndex);
+        List rawRow = this.rows.get(softFilter[rowIndex]);
 
         for (int i = 0; i < columnNames.size(); i++) {
             variantCall.put(this.columnNames.get(i), rawRow.get(i));
@@ -100,7 +105,7 @@ public class VariantTable {
     }
 
     public synchronized Object getCallProperty(int index, String columnName) {
-        return this.rows.get(index).get(indexMap.get(columnName));
+        return this.rows.get(softFilter[index]).get(indexMap.get(columnName));
     }
 
     public synchronized List<List<Object>> getRawCalls() {
@@ -111,12 +116,12 @@ public class VariantTable {
         return IntStream
                 .range(lower, upper)
                 .boxed()
-                .map((index) -> getCall(index))
+                .map((index) -> getCall(softFilter[index]))
                 .collect(Collectors.toList());
     }
 
     public synchronized int getNumberOfCalls() {
-        return this.rows.size();
+        return this.softFilter.length;
     }
 
     public synchronized List<String> getColumnNames() {
@@ -148,13 +153,14 @@ public class VariantTable {
     public synchronized void setCallProperty(int rowIndex, String column, Object newValue) {
         checkCorrectType(newValue, getColumnType(column));
 
-        this.rows.get(rowIndex).set(indexMap.get(column), newValue);
+        this.rows.get(softFilter[rowIndex]).set(indexMap.get(column), newValue);
     }
 
     public synchronized List<Object> getColumn(String columnName) {
 
-        return this.rows.stream()
-                .map(call -> call.get(indexMap.get(columnName)))
+        return Arrays.stream(this.softFilter)
+                .boxed()
+                .map(callIndex -> this.rows.get(callIndex).get(indexMap.get(columnName)))
                 .collect(Collectors.toList());
 
     }
