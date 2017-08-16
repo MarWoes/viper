@@ -48,7 +48,7 @@ public class ProgressManager {
 
     public boolean saveProgress(VariantTableCluster cluster) {
 
-        List<String> decisions = cluster.getClusteredTable().getColumn(VariantTable.DECISION_COLUMN_NAME).stream()
+        List<String> decisions = cluster.getClusteredTable().getUnfilteredColumn(VariantTable.DECISION_COLUMN_NAME).stream()
                 .map(decision -> (String) decision)
                 .collect(Collectors.toList());
 
@@ -85,7 +85,7 @@ public class ProgressManager {
 
     private Path getSavePath(VariantTableCluster cluster) {
 
-        String[] bp1 = cluster.getClusteredTable().getColumn(VariantTable.BP1_COLUMN_NAME)
+        String[] bp1 = cluster.getClusteredTable().getUnfilteredColumn(VariantTable.BP1_COLUMN_NAME)
                 .stream()
                 .map(bp -> bp.toString())
                 .toArray(String[]::new);

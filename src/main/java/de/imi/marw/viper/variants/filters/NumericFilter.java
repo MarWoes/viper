@@ -34,7 +34,7 @@ public class NumericFilter extends SingleColumnFilter<Double> {
     private final double possibleMin, possibleMax;
 
     public NumericFilter(String columnName, double possibleMin, double possibleMax) {
-        super(columnName, VariantPropertyType.NUMERIC_COLLECTION);
+        super(columnName, VariantPropertyType.NUMERIC);
         this.possibleMin = possibleMin;
         this.possibleMax = possibleMax;
         this.selectedMin = possibleMin;

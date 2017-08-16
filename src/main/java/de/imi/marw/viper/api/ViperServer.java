@@ -23,10 +23,17 @@
 package de.imi.marw.viper.api;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import de.imi.marw.viper.util.Util;
+import de.imi.marw.viper.variants.VariantCallFilter;
 import de.imi.marw.viper.variants.VariantClusterBuilder;
+import de.imi.marw.viper.variants.VariantPropertyType;
 import de.imi.marw.viper.variants.VariantTableCluster;
 import de.imi.marw.viper.variants.filters.FilterManager;
+import de.imi.marw.viper.variants.filters.NumericCollectionFilter;
+import de.imi.marw.viper.variants.filters.NumericFilter;
+import de.imi.marw.viper.variants.filters.StringCollectionFilter;
+import de.imi.marw.viper.variants.filters.StringFilter;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.variants.table.ProgressManager;
@@ -34,6 +41,7 @@ import de.imi.marw.viper.visualization.IGVVisualizer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import spark.Request;
@@ -186,7 +194,53 @@ public class ViperServer {
             }
         });
 
-        get("/api/variant-table/filters", (req, res) -> filterManager.getFilters(), gson::toJson);
+        get("/api/variant-table/current-filters", (req, res) -> filterManager.getFilters(), gson::toJson);
+
+        post("/api/variant-table/apply-filters", (req, res) -> {
+
+            String body = req.body();
+
+            List<VariantCallFilter> filters = parseFilters(body);
+            filterManager.setFilters(filters);
+
+            variantTableCluster.getClusteredTable().filter(filters);
+
+            return "OK";
+        });
+    }
+
+    private List<VariantCallFilter> parseFilters(String jsonFilterArray) {
+
+        JsonObject[] rawObjects = gson.fromJson(jsonFilterArray, JsonObject[].class);
+
+        List<VariantCallFilter> filters = new ArrayList<>();
+
+        for (JsonObject rawObject : rawObjects) {
+
+            VariantPropertyType type = VariantPropertyType.valueOf(rawObject.get("columnType").getAsString());
+
+            VariantCallFilter filter = parseFilter(rawObject, type);
+
+            filters.add(filter);
+        }
+
+        return filters;
+    }
+
+    private VariantCallFilter parseFilter(JsonObject rawObject, VariantPropertyType type) {
+
+        switch (type) {
+            case NUMERIC:
+                return gson.fromJson(rawObject, NumericFilter.class);
+            case NUMERIC_COLLECTION:
+                return gson.fromJson(rawObject, NumericCollectionFilter.class);
+            case STRING:
+                return gson.fromJson(rawObject, StringFilter.class);
+            case STRING_COLLECTION:
+                return gson.fromJson(rawObject, StringCollectionFilter.class);
+            default:
+                throw new IllegalStateException("unrecognized filter type " + type);
+        }
     }
 
     private Object takeSnapshot(Request req, Response res) {

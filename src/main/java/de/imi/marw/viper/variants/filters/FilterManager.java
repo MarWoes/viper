@@ -46,7 +46,7 @@ public class FilterManager {
         for (String columnName : table.getColumnNames()) {
 
             VariantPropertyType type = table.getColumnType(columnName);
-            List<Object> columnCalls = table.getColumn(columnName);
+            List<Object> columnCalls = table.getUnfilteredColumn(columnName);
 
             VariantCallFilter filter = generateFilterFromColumn(columnCalls, type, columnName);
 

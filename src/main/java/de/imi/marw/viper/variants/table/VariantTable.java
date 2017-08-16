@@ -156,11 +156,10 @@ public class VariantTable {
         this.rows.get(softFilter[rowIndex]).set(indexMap.get(column), newValue);
     }
 
-    public synchronized List<Object> getColumn(String columnName) {
+    public synchronized List<Object> getUnfilteredColumn(String columnName) {
 
-        return Arrays.stream(this.softFilter)
-                .boxed()
-                .map(callIndex -> this.rows.get(callIndex).get(indexMap.get(columnName)))
+        return this.rows.stream()
+                .map(call -> call.get(indexMap.get(columnName)))
                 .collect(Collectors.toList());
 
     }
