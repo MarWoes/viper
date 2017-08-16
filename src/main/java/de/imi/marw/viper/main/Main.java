@@ -39,5 +39,6 @@ public class Main {
 
         ViperServer server = new ViperServer(config);
         server.start();
+
     }
 }

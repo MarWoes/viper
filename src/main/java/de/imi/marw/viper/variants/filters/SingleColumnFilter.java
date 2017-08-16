@@ -23,6 +23,7 @@
 package de.imi.marw.viper.variants.filters;
 
 import de.imi.marw.viper.variants.VariantCallFilter;
+import de.imi.marw.viper.variants.VariantPropertyType;
 import java.util.List;
 import java.util.Map;
 
@@ -34,9 +35,11 @@ public abstract class SingleColumnFilter<T> implements VariantCallFilter {
 
     private final String columnName;
     private boolean nullAllowed = false;
+    private final VariantPropertyType columnType;
 
-    public SingleColumnFilter(String columnName) {
+    public SingleColumnFilter(String columnName, VariantPropertyType columnType) {
         this.columnName = columnName;
+        this.columnType = columnType;
     }
 
     @Override

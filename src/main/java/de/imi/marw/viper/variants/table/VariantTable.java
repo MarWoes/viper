@@ -135,6 +135,16 @@ public class VariantTable {
         return types.get(indexMap.get(column));
     }
 
+    public ColumnProperty[] getColumnProperties() {
+        ColumnProperty[] properties = new ColumnProperty[this.types.size()];
+
+        for (int i = 0; i < this.types.size(); i++) {
+            properties[i] = new ColumnProperty(this.columnNames.get(i), this.types.get(i));
+        }
+
+        return properties;
+    }
+
     public synchronized void setCallProperty(int rowIndex, String column, Object newValue) {
         checkCorrectType(newValue, getColumnType(column));
 
@@ -244,5 +254,25 @@ public class VariantTable {
                 call.set(indexMap.get(BP2_COLUMN_NAME), bp1);
             }
         });
+    }
+
+    public static class ColumnProperty {
+
+        private final String name;
+        private final VariantPropertyType type;
+
+        public ColumnProperty(String name, VariantPropertyType type) {
+            this.name = name;
+            this.type = type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public VariantPropertyType getType() {
+            return type;
+        }
+
     }
 }

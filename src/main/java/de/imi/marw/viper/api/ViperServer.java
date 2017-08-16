@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import de.imi.marw.viper.util.Util;
 import de.imi.marw.viper.variants.VariantClusterBuilder;
 import de.imi.marw.viper.variants.VariantTableCluster;
+import de.imi.marw.viper.variants.filters.FilterManager;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.variants.table.ProgressManager;
@@ -50,6 +51,7 @@ public class ViperServer {
     private final Gson gson;
     private final VariantClusterBuilder clusterer;
     private final ProgressManager progressManager;
+    private final FilterManager filterManager;
     private VariantTableCluster variantTableCluster;
 
     private IGVVisualizer igv;
@@ -60,6 +62,7 @@ public class ViperServer {
         this.gson = new Gson();
         this.clusterer = new VariantClusterBuilder();
         this.progressManager = new ProgressManager(config.getWorkDir());
+        this.filterManager = new FilterManager();
     }
 
     public void start() {
@@ -68,6 +71,8 @@ public class ViperServer {
         this.igv.start();
 
         this.variantTableCluster = this.loadVariants();
+        progressManager.loadProgress(this.variantTableCluster);
+        filterManager.loadFromTable(this.variantTableCluster.getClusteredTable());
 
         this.igv.awaitStartup();
 
@@ -79,8 +84,6 @@ public class ViperServer {
 
         VariantTable unclusteredTable = reader.readTable();
         VariantTableCluster cluster = clusterer.clusterVariantTable(unclusteredTable);
-
-        progressManager.loadProgress(cluster);
 
         return cluster;
     }
@@ -182,6 +185,8 @@ public class ViperServer {
                 return "ERROR";
             }
         });
+
+        get("/api/variant-table/filters", (req, res) -> filterManager.getFilters(), gson::toJson);
     }
 
     private Object takeSnapshot(Request req, Response res) {

@@ -22,40 +22,53 @@
  */
 package de.imi.marw.viper.variants.filters;
 
+import de.imi.marw.viper.variants.VariantPropertyType;
+
 /**
  *
  * @author marius
  */
 public class NumericFilter extends SingleColumnFilter<Double> {
 
-    private double min, max;
+    private double selectedMin, selectedMax;
+    private final double possibleMin, possibleMax;
 
-    public NumericFilter(String columnName, double min, double max) {
-        super(columnName);
-        this.min = min;
-        this.max = max;
+    public NumericFilter(String columnName, double possibleMin, double possibleMax) {
+        super(columnName, VariantPropertyType.NUMERIC_COLLECTION);
+        this.possibleMin = possibleMin;
+        this.possibleMax = possibleMax;
+        this.selectedMin = possibleMin;
+        this.selectedMax = possibleMax;
         setNullAllowed(true);
     }
 
     @Override
     protected boolean isSingleValuePassing(Double value) {
-        return value >= min && value <= max;
+        return value >= selectedMin && value <= selectedMax;
     }
 
-    public double getMin() {
-        return min;
+    public double getSelectedMin() {
+        return selectedMin;
     }
 
-    public void setMin(double min) {
-        this.min = min;
+    public void setSelectedMin(double selectedMin) {
+        this.selectedMin = selectedMin;
     }
 
-    public double getMax() {
-        return max;
+    public double getSelectedMax() {
+        return selectedMax;
     }
 
-    public void setMax(double max) {
-        this.max = max;
+    public void setSelectedMax(double selectedMax) {
+        this.selectedMax = selectedMax;
+    }
+
+    public double getPossibleMin() {
+        return possibleMin;
+    }
+
+    public double getPossibleMax() {
+        return possibleMax;
     }
 
 }

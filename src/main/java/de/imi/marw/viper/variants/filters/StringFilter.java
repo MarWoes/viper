@@ -22,6 +22,8 @@
  */
 package de.imi.marw.viper.variants.filters;
 
+import de.imi.marw.viper.variants.VariantPropertyType;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -31,10 +33,12 @@ import java.util.Set;
 public class StringFilter extends SingleColumnFilter<String> {
 
     private Set<String> allowedValues;
+    private final Set<String> possibleValues;
 
-    public StringFilter(String columnName, Set<String> allowedValues) {
-        super(columnName);
-        this.allowedValues = allowedValues;
+    public StringFilter(String columnName, Set<String> possibleValues) {
+        super(columnName, VariantPropertyType.STRING);
+        this.allowedValues = new HashSet<>();
+        this.possibleValues = possibleValues;
     }
 
     @Override
@@ -49,4 +53,9 @@ public class StringFilter extends SingleColumnFilter<String> {
     public void setAllowedValues(Set<String> allowedValues) {
         this.allowedValues = allowedValues;
     }
+
+    public Set<String> getPossibleValues() {
+        return possibleValues;
+    }
+
 }

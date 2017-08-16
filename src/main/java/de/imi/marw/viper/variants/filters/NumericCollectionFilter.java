@@ -22,6 +22,7 @@
  */
 package de.imi.marw.viper.variants.filters;
 
+import de.imi.marw.viper.variants.VariantPropertyType;
 import java.util.Collection;
 
 /**
@@ -30,34 +31,45 @@ import java.util.Collection;
  */
 public class NumericCollectionFilter extends SingleColumnFilter<Collection<Double>> {
 
-    private double min, max;
+    private double selectedMin, selectedMax;
+    private final double possibleMin, possibleMax;
 
-    public NumericCollectionFilter(String columnName, double min, double max) {
-        super(columnName);
-        this.min = min;
-        this.max = max;
+    public NumericCollectionFilter(String columnName, double possibleMin, double possibleMax) {
+        super(columnName, VariantPropertyType.NUMERIC_COLLECTION);
+        this.possibleMin = possibleMin;
+        this.possibleMax = possibleMax;
+        this.selectedMin = possibleMin;
+        this.selectedMax = possibleMax;
         setNullAllowed(true);
     }
 
     @Override
     protected boolean isSingleValuePassing(Collection<Double> values) {
-        return values.stream().anyMatch((val) -> (val == null && isNullAllowed()) || (val >= min && val <= max));
+        return values.stream().anyMatch((val) -> (val == null && isNullAllowed()) || (val >= selectedMin && val <= selectedMax));
     }
 
-    public double getMin() {
-        return min;
+    public double getSelectedMin() {
+        return selectedMin;
     }
 
-    public void setMin(double min) {
-        this.min = min;
+    public void setSelectedMin(double selectedMin) {
+        this.selectedMin = selectedMin;
     }
 
-    public double getMax() {
-        return max;
+    public double getSelectedMax() {
+        return selectedMax;
     }
 
-    public void setMax(double max) {
-        this.max = max;
+    public void setSelectedMax(double selectedMax) {
+        this.selectedMax = selectedMax;
+    }
+
+    public double getPossibleMin() {
+        return possibleMin;
+    }
+
+    public double getPossibleMax() {
+        return possibleMax;
     }
 
 }
