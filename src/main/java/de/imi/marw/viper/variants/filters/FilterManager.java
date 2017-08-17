@@ -81,7 +81,7 @@ public class FilterManager {
 
                 // HACK: we use ceil and floor to prevent potential errors because of rounding when using rz-sliders
                 min = Math.floor(min);
-                max = Math.floor(max);
+                max = Math.ceil(max);
 
                 return new NumericFilter(columnName, min, max);
             }

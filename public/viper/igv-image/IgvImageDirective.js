@@ -26,6 +26,8 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
 
   function onVariantChange (newVal, oldVal) {
 
+    if (newVal == null) return;
+
     var key = Ctrl.getSnapshotKey(newVal);
 
     Ctrl.isSnapshotAvailable(key)

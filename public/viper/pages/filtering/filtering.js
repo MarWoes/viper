@@ -16,29 +16,37 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   Ctrl.currentPage     = 0;
 
   Ctrl.reloadTable = reloadTable;
+  Ctrl.init = init;
   Ctrl.onPageChange = onPageChange;
 
   Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
 
-  Ctrl.reloadTable();
+  Ctrl.init();
+
+  function init () {
+    VariantTableService.getColumnNames()
+    .then(function (columnNames) {
+      Ctrl.columnNames = columnNames;
+
+      Ctrl.reloadTable();
+    })
+  }
 
   function reloadTable () {
 
-    VariantTableService.getColumnNames()
-      .then(function (columnNames) {
-        Ctrl.columnNames = columnNames;
+    VariantTableService.getSize()
+    .then(function (tableSize) {
 
-        return VariantTableService.getSize();
-      })
-      .then(function (tableSize) {
+      Ctrl.tableSize   = tableSize;
 
-        Ctrl.tableSize   = tableSize;
+      if (tableSize == 0) {
+        Ctrl.currentVariants = [ ];
+        return;
+      }
 
-        if (tableSize == 0) return;
-
-        Ctrl.currentPage = 1;
-        Ctrl.onPageChange();
-      })
+      Ctrl.currentPage = 1;
+      Ctrl.onPageChange();
+    });
   }
 
   function onPageChange () {
@@ -90,7 +98,10 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   }
 
   function applyFilters () {
-    console.log(Ctrl.filters);
+
+    VariantTableService.applyFilters(Ctrl.filters)
+    .then(Ctrl.onFilterApplied);
+
   }
 
   function onSelectRefresh (search, columnName) {
@@ -106,7 +117,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
 .directive('columnFilters', function () {
   return {
     scope: {
-      onFilterApplied: "&"
+      onFilterApplied: "="
     },
     restrict: 'E',
     controller: 'ColumnFiltersController',

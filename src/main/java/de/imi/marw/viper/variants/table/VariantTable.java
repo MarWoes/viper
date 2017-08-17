@@ -144,7 +144,7 @@ public class VariantTable {
         return IntStream
                 .range(lower, upper)
                 .boxed()
-                .map((index) -> getCall(softFilter[index]))
+                .map((index) -> getCall(index))
                 .collect(Collectors.toList());
     }
 

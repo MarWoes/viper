@@ -5,6 +5,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
   var Service = { };
 
+  Service.applyFilters = applyFilters;
   Service.getColumnNames = getColumnNames;
   Service.getCurrentFilters = getCurrentFilters;
   Service.getRelatedCalls = getRelatedCalls;
@@ -16,6 +17,15 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.saveProgress = saveProgress;
   Service.scheduleSnapshot = scheduleSnapshot;
   Service.searchStringColumn = searchStringColumn
+
+  function applyFilters (filters) {
+    var promise = $http.post('/api/variant-table/apply-filters',filters)
+    .then(function (res) {
+      return res.data;
+    })
+
+    return promise;
+  }
 
   function performRequest (url) {
     var promise = $http.get(url).then(function (res) {
