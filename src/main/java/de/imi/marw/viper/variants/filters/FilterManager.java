@@ -79,6 +79,10 @@ public class FilterManager {
                 double min = values.length > 0 ? values[0] : 0;
                 double max = values.length > 0 ? values[values.length - 1] : 1;
 
+                // HACK: we use ceil and floor to prevent potential errors because of rounding when using rz-sliders
+                min = Math.floor(min);
+                max = Math.floor(max);
+
                 return new NumericFilter(columnName, min, max);
             }
 
