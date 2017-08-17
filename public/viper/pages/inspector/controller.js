@@ -56,6 +56,8 @@ var module = angular.module('de.imi.marw.viper.inspector', [
 
   function onIndexChange () {
 
+    if (Ctrl.tableSize == 0) return Ctrl.currentVariant = null;
+
     VariantTableService.scheduleSnapshot(Ctrl.index);
 
     $q.all([

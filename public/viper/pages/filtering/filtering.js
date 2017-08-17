@@ -37,7 +37,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
     VariantTableService.getSize()
     .then(function (tableSize) {
 
-      Ctrl.tableSize   = tableSize;
+      Ctrl.tableSize = tableSize;
 
       if (tableSize == 0) {
         Ctrl.currentVariants = [ ];
