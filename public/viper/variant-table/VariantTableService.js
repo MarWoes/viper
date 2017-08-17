@@ -6,6 +6,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   var Service = { };
 
   Service.getColumnNames = getColumnNames;
+  Service.getCurrentFilters = getCurrentFilters;
   Service.getRelatedCalls = getRelatedCalls;
   Service.getRelatedColumnNames = getRelatedColumnNames;
   Service.getSize = getSize;
@@ -15,29 +16,28 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.saveProgress = saveProgress;
   Service.scheduleSnapshot = scheduleSnapshot;
 
-  function getColumnNames () {
-    var promise = $http.get('/api/variant-table/column-names').then(function (res) {
-      return res.data;
-    })
-
-    return promise;
-  }
-
-  function getSize () {
-
-    var promise = $http.get('/api/variant-table/size').then(function (res) {
+  function performRequest (url) {
+    var promise = $http.get(url).then(function (res) {
       return res.data;
     });
 
     return promise;
   }
 
-  function getRelatedColumnNames () {
-    var promise = $http.get('/api/variant-table/related-calls/column-names').then(function (res) {
-      return res.data;
-    })
+  function getCurrentFilters () {
+    return performRequest('/api/variant-table/current-filters');
+  }
 
-    return promise;
+  function getColumnNames () {
+    return performRequest('/api/variant-table/column-names');
+  }
+
+  function getSize () {
+    return performRequest('/api/variant-table/size');
+  }
+
+  function getRelatedColumnNames () {
+    return performRequest('/api/variant-table/related-calls/column-names');
   }
 
   function getRelatedCalls (index) {

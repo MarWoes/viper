@@ -1,0 +1,38 @@
+<h4>Filters:</h4>
+
+<div class="row" ng-repeat="filterChunk in ::columnFiltersCtrl.filters | chunkBy: 6">
+
+    <div class="col-md-2" ng-repeat="filter in ::filterChunk">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          {{ ::filter.columnName }}
+        </div>
+        <div class="panel-body">
+          <div ng-if="::(filter.columnType == 'NUMERIC' || filter.columnType == 'NUMERIC_COLLECTION')">
+
+            <rzslider
+              rz-slider-options="{
+                floor: filter.possibleMin,
+                ceil: filter.possibleMax,
+                precision: 2,
+                step: (filter.possibleMax - filter.possibleMin) / 1000,
+                hideLimitLabels: true
+              }"
+              rz-slider-model="filter.selectedMin"
+              rz-slider-high="filter.selectedMax"></rzslider>
+
+          </div>
+          <div ng-if="::(filter.columnType == 'STRING')">
+            STRING
+          </div>
+          <div ng-if="::(filter.columnType == 'STRING_COLLECTION')">
+            STRING_COLLECTION
+          </div>
+        </div>
+      </div>
+
+    </div>
+</div>
+
+<button type="button" class="btn btn-primary" ng-click="columnFiltersCtrl.applyFilters()">apply filters</button>

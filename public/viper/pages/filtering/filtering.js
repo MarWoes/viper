@@ -1,22 +1,25 @@
-var module = angular.module('de.imi.marw.viper.variant-table.viewer', [
-  'de.imi.marw.viper.variant-table.service'
+var module = angular.module('de.imi.marw.viper.filtering', [
+  'angular.filter',
+  'de.imi.marw.viper.variant-table.service',
+  'rzModule'
 ])
-.controller('VariantTableViewController', function (VariantTableService) {
+.controller('FilteringPageCtrl', function (VariantTableService, $http) {
+
   var Ctrl = this;
 
-  Ctrl.columnNames     = [];
-  Ctrl.currentVariants = []
+  Ctrl.columnNames     = undefined;
+  Ctrl.currentVariants = undefined;
   Ctrl.tableSize       = 0;
   Ctrl.pageSize        = 10;
   Ctrl.currentPage     = 0;
 
-  Ctrl.init = init;
+  Ctrl.reloadTable = reloadTable;
   Ctrl.onPageChange = onPageChange;
   Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
 
-  Ctrl.init();
+  Ctrl.reloadTable();
 
-  function init () {
+  function reloadTable () {
 
     VariantTableService.getColumnNames()
       .then(function (columnNames) {
@@ -54,11 +57,34 @@ var module = angular.module('de.imi.marw.viper.variant-table.viewer', [
   }
 
 })
-.directive('variantTableViewer', function () {
+.controller('ColumnFiltersController', function (VariantTableService) {
+  var Ctrl = this;
+
+  Ctrl.applyFilters = applyFilters;
+  Ctrl.init = init;
+  Ctrl.init();
+
+
+  function init () {
+    VariantTableService.getCurrentFilters()
+    .then(function (filters) {
+      Ctrl.filters = filters;
+    });
+  }
+
+  function applyFilters () {
+    console.log(Ctrl.filters);
+  }
+})
+.directive('columnFilters', function () {
   return {
+    scope: {
+      onFilterApplied: "&"
+    },
     restrict: 'E',
-    controller: 'VariantTableViewController',
-    controllerAs: 'variantTableViewCtrl',
-    templateUrl: 'viper/variant-table/variant-table.tpl.html'
+    controller: 'ColumnFiltersController',
+    controllerAs: 'columnFiltersCtrl',
+    templateUrl: 'viper/pages/filtering/column-filters.tpl.html',
+    bindToController: true
   }
 })

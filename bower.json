@@ -21,6 +21,8 @@
     "bootstrap": "^3.3.7",
     "angular-bootstrap": "^2.5.0",
     "angular-route": "^1.6.5",
-    "numeral": "^2.0.6"
+    "numeral": "^2.0.6",
+    "angular-filter": "^0.5.16",
+    "angularjs-slider": "^6.4.0"
   }
 }

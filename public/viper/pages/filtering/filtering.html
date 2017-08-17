@@ -3,10 +3,37 @@
   <div class="row">
 
     <div class="col-md-12">
-      <variant-table-viewer>
-      </variant-table-viewer>
+      <h4>Variants:</h4>
+      <table class="table table-bordered table-condensed table-striped table-small-font">
+        <thead>
+          <tr>
+            <th ng-repeat="columnName in filteringPageCtrl.columnNames">
+              {{ columnName }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="variantCall in filteringPageCtrl.currentVariants track by $index">
+            <td ng-repeat="variantColumn in variantCall track by $index">
+              {{ variantColumn }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ul uib-pagination
+        ng-model="filteringPageCtrl.currentPage"
+        class="pagination-sm btn-block"
+        total-items="filteringPageCtrl.tableSize"
+        items-per-page="filteringPageCtrl.pageSize"
+        max-size="10"
+        boundary-link-numbers="true"
+        ng-change="filteringPageCtrl.onPageChange()"
+      ></ul>
     </div>
 
   </div>
+
+  <column-filters>
+ </column-filters>
 
 </div>
