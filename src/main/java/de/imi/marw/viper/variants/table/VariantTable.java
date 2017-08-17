@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  *
@@ -90,6 +91,33 @@ public class VariantTable {
                 .toArray();
 
         this.softFilter = callsAfterFiltering;
+    }
+
+    public synchronized List<String> searchStringColumn(String columnName, String search, int limit) {
+
+        VariantPropertyType type = getColumnType(columnName);
+
+        Stream<String> values;
+
+        switch (type) {
+            case STRING:
+                values = this.rows.stream()
+                        .map(call -> (String) call.get(indexMap.get(columnName)));
+                break;
+            case STRING_COLLECTION:
+                values = this.rows.stream()
+                        .flatMap(call -> ((Collection<String>) call.get(indexMap.get(columnName))).stream());
+                break;
+            default:
+                throw new IllegalStateException("Unexpected non-string type " + type + " when trying to access column " + columnName);
+        }
+
+        return values
+                .filter(str -> str.contains(search))
+                .distinct()
+                .limit(limit)
+                .collect(Collectors.toList());
+
     }
 
     public synchronized Map<String, Object> getCall(int rowIndex) {

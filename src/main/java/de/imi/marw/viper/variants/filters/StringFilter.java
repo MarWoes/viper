@@ -33,12 +33,10 @@ import java.util.Set;
 public class StringFilter extends SingleColumnFilter<String> {
 
     private Set<String> allowedValues;
-    private final Set<String> possibleValues;
 
-    public StringFilter(String columnName, Set<String> possibleValues) {
+    public StringFilter(String columnName) {
         super(columnName, VariantPropertyType.STRING);
         this.allowedValues = new HashSet<>();
-        this.possibleValues = possibleValues;
     }
 
     @Override
@@ -52,10 +50,6 @@ public class StringFilter extends SingleColumnFilter<String> {
 
     public void setAllowedValues(Set<String> allowedValues) {
         this.allowedValues = allowedValues;
-    }
-
-    public Set<String> getPossibleValues() {
-        return possibleValues;
     }
 
 }

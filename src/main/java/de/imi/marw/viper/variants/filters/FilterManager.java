@@ -100,23 +100,11 @@ public class FilterManager {
                 return new NumericCollectionFilter(columnName, min, max);
             }
 
-            case STRING: {
-                Set<String> values = columnCalls.stream()
-                        .map(o -> o.toString())
-                        .distinct()
-                        .collect(Collectors.toSet());
+            case STRING:
+                return new StringFilter(columnName);
 
-                return new StringFilter(columnName, values);
-            }
-
-            case STRING_COLLECTION: {
-                Set<String> values = columnCalls.stream()
-                        .flatMap(c -> ((Collection<String>) c).stream())
-                        .distinct()
-                        .collect(Collectors.toSet());
-
-                return new StringCollectionFilter(columnName, values);
-            }
+            case STRING_COLLECTION:
+                return new StringCollectionFilter(columnName);
 
             default: {
                 throw new IllegalStateException("Unexpected column type " + type + " when generating filters");

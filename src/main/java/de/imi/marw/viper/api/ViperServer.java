@@ -207,6 +207,16 @@ public class ViperServer {
 
             return "OK";
         });
+
+        get("/api/variant-table/string-column-search", (req, res) -> {
+
+            int limit = gson.fromJson(req.queryParams("limit"), Integer.class);
+            String columnName = req.queryParams("columnName");
+            String search = req.queryParams("search");
+
+            return this.variantTableCluster.getClusteredTable().searchStringColumn(columnName, search, limit);
+
+        }, gson::toJson);
     }
 
     private List<VariantCallFilter> parseFilters(String jsonFilterArray) {

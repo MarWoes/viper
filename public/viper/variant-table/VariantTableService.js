@@ -15,6 +15,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.variantPropertyToString = variantPropertyToString;
   Service.saveProgress = saveProgress;
   Service.scheduleSnapshot = scheduleSnapshot;
+  Service.searchStringColumn = searchStringColumn
 
   function performRequest (url) {
     var promise = $http.get(url).then(function (res) {
@@ -38,6 +39,20 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
   function getRelatedColumnNames () {
     return performRequest('/api/variant-table/related-calls/column-names');
+  }
+
+  function searchStringColumn (columnName, search, limit) {
+    var promise = $http.get('/api/variant-table/string-column-search', {
+      params: {
+        columnName: columnName,
+        search: search,
+        limit: limit
+      }
+    }).then(function (res) {
+      return res.data;
+    })
+
+    return promise;
   }
 
   function getRelatedCalls (index) {

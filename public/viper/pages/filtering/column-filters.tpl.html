@@ -24,9 +24,12 @@
 
           </div>
           <div ng-if="::(filter.columnType == 'STRING' || filter.columnType == 'STRING_COLLECTION')">
-            <ui-select ng-model="filter.allowedValues" multiple theme="bootstrap">
+            <ui-select ng-model="filter.allowedValues" multiple>
               <ui-select-match placeholder="Search for values...">{{ $item }}</ui-select-match>
-              <ui-select-choices repeat="possibleChoice in filter.possibleValues | filter: $select.search">
+              <ui-select-choices
+                repeat="possibleChoice in columnFiltersCtrl.possibleValues[filter.columnName] | filter: $select.search"
+                refresh="columnFiltersCtrl.onSelectRefresh($select.search, filter.columnName)"
+                refresh-delay="250">
                 <div ng-bind-html="possibleChoice | highlight: $select.search"></div>
               </ui-select-choices>
             </ui-select>

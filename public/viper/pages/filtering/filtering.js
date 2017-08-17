@@ -67,7 +67,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   Ctrl.applyFilters = applyFilters;
   Ctrl.init = init;
   Ctrl.onSelectRefresh = onSelectRefresh;
-  Ctrl.resultLimit = 25;
+  Ctrl.resultLimit = 50;
 
   Ctrl.init();
 
@@ -82,7 +82,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
       for (filter in Ctrl.filters) {
 
         if (filter.columnType == 'STRING' || filter.columnType == 'STRING_COLLECTION') {
-          Ctrl.possibleValues = [ ];
+          Ctrl.possibleValues[filter.columnName] = [ ];
         }
 
       }
@@ -94,7 +94,11 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   }
 
   function onSelectRefresh (search, columnName) {
-    console.log(columnName + ": " + search);
+
+    VariantTableService.searchStringColumn(columnName, search, Ctrl.resultLimit)
+    .then(function (strings) {
+      Ctrl.possibleValues[columnName] = strings;
+    })
   }
 })
 .directive('columnFilters', function () {
