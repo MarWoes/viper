@@ -95,6 +95,8 @@ var module = angular.module('de.imi.marw.viper.filtering', [
 
   function onSelectRefresh (search, columnName) {
 
+    if (columnName === 'viperDecision') return Ctrl.possibleValues[columnName] =  ['NA', 'declined', 'maybe', 'approved'];
+
     VariantTableService.searchStringColumn(columnName, search, Ctrl.resultLimit)
     .then(function (strings) {
       Ctrl.possibleValues[columnName] = strings;
