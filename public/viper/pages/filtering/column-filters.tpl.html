@@ -23,11 +23,13 @@
               rz-slider-high="filter.selectedMax"></rzslider>
 
           </div>
-          <div ng-if="::(filter.columnType == 'STRING')">
-            STRING
-          </div>
-          <div ng-if="::(filter.columnType == 'STRING_COLLECTION')">
-            STRING_COLLECTION
+          <div ng-if="::(filter.columnType == 'STRING' || filter.columnType == 'STRING_COLLECTION')">
+            <ui-select ng-model="filter.allowedValues" multiple theme="bootstrap">
+              <ui-select-match placeholder="Search for values...">{{ $item }}</ui-select-match>
+              <ui-select-choices repeat="possibleChoice in filter.possibleValues | filter: $select.search">
+                <div ng-bind-html="possibleChoice | highlight: $select.search"></div>
+              </ui-select-choices>
+            </ui-select>
           </div>
         </div>
       </div>

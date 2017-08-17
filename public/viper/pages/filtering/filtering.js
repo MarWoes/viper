@@ -1,7 +1,9 @@
 var module = angular.module('de.imi.marw.viper.filtering', [
   'angular.filter',
   'de.imi.marw.viper.variant-table.service',
-  'rzModule'
+  'ngSanitize',
+  'rzModule',
+  'ui.select'
 ])
 .controller('FilteringPageCtrl', function (VariantTableService, $http) {
 
@@ -15,6 +17,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
 
   Ctrl.reloadTable = reloadTable;
   Ctrl.onPageChange = onPageChange;
+
   Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
 
   Ctrl.reloadTable();
@@ -53,15 +56,19 @@ var module = angular.module('de.imi.marw.viper.filtering', [
         })
       })
     })
-
   }
 
 })
 .controller('ColumnFiltersController', function (VariantTableService) {
   var Ctrl = this;
 
+  Ctrl.filters = undefined;
+
   Ctrl.applyFilters = applyFilters;
   Ctrl.init = init;
+  Ctrl.onSelectRefresh = onSelectRefresh;
+  Ctrl.resultLimit = 25;
+
   Ctrl.init();
 
 
@@ -69,11 +76,25 @@ var module = angular.module('de.imi.marw.viper.filtering', [
     VariantTableService.getCurrentFilters()
     .then(function (filters) {
       Ctrl.filters = filters;
+
+      Ctrl.possibleValues = { };
+
+      for (filter in Ctrl.filters) {
+
+        if (filter.columnType == 'STRING' || filter.columnType == 'STRING_COLLECTION') {
+          Ctrl.possibleValues = [ ];
+        }
+
+      }
     });
   }
 
   function applyFilters () {
     console.log(Ctrl.filters);
+  }
+
+  function onSelectRefresh (search, columnName) {
+    console.log(columnName + ": " + search);
   }
 })
 .directive('columnFilters', function () {
