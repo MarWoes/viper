@@ -15,7 +15,10 @@
         <tbody>
           <tr ng-repeat="variantCall in filteringPageCtrl.currentVariants track by $index">
             <td ng-repeat="variantColumn in variantCall track by $index">
-              <span uib-tooltip="{{ variantColumn }}" tooltip-popup-delay="500">{{ variantColumn | limitTo: 15 }}{{ variantColumn.length > 15 ? '&hellip;' : '' }}</span>
+              <a ng-show="::($index == 0)" href="#!inspector" ng-click="filteringPageCtrl.onInspectorLinkClicked($parent.$index)">{{ variantColumn }}</a>
+              <span ng-show="::($index != 0)"
+                uib-tooltip="{{ variantColumn }}"
+                tooltip-popup-delay="500">{{ variantColumn | limitTo: 15 }}{{ variantColumn.length > 15 ? '&hellip;' : '' }}</span>
             </td>
           </tr>
         </tbody>

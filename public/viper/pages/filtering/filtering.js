@@ -17,6 +17,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
 
   Ctrl.reloadTable = reloadTable;
   Ctrl.init = init;
+  Ctrl.onInspectorLinkClicked = onInspectorLinkClicked;
   Ctrl.onPageChange = onPageChange;
 
   Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
@@ -47,6 +48,11 @@ var module = angular.module('de.imi.marw.viper.filtering', [
       Ctrl.currentPage = 1;
       Ctrl.onPageChange();
     });
+  }
+
+  function onInspectorLinkClicked(index) {
+    var variantIndex = Ctrl.pageSize * (Ctrl.currentPage - 1) + index;
+    VariantTableService.clickedVariantIndex = variantIndex;
   }
 
   function onPageChange () {

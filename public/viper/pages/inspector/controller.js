@@ -29,7 +29,8 @@ var module = angular.module('de.imi.marw.viper.inspector', [
       var columnNames = data[1];
 
       Ctrl.tableSize = tableSize;
-      Ctrl.index     = 0;
+      Ctrl.index     = VariantTableService.clickedVariantIndex == null ? 0 : VariantTableService.clickedVariantIndex;
+      VariantTableService.clickedVariantIndex = null;
       Ctrl.columnNames = columnNames;
 
       Ctrl.onIndexChange();

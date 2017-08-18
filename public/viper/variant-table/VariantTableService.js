@@ -5,6 +5,8 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
   var Service = { };
 
+  Service.clickedVariantIndex = null;
+
   Service.applyFilters = applyFilters;
   Service.getColumnNames = getColumnNames;
   Service.getCurrentFilters = getCurrentFilters;
