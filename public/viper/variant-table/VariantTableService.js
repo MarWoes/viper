@@ -13,10 +13,10 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.getSize = getSize;
   Service.getTableRange = getTableRange;
   Service.getTableRow = getTableRow;
-  Service.variantPropertyToString = variantPropertyToString;
   Service.saveProgress = saveProgress;
   Service.scheduleSnapshot = scheduleSnapshot;
   Service.searchStringColumn = searchStringColumn
+  Service.variantPropertyToString = variantPropertyToString;
 
   function applyFilters (filters) {
     var promise = $http.post('/api/variant-table/apply-filters',filters)

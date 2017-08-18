@@ -67,7 +67,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   }
 
 })
-.controller('ColumnFiltersController', function (VariantTableService) {
+.controller('ColumnFiltersController', function (VariantTableService, $timeout, $scope) {
   var Ctrl = this;
 
   Ctrl.filters = undefined;
@@ -75,6 +75,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   Ctrl.applyFilters = applyFilters;
   Ctrl.init = init;
   Ctrl.onSelectRefresh = onSelectRefresh;
+  Ctrl.resetFilters = resetFilters;
   Ctrl.resultLimit = 50;
 
   Ctrl.init();
@@ -85,20 +86,11 @@ var module = angular.module('de.imi.marw.viper.filtering', [
     .then(function (filters) {
       Ctrl.filters = filters;
 
-      Ctrl.possibleValues = { };
-
-      for (filter in Ctrl.filters) {
-
-        if (filter.columnType == 'STRING' || filter.columnType == 'STRING_COLLECTION') {
-          Ctrl.possibleValues[filter.columnName] = [ ];
-        }
-
-      }
+      resetSelections(filters);
     });
   }
 
   function applyFilters () {
-
     VariantTableService.applyFilters(Ctrl.filters)
     .then(Ctrl.onFilterApplied);
 
@@ -112,6 +104,41 @@ var module = angular.module('de.imi.marw.viper.filtering', [
     .then(function (strings) {
       Ctrl.possibleValues[columnName] = strings;
     })
+  }
+
+  function resetSelections (filters) {
+    Ctrl.possibleValues = { };
+
+    for (var i = 0; i < filters.length; i++) {
+
+      var filter = filters[i];
+
+      if (filter.columnType == 'STRING' || filter.columnType == 'STRING_COLLECTION') {
+        Ctrl.possibleValues[filter.columnName] = [ ];
+      }
+
+    }
+  }
+
+  function resetFilters () {
+
+    for (var i = 0; i < Ctrl.filters.length; i++) {
+
+      var filter = Ctrl.filters[i];
+
+      if (filter.columnType == 'STRING' || filter.columnType == 'STRING_COLLECTION') {
+        filter.allowedValues = [ ];
+      }
+
+      if (filter.columnType == 'NUMERIC' || filter.columnType == 'NUMERIC_COLLECTION') {
+        filter.selectedMin = filter.possibleMin;
+        filter.selectedMax = filter.possibleMax;
+      }
+
+    }
+
+    Ctrl.applyFilters();
+
   }
 })
 .directive('columnFilters', function () {
