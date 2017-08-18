@@ -27,8 +27,10 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   Ctrl.init();
 
   function decideAll (decision) {
-    VariantTableService.sendAllDecisions(decision)
-    .then(Ctrl.onFilterApplied);
+    if(confirm("Are you sure you want to set all current variant decisions to '" + decision + "'?")) {
+      VariantTableService.sendAllDecisions(decision)
+      .then(Ctrl.onFilterApplied);
+    }
   }
 
   function init () {
