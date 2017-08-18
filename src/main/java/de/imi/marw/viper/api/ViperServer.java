@@ -44,6 +44,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 import spark.Request;
 import spark.Response;
 
@@ -129,6 +130,17 @@ public class ViperServer {
         }, gson::toJson);
 
         get("/api/variant-table/column-names", (req, res) -> variantTableCluster.getClusteredTable().getColumnNames(), gson::toJson);
+
+        put("/api/variant-table/decision/all", (req, res) -> {
+
+            String decision = req.queryParams("decision");
+
+            IntStream.range(0, variantTableCluster.getClusteredTable().getNumberOfCalls())
+                    .forEach(i -> variantTableCluster.getClusteredTable().setCallProperty(i, VariantTable.DECISION_COLUMN_NAME, decision));
+
+            return "OK";
+
+        });
 
         put("/api/variant-table/decision", (req, res) -> {
 

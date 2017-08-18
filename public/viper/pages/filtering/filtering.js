@@ -15,6 +15,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   Ctrl.pageSize        = 10;
   Ctrl.currentPage     = 0;
 
+  Ctrl.decideAll = decideAll;
   Ctrl.reloadTable = reloadTable;
   Ctrl.init = init;
   Ctrl.onInspectorLinkClicked = onInspectorLinkClicked;
@@ -23,6 +24,11 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
 
   Ctrl.init();
+
+  function decideAll (decision) {
+    VariantTableService.sendAllDecisions(decision)
+    .then(Ctrl.reloadTable);
+  }
 
   function init () {
     VariantTableService.getColumnNames()

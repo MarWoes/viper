@@ -40,12 +40,7 @@ var module = angular.module('de.imi.marw.viper.inspector', [
 
   function sendDecision (decision) {
 
-    var promise = $http.put('/api/variant-table/decision', {}, {
-      params: {
-        index: Ctrl.index,
-        decision: decision
-      }
-    });
+    var promise = VariantTableService.sendDecision(Ctrl.index, decision);
 
     if (Ctrl.index >= 0 && Ctrl.index < Ctrl.tableSize - 1) {
       Ctrl.index++;

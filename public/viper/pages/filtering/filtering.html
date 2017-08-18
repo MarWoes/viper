@@ -3,7 +3,7 @@
   <div class="row">
 
     <div class="col-md-12">
-      <h4>Variants:</h4>
+      <h4>Variants: {{ filteringPageCtrl.tableSize }}</h4>
       <table class="table table-bordered table-condensed table-striped table-small-font">
         <thead>
           <tr>
@@ -23,17 +23,27 @@
           </tr>
         </tbody>
       </table>
-      <ul uib-pagination
-        ng-model="filteringPageCtrl.currentPage"
-        class="pagination-sm btn-block"
-        total-items="filteringPageCtrl.tableSize"
-        items-per-page="filteringPageCtrl.pageSize"
-        max-size="10"
-        boundary-link-numbers="true"
-        ng-change="filteringPageCtrl.onPageChange()"
-      ></ul>
+      <div>
+        <ul uib-pagination
+          ng-model="filteringPageCtrl.currentPage"
+          class="pagination-sm variant-pagination"
+          total-items="filteringPageCtrl.tableSize"
+          items-per-page="filteringPageCtrl.pageSize"
+          max-size="10"
+          boundary-link-numbers="true"
+          ng-change="filteringPageCtrl.onPageChange()"
+        ></ul>
+        <div class="pull-right">
+          <em>Decide for all: </em>
+          <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-default" ng-click="filteringPageCtrl.decideAll('NA')">NA</button>
+            <button type="button" class="btn btn-sm btn-danger"  ng-click="filteringPageCtrl.decideAll('declined')">declined</button>
+            <button type="button" class="btn btn-sm btn-warning" ng-click="filteringPageCtrl.decideAll('maybe')">maybe</button>
+            <button type="button" class="btn btn-sm btn-success" ng-click="filteringPageCtrl.decideAll('approved')">approved</button>
+          </div>
+        </div>
+      </div>
     </div>
-
   </div>
 
   <column-filters on-filter-applied="filteringPageCtrl.reloadTable">

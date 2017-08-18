@@ -18,6 +18,8 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.saveProgress = saveProgress;
   Service.scheduleSnapshot = scheduleSnapshot;
   Service.searchStringColumn = searchStringColumn
+  Service.sendAllDecisions = sendAllDecisions;
+  Service.sendDecision = sendDecision;
   Service.variantPropertyToString = variantPropertyToString;
 
   function applyFilters (filters) {
@@ -119,6 +121,29 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
     return promise;
   }
+
+  function sendAllDecisions (decision) {
+    return $http.put('/api/variant-table/decision/all', {}, {
+      params: {
+        decision: decision
+      }
+    }).then(function (res) {
+      return res.data;
+    });
+  }
+
+  function sendDecision (index, decision) {
+
+    return $http.put('/api/variant-table/decision', {}, {
+      params: {
+        index: index,
+        decision: decision
+      }
+    }).then(function (res) {
+      return res.data;
+    });
+  }
+
 
   function variantPropertyToString (propertyValue) {
 
