@@ -17,6 +17,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
 
   Ctrl.decideAll = decideAll;
   Ctrl.reloadTable = reloadTable;
+  Ctrl.onFilterApplied = onFilterApplied;
   Ctrl.init = init;
   Ctrl.onInspectorLinkClicked = onInspectorLinkClicked;
   Ctrl.onPageChange = onPageChange;
@@ -27,7 +28,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
 
   function decideAll (decision) {
     VariantTableService.sendAllDecisions(decision)
-    .then(Ctrl.reloadTable);
+    .then(Ctrl.onFilterApplied);
   }
 
   function init () {
@@ -45,23 +46,31 @@ var module = angular.module('de.imi.marw.viper.filtering', [
     .then(function (tableSize) {
 
       Ctrl.tableSize = tableSize;
-
-      if (tableSize == 0) {
-        Ctrl.currentVariants = [ ];
-        return;
-      }
-
-      Ctrl.currentPage = 1;
+      Ctrl.currentPage = VariantTableService.currentVariantPage;
       Ctrl.onPageChange();
     });
   }
 
   function onInspectorLinkClicked(index) {
     var variantIndex = Ctrl.pageSize * (Ctrl.currentPage - 1) + index;
-    VariantTableService.clickedVariantIndex = variantIndex;
+    VariantTableService.currentVariantIndex = variantIndex;
+  }
+
+  function onFilterApplied() {
+
+    VariantTableService.currentVariantPage = 1;
+    VariantTableService.currentVariantIndex = 0;
+    Ctrl.reloadTable();
   }
 
   function onPageChange () {
+
+    VariantTableService.currentVariantPage = Ctrl.currentPage;
+
+    if (Ctrl.tableSize == 0) {
+      Ctrl.currentVariants = [ ];
+      return;
+    }
 
     var fromIndex = (Ctrl.currentPage - 1) * Ctrl.pageSize;
     var toIndex   = Math.min(Ctrl.currentPage * Ctrl.pageSize, Ctrl.tableSize);

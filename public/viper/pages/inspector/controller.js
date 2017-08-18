@@ -29,8 +29,7 @@ var module = angular.module('de.imi.marw.viper.inspector', [
       var columnNames = data[1];
 
       Ctrl.tableSize = tableSize;
-      Ctrl.index     = VariantTableService.clickedVariantIndex == null ? 0 : VariantTableService.clickedVariantIndex;
-      VariantTableService.clickedVariantIndex = null;
+      Ctrl.index     = VariantTableService.currentVariantIndex;
       Ctrl.columnNames = columnNames;
 
       Ctrl.onIndexChange();
@@ -54,6 +53,7 @@ var module = angular.module('de.imi.marw.viper.inspector', [
 
     if (Ctrl.tableSize == 0) return Ctrl.currentVariant = null;
 
+    VariantTableService.currentVariantIndex = Ctrl.index;
     VariantTableService.scheduleSnapshot(Ctrl.index);
 
     $q.all([
