@@ -112,11 +112,12 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
     return promise;
   }
 
-  function scheduleSnapshot(index) {
+  function scheduleSnapshot(index, relatedCallIndex) {
 
     var promise = $http.post("/api/variant-table/snapshot", {}, {
       params: {
-        index: index
+        index: index,
+        relatedCallIndex: relatedCallIndex
       }
     });
 

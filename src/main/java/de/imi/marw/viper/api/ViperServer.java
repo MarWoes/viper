@@ -267,21 +267,23 @@ public class ViperServer {
 
     private Object takeSnapshot(Request req, Response res) {
         int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
+        int selectedRelatedCall = gson.fromJson(req.queryParams("relatedCallIndex"), Integer.class);
         int maxIndex = Util.clamp(queryIndex + 10, 0, variantTableCluster.getClusteredTable().getNumberOfCalls());
 
         for (int i = queryIndex; queryIndex < maxIndex; queryIndex++) {
 
             List<Map<String, Object>> relatedCalls = variantTableCluster.getUnclusteredCalls(queryIndex);
 
-            Map<String, Object> firstCall = relatedCalls.get(0);
+            int relatedCallIndex = i == queryIndex ? selectedRelatedCall : 0;
+            Map<String, Object> relatedCall = relatedCalls.get(relatedCallIndex);
 
-            String sample = firstCall.get(VariantTable.SAMPLE_COLUMN_NAME).toString();
+            String sample = relatedCall.get(VariantTable.SAMPLE_COLUMN_NAME).toString();
 
-            String chr1 = firstCall.get(VariantTable.CHR1_COLUMN_NAME).toString();
-            String chr2 = firstCall.get(VariantTable.CHR2_COLUMN_NAME).toString();
+            String chr1 = relatedCall.get(VariantTable.CHR1_COLUMN_NAME).toString();
+            String chr2 = relatedCall.get(VariantTable.CHR2_COLUMN_NAME).toString();
 
-            int bp1 = ((Double) firstCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
-            int bp2 = ((Double) firstCall.get(VariantTable.BP2_COLUMN_NAME)).intValue();
+            int bp1 = ((Double) relatedCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
+            int bp2 = ((Double) relatedCall.get(VariantTable.BP2_COLUMN_NAME)).intValue();
 
             this.igv.scheduleSnapshot(sample, chr1, bp1);
             this.igv.scheduleSnapshot(sample, chr2, bp2);

@@ -60,17 +60,27 @@
         <div class="row">
 
           <div class="col-md-6">
-            <igv-image variant="inspectorCtrl.relatedVariants[0]" chr-column="'chr1'", bp-column="'bp1'">
+            <h4>First breakpoint:</h4>
+            <igv-image variant="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]" chr-column="'chr1'", bp-column="'bp1'">
             </igv-image>
           </div>
 
           <div class="col-md-6">
-            <igv-image variant="inspectorCtrl.relatedVariants[0]" chr-column="'chr2'", bp-column="'bp2'">
+            <h4>Second breakpoint:</h4>
+            <igv-image variant="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]" chr-column="'chr2'", bp-column="'bp2'">
             </igv-image>
           </div>
 
         </div>
 
+        <hr>
+
+        <div ng-if="inspectorCtrl.relatedVariants.length > 1">
+          <rzslider
+            rz-slider-model="inspectorCtrl.relatedCallIndex"
+            rz-slider-options="inspectorCtrl.sliderOptions">
+          </rzslider>
+        </div>
 
       </uib-tab>
       <uib-tab heading="related calls">

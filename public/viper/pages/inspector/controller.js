@@ -1,6 +1,7 @@
 var module = angular.module('de.imi.marw.viper.inspector', [
   'de.imi.marw.viper.igv.image',
-  'de.imi.marw.viper.variant-table.service'
+  'de.imi.marw.viper.variant-table.service',
+  'rzModule',
 ])
 .controller('InspectorPageCtrl', function (VariantTableService, $q, $http, $interval) {
 
@@ -8,6 +9,7 @@ var module = angular.module('de.imi.marw.viper.inspector', [
 
   Ctrl.tableSize      = null;
   Ctrl.index          = null;
+  Ctrl.relatedCallIndex = null;
   Ctrl.currentVariant = null;
   Ctrl.relatedVariants = [ ];
   Ctrl.columnNames = [ ];
@@ -16,7 +18,6 @@ var module = angular.module('de.imi.marw.viper.inspector', [
   Ctrl.onIndexChange = onIndexChange;
   Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
   Ctrl.sendDecision = sendDecision;
-  Ctrl.count = 0;
   Ctrl.init();
 
   function init() {
@@ -49,12 +50,16 @@ var module = angular.module('de.imi.marw.viper.inspector', [
     }
   }
 
+  function onRelatedCallIndexChange (sliderId, modelValue) {
+    VariantTableService.scheduleSnapshot(Ctrl.index, modelValue);
+  }
+
   function onIndexChange () {
 
     if (Ctrl.tableSize == 0) return Ctrl.currentVariant = null;
 
     VariantTableService.currentVariantIndex = Ctrl.index;
-    VariantTableService.scheduleSnapshot(Ctrl.index);
+    VariantTableService.scheduleSnapshot(Ctrl.index, 0);
 
     $q.all([
         VariantTableService.getTableRow(Ctrl.index),
@@ -62,6 +67,21 @@ var module = angular.module('de.imi.marw.viper.inspector', [
     ]).then(function (data) {
       Ctrl.currentVariant = data[0];
       Ctrl.relatedVariants = data[1];
+
+      var samples = [];
+
+      for(var i = 0; i < Ctrl.relatedVariants.length; i++) {
+        samples.push(Ctrl.relatedVariants[i].sample);
+      }
+
+      Ctrl.relatedCallIndex = 0;
+
+      Ctrl.sliderOptions = {
+        floor: 0,
+        ceil: samples.length - 1,
+        showTicks: true,
+        onEnd: onRelatedCallIndexChange
+      }
     });
 
   }

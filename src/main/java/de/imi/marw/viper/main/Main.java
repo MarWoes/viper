@@ -32,7 +32,7 @@ public class Main {
      */
     public static void main(String[] args) throws InterruptedException {
 
-        ViperServerConfig config = new ViperServerConfig("../results-france1/all_analysis.csv");
+        ViperServerConfig config = new ViperServerConfig("../results-unit-test/all_analysis.csv");
         config.setWorkDir("/home/marius/wd");
         config.setFastaRef("/home/marius/workspace/sftp-share/Genomes/Homo_sapiens.GRCh37.67/Homo_sapiens.GRCh37.67.dna.chromosome.all.fasta");
         config.setBamDir("/home/marius/workspace/sftp-share/Analyses/Nijmegen_MDS_sequencing/MDS-Triage/Netherlands_illumina_1/alignment2/alignment");
