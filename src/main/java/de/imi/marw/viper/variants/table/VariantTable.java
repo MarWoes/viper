@@ -79,6 +79,13 @@ public class VariantTable {
 
         this.indexMap = new HashMap<>();
         for (int i = 0; i < columnNames.size(); i++) {
+
+            String columnName = columnNames.get(i);
+
+            if (indexMap.containsKey(columnName)) {
+                throw new IllegalArgumentException("table contains duplicates of column " + columnName);
+            }
+
             indexMap.put(columnNames.get(i), i);
         }
         this.rows = new ArrayList<>();
