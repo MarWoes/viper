@@ -46,6 +46,7 @@ import java.util.stream.IntStream;
 public class VcfTableReader implements TableReader {
 
     private List<String> columns;
+    private List<String> prefixedColumns;
     private List<VariantPropertyType> types;
     private List<Boolean> valuesDefinedPerSample;
 
@@ -95,8 +96,9 @@ public class VcfTableReader implements TableReader {
         }
     }
 
-    private void extractColumnAndType(VCFCompoundHeaderLine info) {
+    private void extractColumnAndType(VCFCompoundHeaderLine info, String prefix) {
         columns.add(info.getID());
+        prefixedColumns.add(prefix + ":" + info.getID());
         types.add(convertVcfToVariantType(info));
         valuesDefinedPerSample.add(info.getCountType() == VCFHeaderLineCount.G);
     }
@@ -118,12 +120,14 @@ public class VcfTableReader implements TableReader {
         columns.add(VCF_FILTER_FIELD);
         types.add(VariantPropertyType.STRING_COLLECTION);
 
+        prefixedColumns.addAll(columns);
+
         for (VCFInfoHeaderLine infoHeaderLine : header.getInfoHeaderLines()) {
-            extractColumnAndType(infoHeaderLine);
+            extractColumnAndType(infoHeaderLine, "INFO");
         }
 
         for (VCFFormatHeaderLine formatHeaderLine : header.getFormatHeaderLines()) {
-            extractColumnAndType(formatHeaderLine);
+            extractColumnAndType(formatHeaderLine, "FORMAT");
         }
 
     }
@@ -150,11 +154,13 @@ public class VcfTableReader implements TableReader {
 
         List<Object> vcfFieldValues = new ArrayList<>();
 
-        vcfFieldValues.add(context.getID());
-        vcfFieldValues.add(context.getReference().toString());
+        String id = ".".equals(context.getID()) ? "NA" : context.getID();
+
+        vcfFieldValues.add(id);
+        vcfFieldValues.add(context.getReference().getBaseString());
 
         List<String> altAlleles = context.getAlleles().stream()
-                .map(allele -> allele.toString())
+                .map(allele -> allele.getBaseString())
                 .collect(Collectors.toList());
         vcfFieldValues.add(altAlleles);
 
@@ -288,6 +294,7 @@ public class VcfTableReader implements TableReader {
                 .collect(Collectors.toList());
 
         this.columns = newColumns;
+        this.prefixedColumns = new ArrayList<>();
         this.types = newTypes;
         this.valuesDefinedPerSample = newValuesDefinedPerSample;
 
@@ -305,7 +312,7 @@ public class VcfTableReader implements TableReader {
 
         }
 
-        return new VariantTable(calls, columns, types);
+        return new VariantTable(calls, prefixedColumns, types);
 
     }
 
