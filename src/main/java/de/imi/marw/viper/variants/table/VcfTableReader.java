@@ -159,7 +159,7 @@ public class VcfTableReader implements TableReader {
         vcfFieldValues.add(id);
         vcfFieldValues.add(context.getReference().getBaseString());
 
-        List<String> altAlleles = context.getAlleles().stream()
+        List<String> altAlleles = context.getAlternateAlleles().stream()
                 .map(allele -> allele.getBaseString())
                 .collect(Collectors.toList());
         vcfFieldValues.add(altAlleles);
@@ -271,10 +271,26 @@ public class VcfTableReader implements TableReader {
 
         for (int i = attributeUpper; i < columns.size(); i++) {
 
+            String columnName = columns.get(i);
             Genotype genotype = context.getGenotype(sample);
-            Object genotypeAttribute = genotype.getAnyAttribute(columns.get(i));
 
-            call.add(extractGenotypeValues(genotypeAttribute, types.get(i)));
+            if (columnName.equals("GT")) {
+
+                String delimiter = genotype.isPhased() ? "|" : "/";
+
+                String genotypeString = genotype.getAlleles().stream()
+                        .map(allele -> allele.getBaseString())
+                        .collect(Collectors.joining(delimiter));
+
+                call.add(genotypeString);
+
+            } else {
+
+                Object genotypeAttribute = genotype.getAnyAttribute(columnName);
+
+                call.add(extractGenotypeValues(genotypeAttribute, types.get(i)));
+
+            }
 
         }
 
@@ -305,6 +321,12 @@ public class VcfTableReader implements TableReader {
         for (VariantContext context : reader) {
 
             for (String sample : context.getSampleNamesOrderedByName()) {
+
+                boolean hasNonReferenceAlleles = context.getGenotype(sample).getAlleles().stream().anyMatch(allele -> allele.isNonReference());
+
+                if (!hasNonReferenceAlleles) {
+                    continue;
+                }
 
                 calls.add(extractCall(context, sample, columns, types));
 
