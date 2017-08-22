@@ -30,9 +30,9 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
-        ViperServerConfig config = new ViperServerConfig("../playground/delly2.vcf");
+        ViperServerConfig config = new ViperServerConfig("../results-unit-test/all_analysis.csv");
         config.setWorkDir("/home/marius/wd");
         config.setFastaRef("/home/marius/workspace/sftp-share/Genomes/Homo_sapiens.GRCh37.67/Homo_sapiens.GRCh37.67.dna.chromosome.all.fasta");
         config.setBamDir("/home/marius/workspace/sftp-share/Analyses/Nijmegen_MDS_sequencing/MDS-Triage/Netherlands_illumina_1/alignment2/alignment");

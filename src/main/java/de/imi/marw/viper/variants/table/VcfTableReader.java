@@ -35,7 +35,6 @@ import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -50,6 +49,13 @@ public class VcfTableReader implements TableReader {
     private List<String> prefixedColumns;
     private List<VariantPropertyType> types;
     private List<Boolean> valuesDefinedPerSample;
+    private boolean simple;
+    private boolean excludeNonReferenceCalls;
+
+    public VcfTableReader(boolean simple, boolean excludeNonReferenceCalls) {
+        this.simple = simple;
+        this.excludeNonReferenceCalls = excludeNonReferenceCalls;
+    }
 
     private static final String VCF_ID_FIELD = "ID";
     private static final String VCF_REF_FIELD = "REF";
@@ -124,6 +130,10 @@ public class VcfTableReader implements TableReader {
 
         prefixedColumns.addAll(columns);
 
+        if (isSimple()) {
+            return;
+        }
+
         for (VCFInfoHeaderLine infoHeaderLine : header.getInfoHeaderLines()) {
             extractColumnAndType(infoHeaderLine, "INFO");
         }
@@ -138,13 +148,25 @@ public class VcfTableReader implements TableReader {
         List<Object> mandatoryCallValues = new ArrayList<>();
 
         mandatoryCallValues.add(sample);
-        mandatoryCallValues.add(context.getType().toString());
+
+        String svType;
+        String chr2;
+        if (context.isSymbolicOrSV()) {
+            svType = context.getStructuralVariantType().toString();
+            chr2 = context.getAttribute("CHR2").toString();
+        } else {
+            svType = context.getType().toString();
+            chr2 = context.getContig();
+        }
+        mandatoryCallValues.add(svType);
+
         mandatoryCallValues.add(context.getContig());
 
         double start = context.getStart();
         mandatoryCallValues.add(start);
+
         //TODO: this is chr2, how is this expressed in vcf files?
-        mandatoryCallValues.add(context.getContig());
+        mandatoryCallValues.add(chr2);
 
         double end = context.getEnd();
         mandatoryCallValues.add(end);
@@ -159,10 +181,10 @@ public class VcfTableReader implements TableReader {
         String id = ".".equals(context.getID()) ? "NA" : context.getID();
 
         vcfFieldValues.add(id);
-        vcfFieldValues.add(context.getReference().getBaseString());
+        vcfFieldValues.add(context.getReference().getDisplayString());
 
         List<String> altAlleles = context.getAlternateAlleles().stream()
-                .map(allele -> allele.getBaseString())
+                .map(allele -> allele.getDisplayString())
                 .collect(Collectors.toList());
         vcfFieldValues.add(altAlleles);
 
@@ -261,6 +283,10 @@ public class VcfTableReader implements TableReader {
         call.addAll(extractMandatoryFields(context, sample));
         call.addAll(extractRequiredVCFFields(context, sample));
 
+        if (isSimple()) {
+            return call;
+        }
+
         int attributeLower = VariantTable.MANDATORY_FIELDS.length + VCF_REQUIRED_FIELDS.length;
         int attributeUpper = attributeLower + numAttributes;
 
@@ -283,7 +309,7 @@ public class VcfTableReader implements TableReader {
                 String delimiter = genotype.isPhased() ? "|" : "/";
 
                 String genotypeString = genotype.getAlleles().stream()
-                        .map(allele -> allele.getBaseString())
+                        .map(allele -> allele.getDisplayString())
                         .collect(Collectors.joining(delimiter));
 
                 call.add(genotypeString);
@@ -327,7 +353,7 @@ public class VcfTableReader implements TableReader {
 
                 boolean hasNonReferenceAlleles = context.getGenotype(sample).getAlleles().stream().anyMatch(allele -> allele.isNonReference());
 
-                if (!hasNonReferenceAlleles) {
+                if (!hasNonReferenceAlleles && isExcludingNonReferenceCalls()) {
                     continue;
                 }
 
@@ -339,6 +365,22 @@ public class VcfTableReader implements TableReader {
 
         return new VariantTable(calls, prefixedColumns, types);
 
+    }
+
+    public boolean isSimple() {
+        return simple;
+    }
+
+    public void setSimple(boolean simple) {
+        this.simple = simple;
+    }
+
+    public boolean isExcludingNonReferenceCalls() {
+        return excludeNonReferenceCalls;
+    }
+
+    public void setExcludeNonReferenceCalls(boolean excludeNonReferenceCalls) {
+        this.excludeNonReferenceCalls = excludeNonReferenceCalls;
     }
 
 }

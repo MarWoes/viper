@@ -37,6 +37,8 @@ public class ViperServerConfig {
     private String fastaRef = "/tmp/ref.fa";
     private String igvJar = "../igv/igv.jar";
     private String bamDir = "/tmp/bam";
+    private boolean keepVcfSimple = true;
+    private boolean excludeNonRefVcfCalls = true;
 
     public ViperServerConfig(String csvFile) {
         this.analysisCsvFile = csvFile;
@@ -113,4 +115,21 @@ public class ViperServerConfig {
     public void setBamDir(String bamDir) {
         this.bamDir = bamDir;
     }
+
+    public boolean isKeepingVcfSimple() {
+        return keepVcfSimple;
+    }
+
+    public void setKeepVcfSimple(boolean keepVcfSimple) {
+        this.keepVcfSimple = keepVcfSimple;
+    }
+
+    public boolean isExcludingNonRefVcfCalls() {
+        return excludeNonRefVcfCalls;
+    }
+
+    public void setExcludeNonRefVcfCalls(boolean excludeNonRefVcfCalls) {
+        this.excludeNonRefVcfCalls = excludeNonRefVcfCalls;
+    }
+
 }
