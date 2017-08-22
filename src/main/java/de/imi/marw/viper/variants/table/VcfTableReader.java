@@ -45,7 +45,6 @@ import java.util.stream.IntStream;
  */
 public class VcfTableReader implements TableReader {
 
-    private final String fileName;
     private List<String> columns;
     private List<VariantPropertyType> types;
     private List<Boolean> valuesDefinedPerSample;
@@ -63,10 +62,6 @@ public class VcfTableReader implements TableReader {
         VCF_QUAL_FIELD,
         VCF_FILTER_FIELD
     };
-
-    public VcfTableReader(String fileName) {
-        this.fileName = fileName;
-    }
 
     private boolean isCollectionType(VCFCompoundHeaderLine info) {
 
@@ -281,7 +276,7 @@ public class VcfTableReader implements TableReader {
     }
 
     @Override
-    public VariantTable readTable() {
+    public VariantTable readTable(String fileName) {
         VCFFileReader reader = new VCFFileReader(new File(fileName), false);
         VCFHeader header = reader.getFileHeader();
 

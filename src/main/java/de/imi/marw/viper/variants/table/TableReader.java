@@ -27,5 +27,5 @@ package de.imi.marw.viper.variants.table;
  * @author marius
  */
 public interface TableReader {
-    VariantTable readTable();
+    VariantTable readTable(String fileName);
 }

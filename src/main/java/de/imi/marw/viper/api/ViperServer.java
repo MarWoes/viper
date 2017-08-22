@@ -34,7 +34,6 @@ import de.imi.marw.viper.variants.filters.NumericCollectionFilter;
 import de.imi.marw.viper.variants.filters.NumericFilter;
 import de.imi.marw.viper.variants.filters.StringCollectionFilter;
 import de.imi.marw.viper.variants.filters.StringFilter;
-import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.variants.table.ProgressManager;
 import de.imi.marw.viper.visualization.IGVVisualizer;
@@ -89,9 +88,9 @@ public class ViperServer {
     }
 
     private VariantTableCluster loadVariants() {
-        CsvTableReader reader = new CsvTableReader(config.getAnalysisCsvFile(), config.getCsvDelimiter(), config.getPropertyCollectionDelimiter());
+        TableReaderMultiplexer reader = new TableReaderMultiplexer(config);
 
-        VariantTable unclusteredTable = reader.readTable();
+        VariantTable unclusteredTable = reader.readTable(config.getAnalysisCsvFile());
         VariantTableCluster cluster = clusterer.clusterVariantTable(unclusteredTable);
 
         return cluster;

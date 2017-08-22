@@ -20,24 +20,36 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-package de.imi.marw.viper.main;
+package de.imi.marw.viper.api;
 
-import de.imi.marw.viper.api.ViperServer;
-import de.imi.marw.viper.api.ViperServerConfig;
+import de.imi.marw.viper.variants.table.CsvTableReader;
+import de.imi.marw.viper.variants.table.TableReader;
+import de.imi.marw.viper.variants.table.VariantTable;
+import de.imi.marw.viper.variants.table.VcfTableReader;
 
-public class Main {
+/**
+ *
+ * @author marius
+ */
+public class TableReaderMultiplexer implements TableReader {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws InterruptedException {
+    private final CsvTableReader csvReader;
+    private final VcfTableReader vcfReader;
 
-        ViperServerConfig config = new ViperServerConfig("../playground/sample.vcf");
-        config.setWorkDir("/home/marius/wd");
-        config.setFastaRef("/home/marius/workspace/sftp-share/Genomes/Homo_sapiens.GRCh37.67/Homo_sapiens.GRCh37.67.dna.chromosome.all.fasta");
-        config.setBamDir("/home/marius/workspace/sftp-share/Analyses/Nijmegen_MDS_sequencing/MDS-Triage/Netherlands_illumina_1/alignment2/alignment");
-
-        ViperServer server = new ViperServer(config);
-        server.start();
+    public TableReaderMultiplexer(ViperServerConfig config) {
+        this.csvReader = new CsvTableReader(config.getCsvDelimiter(), config.getPropertyCollectionDelimiter());
+        this.vcfReader = new VcfTableReader();
     }
+
+    @Override
+    public VariantTable readTable(String fileName) {
+
+        if (fileName.endsWith(".vcf")) {
+            return vcfReader.readTable(fileName);
+        }
+
+        return csvReader.readTable(fileName);
+
+    }
+
 }

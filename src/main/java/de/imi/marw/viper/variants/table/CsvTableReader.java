@@ -40,12 +40,10 @@ import java.util.stream.IntStream;
  */
 public class CsvTableReader implements TableReader {
 
-    private final String fileName;
     private final char csvDelimiter;
     private final String propertyDelimiter;
 
-    public CsvTableReader(String fileName, char csvDelimiter, String propertyDelimiter) {
-        this.fileName = fileName;
+    public CsvTableReader(char csvDelimiter, String propertyDelimiter) {
         this.csvDelimiter = csvDelimiter;
         this.propertyDelimiter = propertyDelimiter;
     }
@@ -150,8 +148,8 @@ public class CsvTableReader implements TableReader {
     }
 
     @Override
-    public VariantTable readTable() {
-        try (CSVReader reader = new CSVReader(new FileReader(this.fileName), this.csvDelimiter)) {
+    public VariantTable readTable(String fileName) {
+        try (CSVReader reader = new CSVReader(new FileReader(fileName), this.csvDelimiter)) {
 
             String[] header = reader.readNext();
 
@@ -164,7 +162,7 @@ public class CsvTableReader implements TableReader {
             return new VariantTable(parsedCalls, Arrays.asList(header), Arrays.asList(types));
 
         } catch (FileNotFoundException ex) {
-            System.out.println("[ERROR] File " + this.fileName + " not found!");
+            System.out.println("[ERROR] File " + fileName + " not found!");
         } catch (IOException ex) {
             System.out.println("[ERROR] IOException when reading csv file:");
             System.err.print(ex);
