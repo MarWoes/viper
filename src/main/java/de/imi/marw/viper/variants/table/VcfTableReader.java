@@ -35,6 +35,7 @@ import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -69,6 +70,7 @@ public class VcfTableReader implements TableReader {
         VCFHeaderLineCount count = info.getCountType();
 
         return count == VCFHeaderLineCount.A
+                || count == VCFHeaderLineCount.G
                 || count == VCFHeaderLineCount.R
                 || count == VCFHeaderLineCount.UNBOUNDED
                 || (count == VCFHeaderLineCount.INTEGER && info.getCount() > 1);
@@ -233,19 +235,21 @@ public class VcfTableReader implements TableReader {
             return Double.parseDouble(value);
         }
 
-        String[] splitValues = ((String) genotypeAttribute).split(",|;");
+        List splitValues = genotypeAttribute instanceof List ? (List) genotypeAttribute : Arrays.asList(genotypeAttribute.toString().split(",|;"));
 
         if (type == VariantPropertyType.STRING_COLLECTION) {
-            return new ArrayList<>(Arrays.asList(splitValues));
+            return new ArrayList<>(splitValues);
         }
 
         if (type == VariantPropertyType.NUMERIC_COLLECTION) {
-            List<Double> parsed = Arrays.stream(splitValues).map((str) -> ".".equals(str) ? null : Double.parseDouble(str))
+            List<Double> parsed = (List<Double>) splitValues.stream()
+                    .map((str) -> ".".equals(str.toString()) ? null : Double.parseDouble(str.toString()))
                     .collect(Collectors.toList());
+
             return parsed;
         }
 
-        throw new IllegalStateException("unexpected type " + type + "when extracting genotype values");
+        throw new IllegalStateException("unexpected type " + type + " when extracting genotype values");
     }
 
     private List<Object> extractCall(VariantContext context, String sample, List<String> columns, List<VariantPropertyType> types) {
@@ -287,7 +291,6 @@ public class VcfTableReader implements TableReader {
             } else {
 
                 Object genotypeAttribute = genotype.getAnyAttribute(columnName);
-
                 call.add(extractGenotypeValues(genotypeAttribute, types.get(i)));
 
             }
