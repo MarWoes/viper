@@ -30,10 +30,11 @@ import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,7 +51,7 @@ public class IGVVisualizer extends Thread {
     private static final int XVFB_HEIGHT = 1680;
 
     private final Map<String, Boolean> visualizationProgressMap;
-    private final BlockingQueue<IGVCommand> commandQueue;
+    private final PriorityBlockingQueue<IGVCommand> commandQueue;
     private final int port;
     private final String fastaRef;
     private final String igvJar;
@@ -64,7 +65,7 @@ public class IGVVisualizer extends Thread {
         this.port = port;
         this.fastaRef = fastaRef;
         this.igvJar = igvJar;
-        this.commandQueue = new LinkedBlockingQueue<>();
+        this.commandQueue = new PriorityBlockingQueue<>(20, Comparator.reverseOrder());
         this.workDir = workDir;
         this.visualizationProgressMap = new ConcurrentHashMap<>();
         this.bamDir = bamDir;
@@ -162,11 +163,11 @@ public class IGVVisualizer extends Thread {
         return this.visualizationProgressMap.getOrDefault(key, false);
     }
 
-    public void scheduleSnapshot(String sample, String chr, int bp) {
+    public void scheduleSnapshot(String sample, String chr, int bp, boolean isUrgent) {
 
         String key = sample + "-" + chr + "-" + bp;
 
-        if (this.visualizationProgressMap.containsKey(key)) {
+        if (this.visualizationProgressMap.containsKey(key) && (!isUrgent || this.visualizationProgressMap.get(key))) {
             return;
         }
 
@@ -186,7 +187,13 @@ public class IGVVisualizer extends Thread {
             "snapshot " + imageFileName
         };
 
-        this.enqueueCommand(new IGVCommand(subCommands, () -> this.visualizationProgressMap.put(key, true)));
+        IGVCommand command = new IGVCommand(key, subCommands, isUrgent, () -> this.visualizationProgressMap.put(key, true));
+
+        if (isUrgent) {
+            this.commandQueue.remove(command);
+        }
+
+        this.enqueueCommand(command);
     }
 
     public void enqueueCommand(IGVCommand command) {
@@ -194,7 +201,7 @@ public class IGVVisualizer extends Thread {
     }
 
     private void setupViewer() {
-        this.enqueueCommand(new IGVCommand(new String[]{"setSleepInterval 0"}, () -> {
+        this.enqueueCommand(new IGVCommand("setup", new String[]{"setSleepInterval 0"}, true, () -> {
         }));
     }
 
@@ -231,25 +238,5 @@ public class IGVVisualizer extends Thread {
         } catch (IOException | InterruptedException ex) {
             return false;
         }
-    }
-
-    private static final class IGVCommand {
-
-        private final String[] subCommands;
-        private final Runnable finishedCallback;
-
-        public IGVCommand(String[] subCommands, Runnable finishedCallback) {
-            this.subCommands = subCommands;
-            this.finishedCallback = finishedCallback;
-        }
-
-        public Runnable getFinishedCallback() {
-            return finishedCallback;
-        }
-
-        public String[] getSubCommands() {
-            return subCommands;
-        }
-
     }
 }

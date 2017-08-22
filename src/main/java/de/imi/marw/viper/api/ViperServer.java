@@ -267,7 +267,7 @@ public class ViperServer {
     private Object takeSnapshot(Request req, Response res) {
         int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
         int selectedRelatedCall = gson.fromJson(req.queryParams("relatedCallIndex"), Integer.class);
-        int maxIndex = Util.clamp(queryIndex + 10, 0, variantTableCluster.getClusteredTable().getNumberOfCalls());
+        int maxIndex = Util.clamp(queryIndex + config.getNumPrecomputedSnapshots(), 0, variantTableCluster.getClusteredTable().getNumberOfCalls());
 
         for (int i = queryIndex; queryIndex < maxIndex; queryIndex++) {
 
@@ -284,8 +284,8 @@ public class ViperServer {
             int bp1 = ((Double) relatedCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
             int bp2 = ((Double) relatedCall.get(VariantTable.BP2_COLUMN_NAME)).intValue();
 
-            this.igv.scheduleSnapshot(sample, chr1, bp1);
-            this.igv.scheduleSnapshot(sample, chr2, bp2);
+            this.igv.scheduleSnapshot(sample, chr1, bp1, i == queryIndex);
+            this.igv.scheduleSnapshot(sample, chr2, bp2, i == queryIndex);
         }
 
         return "OK";

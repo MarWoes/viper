@@ -39,6 +39,7 @@ public class ViperServerConfig {
     private String bamDir = "/tmp/bam";
     private boolean keepVcfSimple = true;
     private boolean excludeNonRefVcfCalls = true;
+    private int numPrecomputedSnapshots = 10;
 
     public ViperServerConfig(String csvFile) {
         this.analysisCsvFile = csvFile;
@@ -130,6 +131,14 @@ public class ViperServerConfig {
 
     public void setExcludeNonRefVcfCalls(boolean excludeNonRefVcfCalls) {
         this.excludeNonRefVcfCalls = excludeNonRefVcfCalls;
+    }
+
+    public int getNumPrecomputedSnapshots() {
+        return numPrecomputedSnapshots;
+    }
+
+    public void setNumPrecomputedSnapshots(int numPrecomputedSnapshots) {
+        this.numPrecomputedSnapshots = numPrecomputedSnapshots;
     }
 
 }
