@@ -51,13 +51,22 @@ public class VariantTable {
     public static final String DECISION_COLUMN_NAME = "viperDecision";
     public static final String ID_COLUMN_NAME = "viperId";
 
-    private static final String[] MANDATORY_FIELDS = {
-        TYPE_COLUMN_NAME,
+    public static final String[] MANDATORY_FIELDS = {
         SAMPLE_COLUMN_NAME,
+        TYPE_COLUMN_NAME,
         CHR1_COLUMN_NAME,
-        CHR2_COLUMN_NAME,
         BP1_COLUMN_NAME,
+        CHR2_COLUMN_NAME,
         BP2_COLUMN_NAME
+    };
+
+    public static final VariantPropertyType[] MANDATORY_FIELDS_TYPES = {
+        VariantPropertyType.STRING,
+        VariantPropertyType.STRING,
+        VariantPropertyType.STRING,
+        VariantPropertyType.NUMERIC,
+        VariantPropertyType.STRING,
+        VariantPropertyType.NUMERIC
     };
 
     private final List<List<Object>> rows;
@@ -197,8 +206,8 @@ public class VariantTable {
             ((Collection) value).stream().forEach((o) -> checkCorrectType(o, someClass));
         } else {
             throw new IllegalArgumentException("Variant table contained value "
-                    + value.toString() + " that could not be interpreted as a collection of "
-                    + someClass.getSimpleName() + ", is " + value.getClass().getSimpleName());
+                    + value + " that could not be interpreted as a collection of "
+                    + someClass.getSimpleName() + ", is " + (value == null ? "null" : value.getClass().getSimpleName()));
         }
     }
 
@@ -260,6 +269,10 @@ public class VariantTable {
 
         if (types.size() != columnNames.size()) {
             throw new IllegalArgumentException("Type and column names differ in length");
+        }
+
+        if (this.rows.stream().anyMatch(call -> call.size() != types.size())) {
+            throw new IllegalArgumentException("number of columns in calls differ from column names / types");
         }
 
         indexMap.forEach((key, value) -> {
