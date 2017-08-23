@@ -230,7 +230,7 @@ public class ViperServer {
 
             res.raw().setHeader("Content-Disposition", "attachment; filename=viper-all.csv");
 
-            serveFile(res.raw(), exportedFile, "text/plain");
+            serveFile(res.raw(), exportedFile, "text/csv");
 
             return res.raw();
 
