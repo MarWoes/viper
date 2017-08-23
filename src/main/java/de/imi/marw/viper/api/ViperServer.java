@@ -40,11 +40,13 @@ import de.imi.marw.viper.variants.table.ProgressManager;
 import de.imi.marw.viper.visualization.IGVVisualizer;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
+import javax.servlet.http.HttpServletResponse;
 import spark.Request;
 import spark.Response;
 
@@ -176,21 +178,9 @@ public class ViperServer {
         get("/api/variant-table/snapshot/:key", (req, res) -> {
 
             String key = req.params("key");
+            String fileName = this.config.getWorkDir() + "/" + key + ".png";
 
-            res.raw().setContentType("image/png");
-
-            File image = new File(this.config.getWorkDir() + "/" + key + ".png");
-
-            try (
-                    OutputStream out = res.raw().getOutputStream();
-                    FileInputStream in = new FileInputStream(image);) {
-
-                byte[] buf = new byte[1024];
-                int count = 0;
-                while ((count = in.read(buf)) >= 0) {
-                    out.write(buf, 0, count);
-                }
-            }
+            serveFile(res.raw(), fileName, "image/png");
 
             return res.raw();
 
@@ -231,6 +221,20 @@ public class ViperServer {
             return this.variantTableCluster.getClusteredTable().searchStringColumn(columnName, search, limit);
 
         }, gson::toJson);
+
+        get("/api/variant-table/export-clustered", (req, res) -> {
+
+            String exportedFile = config.getWorkDir() + "/viper-all.csv";
+
+            writer.writeAllToCSV(this.variantTableCluster, exportedFile);
+
+            res.raw().setHeader("Content-Disposition", "attachment; filename=viper-all.csv");
+
+            serveFile(res.raw(), exportedFile, "text/plain");
+
+            return res.raw();
+
+        });
     }
 
     private List<VariantCallFilter> parseFilters(String jsonFilterArray) {
@@ -292,6 +296,24 @@ public class ViperServer {
         }
 
         return "OK";
+    }
+
+    private void serveFile(HttpServletResponse res, String fileName, String contentType) throws IOException {
+
+        res.setContentType(contentType);
+
+        File image = new File(fileName);
+
+        try (
+                OutputStream out = res.getOutputStream();
+                FileInputStream in = new FileInputStream(image);) {
+
+            byte[] buf = new byte[1024];
+            int count = 0;
+            while ((count = in.read(buf)) >= 0) {
+                out.write(buf, 0, count);
+            }
+        }
     }
 
     private IGVVisualizer setupIGV() {

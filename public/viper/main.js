@@ -2,6 +2,7 @@ var module = angular.module('de.imi.marw.viper',
   [
     'de.imi.marw.viper.filtering',
     'de.imi.marw.viper.inspector',
+    'de.imi.marw.viper.export',
     'de.imi.marw.viper.variant-table.service',
     'ngRoute',
     'ui.bootstrap'
@@ -26,7 +27,7 @@ var module = angular.module('de.imi.marw.viper',
     })
   }
 })
-.config(function ($routeProvider, $locationProvider) {
+.config(function ($routeProvider) {
   $routeProvider
     .when('/inspector', {
       templateUrl : 'viper/pages/inspector/inspector.html',
@@ -37,6 +38,11 @@ var module = angular.module('de.imi.marw.viper',
       templateUrl : 'viper/pages/filtering/filtering.html',
       controller: 'FilteringPageCtrl',
       controllerAs: 'filteringPageCtrl'
+    })
+    .when('/export', {
+      templateUrl : 'viper/pages/export/export.html',
+      controller: 'ExportPageCtrl',
+      controllerAs: 'exportPageCtrl'
     })
     .otherwise({redirectTo : '/inspector'})
 });

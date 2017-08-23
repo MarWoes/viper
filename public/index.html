@@ -44,6 +44,7 @@
   <script type="text/javascript" src="viper/igv-image/IgvImageDirective.js"></script>
   <script type="text/javascript" src="viper/pages/inspector/controller.js"></script>
   <script type="text/javascript" src="viper/pages/filtering/filtering.js"></script>
+  <script type="text/javascript" src="viper/pages/export/controller.js"></script>
   <script type="text/javascript" src="viper/main.js"></script>
 </head>
 
@@ -62,6 +63,7 @@
         <ul class="nav navbar-nav ">
           <li ng-class="{ active: viperMainCtrl.getCurrentRoute() == '/inspector' }"><a href="#!inspector">Inspector</a></li>
           <li ng-class="{ active: viperMainCtrl.getCurrentRoute() == '/filtering' }"><a href="#!filtering">Filtering</a></li>
+          <li ng-class="{ active: viperMainCtrl.getCurrentRoute() == '/export' }"><a href="#!export">Export</a></li>
         </ul>
 
         <ul class="nav navbar-nav pull-right">
