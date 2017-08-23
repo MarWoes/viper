@@ -27,7 +27,6 @@ import de.imi.marw.viper.variants.VariantTableCluster;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,12 +43,14 @@ public class CsvTableWriter {
 
     private final String collectionDelimiter;
     private final CSVFormat csvFormat;
+    private final CallStringifier stringifier;
 
     public CsvTableWriter(char csvDelimiter, String collectionDelimiter) {
         this.csvFormat = CSVFormat.RFC4180
                 .withDelimiter(csvDelimiter)
                 .withQuoteMode(QuoteMode.MINIMAL);
         this.collectionDelimiter = collectionDelimiter;
+        this.stringifier = new CallStringifier(collectionDelimiter);
     }
 
     private void writeStringsToCsv(List<List<String>> data, String fileName) {
@@ -68,30 +69,6 @@ public class CsvTableWriter {
         }
     }
 
-    private List<String> callToStringList(List<Object> callValues, List<VariantPropertyType> types) {
-
-        List<String> callStrings = new ArrayList<>(types.size());
-
-        for (int j = 0; j < types.size(); j++) {
-
-            switch (types.get(j)) {
-                case STRING:
-                case NUMERIC:
-                    callStrings.add("" + (callValues.get(j) == null ? "NA" : callValues.get(j).toString()));
-                    break;
-                case NUMERIC_COLLECTION:
-                case STRING_COLLECTION:
-                    String joinedValues = ((Collection) callValues.get(j)).stream()
-                            .map(property -> property == null ? "NA" : property.toString())
-                            .collect(Collectors.joining(collectionDelimiter + " ")).toString();
-                    callStrings.add(joinedValues);
-            }
-
-        }
-
-        return callStrings;
-    }
-
     private void writeCallsToCsv(List<List<Object>> rawCalls, VariantTableCluster cluster, String fileName) {
 
         List<List<String>> values = new ArrayList<>();
@@ -104,7 +81,7 @@ public class CsvTableWriter {
         for (int i = 0; i < rawCalls.size(); i++) {
 
             List<Object> call = rawCalls.get(i);
-            List<String> callStrings = callToStringList(call, types);
+            List<String> callStrings = stringifier.convertVariantCallsToString(call, types);
 
             String joinedIndices = cluster.getRelatedIndices(i).stream()
                     .map(relatedIndex -> relatedIndex.toString())
