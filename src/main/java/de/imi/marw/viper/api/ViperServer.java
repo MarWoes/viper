@@ -34,6 +34,7 @@ import de.imi.marw.viper.variants.filters.NumericCollectionFilter;
 import de.imi.marw.viper.variants.filters.NumericFilter;
 import de.imi.marw.viper.variants.filters.StringCollectionFilter;
 import de.imi.marw.viper.variants.filters.StringFilter;
+import de.imi.marw.viper.variants.table.CsvTableWriter;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.variants.table.ProgressManager;
 import de.imi.marw.viper.visualization.IGVVisualizer;
@@ -61,6 +62,7 @@ public class ViperServer {
     private final ProgressManager progressManager;
     private final FilterManager filterManager;
     private VariantTableCluster variantTableCluster;
+    private CsvTableWriter writer;
 
     private IGVVisualizer igv;
 
@@ -71,6 +73,7 @@ public class ViperServer {
         this.clusterer = new VariantClusterBuilder();
         this.progressManager = new ProgressManager(config.getWorkDir());
         this.filterManager = new FilterManager();
+        this.writer = new CsvTableWriter(config.getCsvDelimiter(), config.getPropertyCollectionDelimiter());
     }
 
     public void start() {

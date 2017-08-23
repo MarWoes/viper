@@ -44,6 +44,10 @@ public class VariantTableCluster {
         this.rowMapCluster = rowMapCluster;
     }
 
+    public Collection<Integer> getRelatedIndices(int clusteredRowIndex) {
+        return rowMapCluster.get(clusteredRowIndex);
+    }
+
     public synchronized List<Map<String, Object>> getUnclusteredCalls(int clusteredRowIndex) {
         return rowMapCluster.get(clusteredRowIndex).stream()
                 .map((rowIndex) -> unclusteredTable.getCall(rowIndex))
