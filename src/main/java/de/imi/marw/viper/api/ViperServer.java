@@ -62,7 +62,7 @@ public class ViperServer {
     private final ProgressManager progressManager;
     private final FilterManager filterManager;
     private VariantTableCluster variantTableCluster;
-    private CsvTableWriter writer;
+    private final CsvTableWriter writer;
 
     private IGVVisualizer igv;
 

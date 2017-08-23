@@ -22,7 +22,6 @@
  */
 package de.imi.marw.viper.variants.table;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import de.imi.marw.viper.variants.VariantPropertyType;
 import de.imi.marw.viper.variants.VariantTableCluster;
 import java.io.FileWriter;
@@ -33,6 +32,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.QuoteMode;
 
 /**
  *
@@ -40,24 +42,26 @@ import java.util.stream.Collectors;
  */
 public class CsvTableWriter {
 
-    private final char csvDelimiter;
     private final String collectionDelimiter;
+    private final CSVFormat csvFormat;
 
     public CsvTableWriter(char csvDelimiter, String collectionDelimiter) {
-        this.csvDelimiter = csvDelimiter;
+        this.csvFormat = CSVFormat.RFC4180
+                .withDelimiter(csvDelimiter)
+                .withQuoteMode(QuoteMode.MINIMAL);
         this.collectionDelimiter = collectionDelimiter;
     }
 
     private void writeToCSV(List<List<String>> data, String fileName) {
-        try {
-            CSVWriter writer = new CSVWriter(new FileWriter(fileName), this.csvDelimiter, CSVWriter.NO_QUOTE_CHARACTER);
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(fileName), csvFormat)) {
 
             List<String[]> rawData = data.stream()
                     .map(stringList -> stringList.toArray(new String[stringList.size()]))
                     .collect(Collectors.toList());
 
-            writer.writeAll(rawData);
-            writer.close();
+            for (String[] rowValues : rawData) {
+                printer.printRecord((Object[]) rowValues);
+            }
 
         } catch (IOException ex) {
             Logger.getLogger(CsvTableWriter.class.getName()).log(Level.SEVERE, null, ex);

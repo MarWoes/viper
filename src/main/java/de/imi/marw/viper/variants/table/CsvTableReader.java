@@ -22,17 +22,20 @@
  */
 package de.imi.marw.viper.variants.table;
 
-import au.com.bytecode.opencsv.CSVReader;
 import de.imi.marw.viper.util.Util;
 import de.imi.marw.viper.variants.VariantPropertyType;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 
 /**
  *
@@ -40,12 +43,13 @@ import java.util.stream.IntStream;
  */
 public class CsvTableReader implements TableReader {
 
-    private final char csvDelimiter;
     private final String propertyDelimiter;
+    private final CSVFormat csvFormat;
 
     public CsvTableReader(char csvDelimiter, String propertyDelimiter) {
-        this.csvDelimiter = csvDelimiter;
         this.propertyDelimiter = propertyDelimiter;
+        this.csvFormat = CSVFormat.RFC4180
+                .withDelimiter(csvDelimiter);
     }
 
     private VariantPropertyType determineType(List<String> columnValues) {
@@ -149,15 +153,28 @@ public class CsvTableReader implements TableReader {
 
     @Override
     public VariantTable readTable(String fileName) {
-        try (CSVReader reader = new CSVReader(new FileReader(fileName), this.csvDelimiter)) {
+        try (Reader reader = new FileReader(fileName)) {
 
-            String[] header = reader.readNext();
+            List<String[]> rawStrings = new ArrayList<>();
 
-            List<String[]> rawData = reader.readAll();
+            Iterable<CSVRecord> records = this.csvFormat.parse(reader);
 
-            VariantPropertyType[] types = determineTypes(rawData);
+            for (CSVRecord record : records) {
 
-            List<List<Object>> parsedCalls = parseVariantCalls(header, rawData, types);
+                String[] rawData = new String[record.size()];
+
+                for (int i = 0; i < rawData.length; i++) {
+                    rawData[i] = record.get(i);
+                }
+
+                rawStrings.add(rawData);
+            }
+
+            String[] header = rawStrings.remove(0);
+
+            VariantPropertyType[] types = determineTypes(rawStrings);
+
+            List<List<Object>> parsedCalls = parseVariantCalls(header, rawStrings, types);
 
             return new VariantTable(parsedCalls, Arrays.asList(header), Arrays.asList(types));
 
