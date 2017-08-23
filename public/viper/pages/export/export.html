@@ -7,15 +7,16 @@
         <div class="panel-heading">Export as CSV file</div>
         <div class="panel-body">
 
-          Export all variants:
+          Export <strong>all</strong> variants:
 
-          <button type="button" class="btn btn-default" ng-click="exportPageCtrl.downloadAllAsCsv()">
-            <span class="glyphicon glyphicon-download-alt"></span>
-          </button>
-
+          <div class="pull-right">
+            <a href="/api/variant-table/export-clustered" download="viper-all.csv" target="_blank" class="btn btn-default">
+              <span class="glyphicon glyphicon-download-alt"></span> download
+            </a>
+          </div>
           <hr>
 
-          Export filtered variants:
+          Export <strong>filtered</strong> variants:
 
         </div>
       </div>
