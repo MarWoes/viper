@@ -7,7 +7,7 @@
         <div class="panel-heading">Export as CSV file</div>
         <div class="panel-body">
 
-          Export <strong>all</strong> variants:
+          <strong>All</strong> variants: {{ exportPageCtrl.unfilteredSize }}
 
           <div class="pull-right">
             <a href="/api/variant-table/export-clustered" download="viper-all.csv" target="_blank" class="btn btn-default">
@@ -16,7 +16,7 @@
           </div>
           <hr>
 
-          Export <strong>filtered</strong> variants:
+          <strong>Filtered</strong> variants: {{ exportPageCtrl.size }}
 
         </div>
       </div>

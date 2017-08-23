@@ -16,6 +16,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.getSize = getSize;
   Service.getTableRange = getTableRange;
   Service.getTableRow = getTableRow;
+  Service.getUnfilteredSize = getUnfilteredSize;
   Service.saveProgress = saveProgress;
   Service.scheduleSnapshot = scheduleSnapshot;
   Service.searchStringColumn = searchStringColumn
@@ -50,6 +51,10 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
   function getSize () {
     return performRequest('/api/variant-table/size');
+  }
+
+  function getUnfilteredSize () {
+    return performRequest('/api/variant-table/unfiltered-size');
   }
 
   function getRelatedColumnNames () {
