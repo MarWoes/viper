@@ -45,10 +45,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 import javax.servlet.http.HttpServletResponse;
 import spark.Request;
 import spark.Response;
+import spark.Route;
 
 import static spark.Spark.*;
 
@@ -115,7 +118,7 @@ public class ViperServer {
     private void setupTableApi() {
 
         get("/api/variant-table/size", (req, res) -> variantTableCluster.getClusteredTable().getNumberOfCalls(), gson::toJson);
-        get("/api/variant-table/unfiltered-size" , (req, res) -> variantTableCluster.getClusteredTable().getRawCalls().size(), gson::toJson);
+        get("/api/variant-table/unfiltered-size", (req, res) -> variantTableCluster.getClusteredTable().getUnfilteredRawCalls().size(), gson::toJson);
 
         get("/api/variant-table/row", (req, res) -> {
 
@@ -223,19 +226,26 @@ public class ViperServer {
 
         }, gson::toJson);
 
-        get("/api/variant-table/export-clustered", (req, res) -> {
+        get("/api/variant-table/export-clustered", exportToCsv("viper-all.csv", writer::writeAllToCSV));
 
-            String exportedFile = config.getWorkDir() + "/viper-all.csv";
+        get("/api/variant-table/export-clustered-filtered", exportToCsv("viper-filtered.csv", writer::writeFilteredToCSV));
 
-            writer.writeAllToCSV(this.variantTableCluster, exportedFile);
+    }
 
-            res.raw().setHeader("Content-Disposition", "attachment; filename=viper-all.csv");
+    private Route exportToCsv(String fileName, BiConsumer<VariantTableCluster, String> csvWritingFn) {
+
+        return (req, res) -> {
+            String exportedFile = config.getWorkDir() + "/" + fileName;
+
+            csvWritingFn.accept(this.variantTableCluster, exportedFile);
+
+            res.raw().setHeader("Content-Disposition", "attachment; filename=" + fileName);
 
             serveFile(res.raw(), exportedFile, "text/csv");
 
             return res.raw();
+        };
 
-        });
     }
 
     private List<VariantCallFilter> parseFilters(String jsonFilterArray) {

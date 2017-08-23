@@ -153,6 +153,18 @@ public class VariantTable {
     }
 
     public synchronized List<List<Object>> getRawCalls() {
+
+        List<List<Object>> filteredCalls = new ArrayList<>(this.softFilter.length);
+
+        for (int i : softFilter) {
+            filteredCalls.add(this.rows.get(i));
+        }
+
+        return filteredCalls;
+
+    }
+
+    public synchronized List<List<Object>> getUnfilteredRawCalls() {
         return this.rows;
     }
 

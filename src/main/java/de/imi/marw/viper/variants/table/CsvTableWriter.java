@@ -52,7 +52,7 @@ public class CsvTableWriter {
         this.collectionDelimiter = collectionDelimiter;
     }
 
-    private void writeToCSV(List<List<String>> data, String fileName) {
+    private void writeStringsToCsv(List<List<String>> data, String fileName) {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(fileName), csvFormat)) {
 
             List<String[]> rawData = data.stream()
@@ -68,10 +68,33 @@ public class CsvTableWriter {
         }
     }
 
-    public void writeAllToCSV(VariantTableCluster cluster, String fileName) {
+    private List<String> callToStringList(List<Object> callValues, List<VariantPropertyType> types) {
+
+        List<String> callStrings = new ArrayList<>(types.size());
+
+        for (int j = 0; j < types.size(); j++) {
+
+            switch (types.get(j)) {
+                case STRING:
+                case NUMERIC:
+                    callStrings.add("" + (callValues.get(j) == null ? "NA" : callValues.get(j).toString()));
+                    break;
+                case NUMERIC_COLLECTION:
+                case STRING_COLLECTION:
+                    String joinedValues = ((Collection) callValues.get(j)).stream()
+                            .map(property -> property == null ? "NA" : property.toString())
+                            .collect(Collectors.joining(collectionDelimiter + " ")).toString();
+                    callStrings.add(joinedValues);
+            }
+
+        }
+
+        return callStrings;
+    }
+
+    private void writeCallsToCsv(List<List<Object>> rawCalls, VariantTableCluster cluster, String fileName) {
 
         List<List<String>> values = new ArrayList<>();
-        List<List<Object>> rawCalls = cluster.getClusteredTable().getRawCalls();
         List<VariantPropertyType> types = cluster.getClusteredTable().getTypes();
 
         List<String> columnNames = new ArrayList<>(cluster.getClusteredTable().getColumnNames());
@@ -81,24 +104,7 @@ public class CsvTableWriter {
         for (int i = 0; i < rawCalls.size(); i++) {
 
             List<Object> call = rawCalls.get(i);
-            List<String> callStrings = new ArrayList<>(types.size());
-
-            for (int j = 0; j < types.size(); j++) {
-
-                switch (types.get(j)) {
-                    case STRING:
-                    case NUMERIC:
-                        callStrings.add("" + (call.get(j) == null ? "NA" : call.get(j).toString()));
-                        break;
-                    case NUMERIC_COLLECTION:
-                    case STRING_COLLECTION:
-                        String joinedValues = ((Collection) call.get(j)).stream()
-                                .map(property -> property == null ? "NA" : property.toString())
-                                .collect(Collectors.joining(collectionDelimiter + " ")).toString();
-                        callStrings.add(joinedValues);
-                }
-
-            }
+            List<String> callStrings = callToStringList(call, types);
 
             String joinedIndices = cluster.getRelatedIndices(i).stream()
                     .map(relatedIndex -> relatedIndex.toString())
@@ -110,7 +116,18 @@ public class CsvTableWriter {
 
         }
 
-        writeToCSV(values, fileName);
+        writeStringsToCsv(values, fileName);
+    }
+
+    public void writeFilteredToCSV(VariantTableCluster cluster, String fileName) {
+
+        writeCallsToCsv(cluster.getClusteredTable().getRawCalls(), cluster, fileName);
+
+    }
+
+    public void writeAllToCSV(VariantTableCluster cluster, String fileName) {
+
+        writeCallsToCsv(cluster.getClusteredTable().getUnfilteredRawCalls(), cluster, fileName);
 
     }
 

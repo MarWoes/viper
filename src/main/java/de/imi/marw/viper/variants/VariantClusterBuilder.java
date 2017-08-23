@@ -50,7 +50,7 @@ public class VariantClusterBuilder {
     }
 
     private Collection<String> getSequenceKeys(VariantTable table) {
-        Collection<String> keys = table.getRawCalls().stream()
+        Collection<String> keys = table.getUnfilteredRawCalls().stream()
                 .map((variantCall) -> getSequenceKey(variantCall, table.getColumnIndexMap()))
                 .distinct()
                 .collect(Collectors.toList());
@@ -59,7 +59,7 @@ public class VariantClusterBuilder {
     }
 
     private List<Collection<Integer>> clusterTableByKey(VariantTable unclustered, String matchingSequenceKey) {
-        List<List<Object>> rawCalls = unclustered.getRawCalls();
+        List<List<Object>> rawCalls = unclustered.getUnfilteredRawCalls();
         List<Interval> matchingCalls = IntStream.range(0, unclustered.getNumberOfCalls())
                 .boxed()
                 .map((rowIndex) -> {
@@ -200,7 +200,7 @@ public class VariantClusterBuilder {
             Collection<Integer> indexCluster = indexClusters.get(i);
 
             Collection<List> callCluster = indexCluster.stream()
-                    .map((index) -> unclustered.getRawCalls().get(index))
+                    .map((index) -> unclustered.getUnfilteredRawCalls().get(index))
                     .collect(Collectors.toList());
 
             List combinedCall = combineCalls(callCluster, unclustered.getColumnIndexMap(), unclustered.getTypes());
