@@ -325,6 +325,10 @@ public class VariantTable {
         });
     }
 
+    public int[] getSoftFilter() {
+        return this.softFilter;
+    }
+
     public static class ColumnProperty {
 
         private final String name;

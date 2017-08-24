@@ -33,6 +33,7 @@ import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.QuoteMode;
@@ -43,7 +44,6 @@ import org.apache.commons.csv.QuoteMode;
  */
 public class CsvTableWriter {
 
-    private final String collectionDelimiter;
     private final CSVFormat csvFormat;
     private final CallStringifier stringifier;
 
@@ -51,14 +51,18 @@ public class CsvTableWriter {
         this.csvFormat = CSVFormat.RFC4180
                 .withDelimiter(csvDelimiter)
                 .withQuoteMode(QuoteMode.MINIMAL);
-        this.collectionDelimiter = collectionDelimiter;
         this.stringifier = new CallStringifier(collectionDelimiter);
     }
 
-    private void writeStringsToCsv(List<List<String>> data, String fileName) {
+    private void writeStringsToCsv(VariantTableCluster cluster, int[] indices, String fileName) {
+
+        VariantTable clustered = cluster.getClusteredTable();
+
+        List<List<String>> stringValues = stringifier.callsToStringLists(clustered, indices);
+
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(fileName), csvFormat)) {
 
-            List<String[]> rawData = data.stream()
+            List<String[]> rawData = stringValues.stream()
                     .map(stringList -> stringList.toArray(new String[stringList.size()]))
                     .collect(Collectors.toList());
 
@@ -71,42 +75,19 @@ public class CsvTableWriter {
         }
     }
 
-    private void writeCallsToCsv(List<List<Object>> rawCalls, VariantTableCluster cluster, String fileName, BiFunction<VariantTableCluster, Integer, Collection<Integer>> indexFn) {
-
-        List<List<String>> values = new ArrayList<>();
-        List<VariantPropertyType> types = cluster.getClusteredTable().getTypes();
-
-        List<String> columnNames = new ArrayList<>(cluster.getClusteredTable().getColumnNames());
-        columnNames.add("viperIndices");
-        values.add(columnNames);
-
-        for (int i = 0; i < rawCalls.size(); i++) {
-
-            List<Object> call = rawCalls.get(i);
-            List<String> callStrings = stringifier.convertVariantCallsToString(call, types);
-
-            String joinedIndices = indexFn.apply(cluster, i).stream()
-                    .map(relatedIndex -> relatedIndex.toString())
-                    .collect(Collectors.joining(collectionDelimiter + " "));
-
-            callStrings.add(joinedIndices);
-
-            values.add(callStrings);
-
-        }
-
-        writeStringsToCsv(values, fileName);
-    }
-
     public void writeFilteredToCSV(VariantTableCluster cluster, String fileName) {
 
-        writeCallsToCsv(cluster.getClusteredTable().getRawCalls(), cluster, fileName, (c, i) -> c.getRelatedIndices(i));
+        int[] indices = cluster.getClusteredTable().getSoftFilter();
+
+        writeStringsToCsv(cluster, indices, fileName);
 
     }
 
     public void writeAllToCSV(VariantTableCluster cluster, String fileName) {
 
-        writeCallsToCsv(cluster.getClusteredTable().getUnfilteredRawCalls(), cluster, fileName, (c, i) -> c.getRowMapCluster().get(i));
+        int[] indices = IntStream.range(0, cluster.getClusteredTable().getUnfilteredRawCalls().size()).toArray();
+
+        writeStringsToCsv(cluster, indices, fileName);
 
     }
 

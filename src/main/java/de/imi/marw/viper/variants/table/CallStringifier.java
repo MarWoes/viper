@@ -40,7 +40,7 @@ public class CallStringifier {
         this.collectionDelimiter = collectionDelimiter;
     }
 
-    public List<String> convertVariantCallsToString(List<Object> call, List<VariantPropertyType> types) {
+    public List<String> callToStringList(List<Object> call, List<VariantPropertyType> types) {
 
         List<String> callStrings = new ArrayList<>(types.size());
 
@@ -62,6 +62,25 @@ public class CallStringifier {
         }
 
         return callStrings;
+    }
+
+    public List<List<String>> callsToStringLists(VariantTable table, int[] indices) {
+
+        List<List<String>> values = new ArrayList<>();
+        List<VariantPropertyType> types = table.getTypes();
+
+        values.add(table.getColumnNames());
+
+        for (int i = 0; i < indices.length; i++) {
+
+            List<Object> call = table.getRawCalls().get(indices[i]);
+            List<String> callStrings = this.callToStringList(call, types);
+
+            values.add(callStrings);
+
+        }
+
+        return values;
     }
 
 }
