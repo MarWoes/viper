@@ -45,11 +45,15 @@ public class VariantTableCluster {
     }
 
     public Collection<Integer> getRelatedIndices(int clusteredRowIndex) {
-        return rowMapCluster.get(clusteredRowIndex);
+        return rowMapCluster.get(clusteredTable.getSoftFilteredIndex(clusteredRowIndex));
+    }
+
+    public List<Collection<Integer>> getRowMapCluster() {
+        return rowMapCluster;
     }
 
     public synchronized List<Map<String, Object>> getUnclusteredCalls(int clusteredRowIndex) {
-        return rowMapCluster.get(clusteredRowIndex).stream()
+        return getRelatedIndices(clusteredRowIndex).stream()
                 .map((rowIndex) -> unclusteredTable.getCall(rowIndex))
                 .collect(Collectors.toList());
     }

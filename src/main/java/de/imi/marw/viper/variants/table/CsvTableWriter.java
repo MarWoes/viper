@@ -27,7 +27,9 @@ import de.imi.marw.viper.variants.VariantTableCluster;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -69,7 +71,7 @@ public class CsvTableWriter {
         }
     }
 
-    private void writeCallsToCsv(List<List<Object>> rawCalls, VariantTableCluster cluster, String fileName) {
+    private void writeCallsToCsv(List<List<Object>> rawCalls, VariantTableCluster cluster, String fileName, BiFunction<VariantTableCluster, Integer, Collection<Integer>> indexFn) {
 
         List<List<String>> values = new ArrayList<>();
         List<VariantPropertyType> types = cluster.getClusteredTable().getTypes();
@@ -83,7 +85,7 @@ public class CsvTableWriter {
             List<Object> call = rawCalls.get(i);
             List<String> callStrings = stringifier.convertVariantCallsToString(call, types);
 
-            String joinedIndices = cluster.getRelatedIndices(i).stream()
+            String joinedIndices = indexFn.apply(cluster, i).stream()
                     .map(relatedIndex -> relatedIndex.toString())
                     .collect(Collectors.joining(collectionDelimiter + " "));
 
@@ -98,13 +100,13 @@ public class CsvTableWriter {
 
     public void writeFilteredToCSV(VariantTableCluster cluster, String fileName) {
 
-        writeCallsToCsv(cluster.getClusteredTable().getRawCalls(), cluster, fileName);
+        writeCallsToCsv(cluster.getClusteredTable().getRawCalls(), cluster, fileName, (c, i) -> c.getRelatedIndices(i));
 
     }
 
     public void writeAllToCSV(VariantTableCluster cluster, String fileName) {
 
-        writeCallsToCsv(cluster.getClusteredTable().getUnfilteredRawCalls(), cluster, fileName);
+        writeCallsToCsv(cluster.getClusteredTable().getUnfilteredRawCalls(), cluster, fileName, (c, i) -> c.getRowMapCluster().get(i));
 
     }
 

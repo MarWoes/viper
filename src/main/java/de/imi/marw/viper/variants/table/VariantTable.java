@@ -164,6 +164,10 @@ public class VariantTable {
 
     }
 
+    public int getSoftFilteredIndex(int unfilteredIndex) {
+        return this.softFilter[unfilteredIndex];
+    }
+
     public synchronized List<List<Object>> getUnfilteredRawCalls() {
         return this.rows;
     }
