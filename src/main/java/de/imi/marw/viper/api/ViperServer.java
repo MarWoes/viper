@@ -120,7 +120,7 @@ public class ViperServer {
     private void setupTableApi() {
 
         get("/api/variant-table/size", (req, res) -> variantTableCluster.getClusteredTable().getNumberOfCalls(), gson::toJson);
-        get("/api/variant-table/unfiltered-size", (req, res) -> variantTableCluster.getClusteredTable().getUnfilteredRawCalls().size(), gson::toJson);
+        get("/api/variant-table/unfiltered-size", (req, res) -> variantTableCluster.getClusteredTable().getRawCalls().size(), gson::toJson);
 
         get("/api/variant-table/row", (req, res) -> {
 

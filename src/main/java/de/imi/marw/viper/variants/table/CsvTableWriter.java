@@ -22,14 +22,10 @@
  */
 package de.imi.marw.viper.variants.table;
 
-import de.imi.marw.viper.variants.VariantPropertyType;
 import de.imi.marw.viper.variants.VariantTableCluster;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -85,7 +81,7 @@ public class CsvTableWriter {
 
     public void writeAllToCSV(VariantTableCluster cluster, String fileName) {
 
-        int[] indices = IntStream.range(0, cluster.getClusteredTable().getUnfilteredRawCalls().size()).toArray();
+        int[] indices = IntStream.range(0, cluster.getClusteredTable().getRawCalls().size()).toArray();
 
         writeStringsToCsv(cluster, indices, fileName);
 

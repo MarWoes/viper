@@ -152,23 +152,11 @@ public class VariantTable {
         return this.rows.get(softFilter[index]).get(indexMap.get(columnName));
     }
 
-    public synchronized List<List<Object>> getRawCalls() {
-
-        List<List<Object>> filteredCalls = new ArrayList<>(this.softFilter.length);
-
-        for (int i : softFilter) {
-            filteredCalls.add(this.rows.get(i));
-        }
-
-        return filteredCalls;
-
-    }
-
     public int getSoftFilteredIndex(int unfilteredIndex) {
         return this.softFilter[unfilteredIndex];
     }
 
-    public synchronized List<List<Object>> getUnfilteredRawCalls() {
+    public synchronized List<List<Object>> getRawCalls() {
         return this.rows;
     }
 
