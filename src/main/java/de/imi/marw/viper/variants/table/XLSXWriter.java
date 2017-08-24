@@ -33,6 +33,7 @@ import java.util.stream.IntStream;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
@@ -89,7 +90,7 @@ public class XLSXWriter {
         List<List<String>> callStrings = stringifier.callsToStringLists(clustered, indices);
         callStrings.remove(0);
 
-        Workbook wb = new XSSFWorkbook();
+        SXSSFWorkbook wb = new SXSSFWorkbook(1000);
 
         Sheet sheet = wb.createSheet("VIPER variants");
 
@@ -111,6 +112,7 @@ public class XLSXWriter {
 
         try {
             wb.write(new FileOutputStream(fileName));
+            wb.dispose();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(XLSXWriter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
