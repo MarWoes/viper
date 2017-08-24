@@ -80,7 +80,7 @@ public class ViperServer {
         this.progressManager = new ProgressManager(config.getWorkDir());
         this.filterManager = new FilterManager();
         this.csvWriter = new CsvTableWriter(config.getCsvDelimiter(), config.getPropertyCollectionDelimiter());
-        this.xlsxWriter = new XLSXWriter(config.getPropertyCollectionDelimiter());
+        this.xlsxWriter = new XLSXWriter(config.getPropertyCollectionDelimiter(), config.getXslxExportWindowSize());
     }
 
     public void start() {

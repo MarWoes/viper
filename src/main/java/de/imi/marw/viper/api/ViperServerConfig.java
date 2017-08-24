@@ -40,6 +40,7 @@ public class ViperServerConfig {
     private boolean keepVcfSimple = true;
     private boolean excludeNonRefVcfCalls = true;
     private int numPrecomputedSnapshots = 10;
+    private int xslxExportWindowSize = 1000;
 
     public ViperServerConfig(String csvFile) {
         this.analysisCsvFile = csvFile;
@@ -139,6 +140,14 @@ public class ViperServerConfig {
 
     public void setNumPrecomputedSnapshots(int numPrecomputedSnapshots) {
         this.numPrecomputedSnapshots = numPrecomputedSnapshots;
+    }
+
+    public int getXslxExportWindowSize() {
+        return xslxExportWindowSize;
+    }
+
+    public void setXslxExportWindowSize(int xslxExportWindowSize) {
+        this.xslxExportWindowSize = xslxExportWindowSize;
     }
 
 }

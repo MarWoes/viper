@@ -41,9 +41,11 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 public class XLSXWriter {
 
     private final CallStringifier stringifier;
+    private final int windowSize;
 
-    public XLSXWriter(String collectionDelimiter) {
+    public XLSXWriter(String collectionDelimiter, int windowSize) {
         this.stringifier = new CallStringifier(collectionDelimiter);
+        this.windowSize = windowSize;
     }
 
     private void addStringRow(Sheet sheet, int rowIndex, List<String> values, int cellOffset) {
@@ -88,7 +90,7 @@ public class XLSXWriter {
         List<List<String>> callStrings = stringifier.callsToStringLists(clustered, indices);
         callStrings.remove(0);
 
-        SXSSFWorkbook wb = new SXSSFWorkbook(1000);
+        SXSSFWorkbook wb = new SXSSFWorkbook(windowSize);
 
         Sheet sheet = wb.createSheet("VIPER variants");
 
