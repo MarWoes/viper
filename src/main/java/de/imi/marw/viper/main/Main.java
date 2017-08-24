@@ -24,13 +24,14 @@ package de.imi.marw.viper.main;
 
 import de.imi.marw.viper.api.ViperServer;
 import de.imi.marw.viper.api.ViperServerConfig;
+import java.io.IOException;
 
 public class Main {
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         ViperServerConfig config = new ViperServerConfig("../results-unit-test/all_analysis.csv");
         config.setWorkDir("/home/marius/wd");
@@ -39,5 +40,6 @@ public class Main {
 
         ViperServer server = new ViperServer(config);
         server.start();
+
     }
 }

@@ -37,6 +37,7 @@ import de.imi.marw.viper.variants.filters.StringFilter;
 import de.imi.marw.viper.variants.table.CsvTableWriter;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.variants.table.ProgressManager;
+import de.imi.marw.viper.variants.table.XLSXWriter;
 import de.imi.marw.viper.visualization.IGVVisualizer;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 import javax.servlet.http.HttpServletResponse;
 import spark.Request;
@@ -67,7 +67,8 @@ public class ViperServer {
     private final ProgressManager progressManager;
     private final FilterManager filterManager;
     private VariantTableCluster variantTableCluster;
-    private final CsvTableWriter writer;
+    private final CsvTableWriter csvWriter;
+    private final XLSXWriter xlsxWriter;
 
     private IGVVisualizer igv;
 
@@ -78,7 +79,8 @@ public class ViperServer {
         this.clusterer = new VariantClusterBuilder();
         this.progressManager = new ProgressManager(config.getWorkDir());
         this.filterManager = new FilterManager();
-        this.writer = new CsvTableWriter(config.getCsvDelimiter(), config.getPropertyCollectionDelimiter());
+        this.csvWriter = new CsvTableWriter(config.getCsvDelimiter(), config.getPropertyCollectionDelimiter());
+        this.xlsxWriter = new XLSXWriter(config.getPropertyCollectionDelimiter());
     }
 
     public void start() {
@@ -226,22 +228,22 @@ public class ViperServer {
 
         }, gson::toJson);
 
-        get("/api/variant-table/export-clustered", exportToCsv("viper-all.csv", writer::writeAllToCSV));
-
-        get("/api/variant-table/export-clustered-filtered", exportToCsv("viper-filtered.csv", writer::writeFilteredToCSV));
-
+        get("/api/variant-table/export-clustered-csv", exportToCsv("viper-all.csv", "text/csv", csvWriter::writeAllToCSV));
+        get("/api/variant-table/export-clustered-filtered-csv", exportToCsv("viper-filtered.csv", "text/csv", csvWriter::writeFilteredToCSV));
+        get("/api/variant-table/export-clustered-xlsx", exportToCsv("viper-all.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", xlsxWriter::writeAllToXSLX));
+        get("/api/variant-table/export-clustered-filtered-xlsx", exportToCsv("viper-filtered.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", xlsxWriter::writeFilteredToXSLX));
     }
 
-    private Route exportToCsv(String fileName, BiConsumer<VariantTableCluster, String> csvWritingFn) {
+    private Route exportToCsv(String fileName, String mimeType, BiConsumer<VariantTableCluster, String> exportFunction) {
 
         return (req, res) -> {
             String exportedFile = config.getWorkDir() + "/" + fileName;
 
-            csvWritingFn.accept(this.variantTableCluster, exportedFile);
+            exportFunction.accept(this.variantTableCluster, exportedFile);
 
             res.raw().setHeader("Content-Disposition", "attachment; filename=" + fileName);
 
-            serveFile(res.raw(), exportedFile, "text/csv");
+            serveFile(res.raw(), exportedFile, mimeType);
 
             return res.raw();
         };

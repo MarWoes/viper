@@ -10,7 +10,7 @@
           <strong>All</strong> variants: {{ exportPageCtrl.unfilteredSize }}
 
           <div class="pull-right">
-            <a href="/api/variant-table/export-clustered" download="viper-all.csv" target="_blank" class="btn btn-default">
+            <a href="/api/variant-table/export-clustered-csv" download="viper-all.csv" target="_blank" class="btn btn-default">
               <span class="glyphicon glyphicon-download-alt"></span> download
             </a>
           </div>
@@ -19,7 +19,7 @@
           <strong>Filtered</strong> variants: {{ exportPageCtrl.size }}
 
           <div class="pull-right">
-            <a href="/api/variant-table/export-clustered-filtered" download="viper-filtered.csv" target="_blank" class="btn btn-default">
+            <a href="/api/variant-table/export-clustered-filtered-csv" download="viper-filtered.csv" target="_blank" class="btn btn-default">
               <span class="glyphicon glyphicon-download-alt"></span> download
             </a>
           </div>
@@ -33,8 +33,22 @@
         <div class="panel-heading">Export as XLSX file</div>
         <div class="panel-body">
 
-          not there yet ¯\_(ツ)_/¯
+          <strong>All</strong> variants: {{ exportPageCtrl.unfilteredSize }}
 
+          <div class="pull-right">
+            <a href="/api/variant-table/export-clustered-xlsx" download="viper-all.xlsx" target="_blank" class="btn btn-default">
+              <span class="glyphicon glyphicon-download-alt"></span> download
+            </a>
+          </div>
+          <hr>
+
+          <strong>Filtered</strong> variants: {{ exportPageCtrl.size }}
+
+          <div class="pull-right">
+            <a href="/api/variant-table/export-clustered-filtered-xlsx" download="viper-filtered.xlsx" target="_blank" class="btn btn-default">
+              <span class="glyphicon glyphicon-download-alt"></span> download
+            </a>
+          </div>
         </div>
       </div>
     </div>

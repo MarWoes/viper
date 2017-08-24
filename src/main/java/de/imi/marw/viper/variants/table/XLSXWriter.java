@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.poi.ss.usermodel.Cell;
+import java.util.stream.IntStream;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -47,46 +47,66 @@ public class XLSXWriter {
         this.stringifier = new CallStringifier(collectionDelimiter);
     }
 
-    private void addColumnNames(Sheet sheet, VariantTableCluster cluster) {
+    private void addStringRow(Sheet sheet, int rowIndex, List<String> values, int cellOffset) {
 
-        List<String> columnNames = cluster.getClusteredTable().getColumnNames();
+        Row columnNameRow = sheet.createRow(rowIndex);
 
-        Row columnNameRow = sheet.createRow(0);
+        for (int i = 0; i < values.size(); i++) {
 
-        for (int i = 0; i < columnNames.size(); i++) {
-
-            columnNameRow.createCell(i);
-            columnNameRow.getCell(i).setCellValue(columnNames.get(i));
+            columnNameRow.createCell(i + cellOffset);
+            columnNameRow.getCell(i + cellOffset).setCellValue(values.get(i));
 
         }
     }
 
-    public void writeAllToXSLX(VariantTableCluster cluster, String fileName) {
+    private int addRelatedCalls(VariantTableCluster cluster, int relatedCallIndex, int currentRowIndex, Sheet sheet) {
+
+        int[] relatedCallIndices = cluster.getRowMapCluster().get(relatedCallIndex).stream().mapToInt(i -> i).toArray();
+
+        if (relatedCallIndices.length == 1) {
+            return 0;
+        }
+
+        List<List<String>> relatedCallStrings = stringifier.callsToStringLists(cluster.getUnclusteredTable(), relatedCallIndices);
+        relatedCallStrings.remove(0);
+
+        for (int i = 0; i < relatedCallStrings.size(); i++) {
+
+            List<String> row = relatedCallStrings.get(i);
+            addStringRow(sheet, currentRowIndex + i, row, 2);
+        }
+
+        sheet.groupRow(currentRowIndex, currentRowIndex + relatedCallIndices.length);
+        sheet.setRowGroupCollapsed(currentRowIndex, true);
+
+        return relatedCallIndices.length;
+
+    }
+
+    private void writeToXSLX(VariantTableCluster cluster, int[] indices, String fileName) {
+        VariantTable clustered = cluster.getClusteredTable();
+
+        List<List<String>> callStrings = stringifier.callsToStringLists(clustered, indices);
+        callStrings.remove(0);
 
         Workbook wb = new XSSFWorkbook();
 
         Sheet sheet = wb.createSheet("VIPER variants");
 
-        addColumnNames(sheet, cluster);
+        addStringRow(sheet, 0, cluster.getClusteredTable().getColumnNames(), 0);
 
         // start at 1 since column names are taking the first row
         int currentRowIndex = 1;
 
-        for (int i = 0; i < cluster.getClusteredTable().getUnfilteredRawCalls().size(); i++) {
+        for (int i = 0; i < callStrings.size(); i++) {
 
-            List<Object> call = cluster.getClusteredTable().getUnfilteredRawCalls().get(i);
-            List<String> strings = stringifier.convertVariantCallsToString(call, cluster.getClusteredTable().getTypes());
+            List<String> strings = callStrings.get(i);
 
-            Row row = sheet.createRow(currentRowIndex);
-
-            for (int j = 0; j < strings.size(); j++) {
-
-                Cell cell = row.createCell(j);
-                cell.setCellValue(strings.get(j));
-
-            }
+            addStringRow(sheet, currentRowIndex, strings, 0);
 
             currentRowIndex++;
+
+            currentRowIndex += addRelatedCalls(cluster, indices[i], currentRowIndex, sheet);
         }
 
         try {
@@ -96,5 +116,21 @@ public class XLSXWriter {
         } catch (IOException ex) {
             Logger.getLogger(XLSXWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void writeAllToXSLX(VariantTableCluster cluster, String fileName) {
+
+        int[] indices = IntStream.range(0, cluster.getClusteredTable().getRawCalls().size()).toArray();
+
+        writeToXSLX(cluster, indices, fileName);
+
+    }
+
+    public void writeFilteredToXSLX(VariantTableCluster cluster, String fileName) {
+
+        int[] indices = cluster.getClusteredTable().getSoftFilter();
+
+        writeToXSLX(cluster, indices, fileName);
+
     }
 }
