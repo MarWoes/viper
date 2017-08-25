@@ -63,7 +63,7 @@ public class CsvTableReader implements TableReader {
             return VariantPropertyType.NUMERIC;
         }
 
-        String numericCollectionRegex = "^$|" +  doubleRegex + "(" + this.propertyDelimiter + "\\s*" + doubleRegex + ")*";
+        String numericCollectionRegex = "^$|" + doubleRegex + "(" + this.propertyDelimiter + "\\s*" + doubleRegex + ")*";
 
         boolean isNumericCollectionColumn = columnValues.stream()
                 .allMatch((str) -> str.matches(numericCollectionRegex));
@@ -119,7 +119,7 @@ public class CsvTableReader implements TableReader {
     }
 
     private Double parseDouble(String str) {
-        if (str.equals("NA") || str.isEmpty()) {
+        if (str.equals("NA") || str.isEmpty() || str.equals("NaN")) {
             return null;
         } else {
             return Double.parseDouble(str);
@@ -131,7 +131,7 @@ public class CsvTableReader implements TableReader {
             case NUMERIC:
                 return parseDouble(rawValue);
             case STRING:
-                return rawValue;
+                return rawValue.isEmpty() ? "NA" : rawValue;
             case NUMERIC_COLLECTION:
 
                 Collection<Double> numbers = Arrays.stream(rawValue.split(this.propertyDelimiter))
@@ -141,7 +141,10 @@ public class CsvTableReader implements TableReader {
                 return (numbers);
             case STRING_COLLECTION:
 
-                Collection<String> strings = Arrays.asList(rawValue.split(this.propertyDelimiter));
+                Collection<String> strings = Arrays.stream(rawValue.split(this.propertyDelimiter))
+                        .map(str -> str.isEmpty() ? "NA" : str)
+                        .collect(Collectors.toList());
+
                 return strings;
 
             default:

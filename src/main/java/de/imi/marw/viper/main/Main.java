@@ -63,17 +63,5 @@ public class Main {
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-//        try (Writer writer = new FileWriter("config.json")) {
-//
-//            Gson gson = new GsonBuilder().setPrettyPrinting()
-//                    .create();
-//            ViperServerConfig c = new ViperServerConfig("../results-unit-test/all_analysis.csv");
-//
-//            gson.toJson(c, writer);
-//
-//        } catch (IOException ex) {
-//            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-//        }
     }
 }
