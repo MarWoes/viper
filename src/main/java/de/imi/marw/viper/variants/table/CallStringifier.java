@@ -40,7 +40,17 @@ public class CallStringifier {
         this.collectionDelimiter = collectionDelimiter;
     }
 
-    public List<String> callToStringList(List<Object> call, List<VariantPropertyType> types) {
+    private String printDouble(Double d) {
+
+        // d%1 == 0 iff d is integer
+        if (d % 1 == 0) {
+            return "" + d.intValue();
+        }
+
+        return d.toString();
+    }
+
+    private List<String> callToStringList(List<Object> call, List<VariantPropertyType> types) {
 
         List<String> callStrings = new ArrayList<>(types.size());
 
@@ -48,15 +58,22 @@ public class CallStringifier {
 
             switch (types.get(j)) {
                 case STRING:
+                    callStrings.add(call.get(j).toString());
+                    break;
                 case NUMERIC:
-                    callStrings.add("" + (call.get(j) == null ? "NA" : call.get(j).toString()));
+                    callStrings.add("" + (call.get(j) == null ? "NA" : printDouble((double) call.get(j))));
                     break;
                 case NUMERIC_COLLECTION:
-                case STRING_COLLECTION:
-                    String joinedValues = ((Collection) call.get(j)).stream()
-                            .map(property -> property == null ? "NA" : property.toString())
+                    String joinedNumericValues = ((Collection) call.get(j)).stream()
+                            .map(property -> property == null ? "NA" : printDouble((double) property))
                             .collect(Collectors.joining(collectionDelimiter + " ")).toString();
-                    callStrings.add(joinedValues);
+                    callStrings.add(joinedNumericValues);
+                    break;
+                case STRING_COLLECTION:
+                    String joinedStringValues = ((Collection) call.get(j)).stream()
+                            .map(property -> property.toString())
+                            .collect(Collectors.joining(collectionDelimiter + " ")).toString();
+                    callStrings.add(joinedStringValues);
             }
 
         }
