@@ -7,6 +7,12 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           {{ ::filter.columnName }}
+
+          <div class="pull-right" ng-if="::(filter.columnType == 'NUMERIC' || filter.columnType == 'NUMERIC_COLLECTION')">
+            <div class="checkbox inline-checkbox">
+              <label><input type="checkbox" ng-model="filter.nullAllowed">NA</label>
+            </div>
+          </div>
         </div>
         <div class="panel-body">
           <div ng-if="::(filter.columnType == 'NUMERIC' || filter.columnType == 'NUMERIC_COLLECTION')">

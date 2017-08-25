@@ -45,7 +45,7 @@ public abstract class SingleColumnFilter<T> implements VariantCallFilter {
     @Override
     public boolean isPassing(List values, Map<String, Integer> indexMap) {
         T value = (T) values.get(indexMap.get(columnName));
-        return (value == null && nullAllowed) || isSingleValuePassing(value);
+        return (value == null && nullAllowed) || (value != null && isSingleValuePassing(value));
     }
 
     protected abstract boolean isSingleValuePassing(T value);

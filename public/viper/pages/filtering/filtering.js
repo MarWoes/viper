@@ -156,6 +156,7 @@ var module = angular.module('de.imi.marw.viper.filtering', [
       if (filter.columnType == 'NUMERIC' || filter.columnType == 'NUMERIC_COLLECTION') {
         filter.selectedMin = filter.possibleMin;
         filter.selectedMax = filter.possibleMax;
+        filter.nullAllowed = true;
       }
 
     }

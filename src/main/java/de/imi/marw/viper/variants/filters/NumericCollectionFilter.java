@@ -45,7 +45,7 @@ public class NumericCollectionFilter extends SingleColumnFilter<Collection<Doubl
 
     @Override
     protected boolean isSingleValuePassing(Collection<Double> values) {
-        return values.stream().anyMatch((val) -> (val == null && isNullAllowed()) || (val >= selectedMin && val <= selectedMax));
+        return values.stream().anyMatch((val) -> (val == null && isNullAllowed()) || (val != null && (val >= selectedMin && val <= selectedMax)));
     }
 
     public double getSelectedMin() {
