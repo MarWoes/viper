@@ -82,7 +82,7 @@ public class CsvTableReader implements TableReader {
         return VariantPropertyType.STRING;
     }
 
-    private VariantPropertyType[] determineTypes(List<String[]> stringTable) {
+    private VariantPropertyType[] guessTypes(List<String[]> stringTable) {
 
         VariantPropertyType[] types = IntStream.range(0, stringTable.get(0).length).boxed()
                 .map((i) -> {
@@ -97,6 +97,25 @@ public class CsvTableReader implements TableReader {
                 .toArray(VariantPropertyType[]::new);
 
         return types;
+    }
+
+    private VariantPropertyType[] determineTypes(String[] columnNames, List<String[]> stringTable) {
+
+        VariantPropertyType[] guessedTypes = guessTypes(stringTable);
+
+        List<String> mandatoryFields = Arrays.asList(VariantTable.MANDATORY_FIELDS);
+
+        for (int i = 0; i < columnNames.length; i++) {
+
+            String columnName = columnNames[i];
+            int foundIndex = mandatoryFields.indexOf(columnName);
+
+            if (foundIndex != -1) {
+                guessedTypes[foundIndex] = VariantTable.MANDATORY_FIELDS_TYPES[foundIndex];
+            }
+        }
+
+        return guessedTypes;
     }
 
     private Double parseDouble(String str) {
@@ -172,7 +191,7 @@ public class CsvTableReader implements TableReader {
 
             String[] header = rawStrings.remove(0);
 
-            VariantPropertyType[] types = determineTypes(rawStrings);
+            VariantPropertyType[] types = determineTypes(header, rawStrings);
 
             List<List<Object>> parsedCalls = parseVariantCalls(header, rawStrings, types);
 
