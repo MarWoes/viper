@@ -38,7 +38,11 @@ import java.util.stream.IntStream;
  */
 public class VariantClusterBuilder {
 
-    private final IntervalClusterBuilder intervalClusterer = new IntervalClusterBuilder();
+    private final IntervalClusterBuilder intervalClusterer;
+
+    public VariantClusterBuilder(int tolerance) {
+        this.intervalClusterer = new IntervalClusterBuilder(tolerance);
+    }
 
     private String getSequenceKey(List variantCall, Map<String, Integer> indexMap) {
 

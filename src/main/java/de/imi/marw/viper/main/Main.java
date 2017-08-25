@@ -22,8 +22,16 @@
  */
 package de.imi.marw.viper.main;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import de.imi.marw.viper.api.ViperServer;
 import de.imi.marw.viper.api.ViperServerConfig;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
 
@@ -32,13 +40,40 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        ViperServerConfig config = new ViperServerConfig("../results-france1/all_analysis.csv");
-        config.setWorkDir("/home/marius/wd");
-        config.setFastaRef("/home/marius/workspace/sftp-share/Genomes/Homo_sapiens.GRCh37.67/Homo_sapiens.GRCh37.67.dna.chromosome.all.fasta");
-        config.setBamDir("/home/marius/workspace/sftp-share/Analyses/Nijmegen_MDS_sequencing/MDS-Triage/Netherlands_illumina_1/alignment2/alignment");
+        String configFileName;
 
-        ViperServer server = new ViperServer(config);
-        server.start();
+        if (args.length > 0) {
+            configFileName = args[0];
+        } else {
+            configFileName = "config.json";
+        }
 
+        Gson gson = new GsonBuilder()
+                .create();
+
+        try (Reader reader = new FileReader(configFileName)) {
+
+            ViperServerConfig config = gson.fromJson(reader, ViperServerConfig.class);
+
+            ViperServer server = new ViperServer(config);
+            server.start();
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+//        try (Writer writer = new FileWriter("config.json")) {
+//
+//            Gson gson = new GsonBuilder().setPrettyPrinting()
+//                    .create();
+//            ViperServerConfig c = new ViperServerConfig("../results-unit-test/all_analysis.csv");
+//
+//            gson.toJson(c, writer);
+//
+//        } catch (IOException ex) {
+//            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 }

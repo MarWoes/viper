@@ -28,8 +28,6 @@ import de.imi.marw.viper.variants.table.VariantTable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  *

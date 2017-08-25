@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -45,10 +44,10 @@ import java.util.logging.Logger;
  */
 public class IGVVisualizer extends Thread {
 
-    private static final int VIEW_RANGE = 25;
-    private static final int XVFB_DISPLAY = 4499;
-    private static final int XVFB_WIDTH = 1280;
-    private static final int XVFB_HEIGHT = 1680;
+    private final int viewRange;
+    private final int xvfbDisplay;
+    private final int xvfbWidth;
+    private final int xvfbHeight;
 
     private final Map<String, Boolean> visualizationProgressMap;
     private final PriorityBlockingQueue<IGVCommand> commandQueue;
@@ -61,7 +60,7 @@ public class IGVVisualizer extends Thread {
     private Process xvfbServer;
     private Socket client;
 
-    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir) {
+    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir, int viewRange, int xvfbDisplay, int xvfbWidth, int xvfbHeight) {
         this.port = port;
         this.fastaRef = fastaRef;
         this.igvJar = igvJar;
@@ -69,6 +68,10 @@ public class IGVVisualizer extends Thread {
         this.workDir = workDir;
         this.visualizationProgressMap = new ConcurrentHashMap<>();
         this.bamDir = bamDir;
+        this.viewRange = viewRange;
+        this.xvfbDisplay = xvfbDisplay;
+        this.xvfbWidth = xvfbWidth;
+        this.xvfbHeight = xvfbHeight;
     }
 
     @Override
@@ -119,14 +122,14 @@ public class IGVVisualizer extends Thread {
 
         if (isXvfbInstalled()) {
             ProcessBuilder xvfbBuilder = new ProcessBuilder("Xvfb",
-                    ":" + XVFB_DISPLAY,
-                    "-screen", "0,", XVFB_WIDTH + "x" + XVFB_HEIGHT + "x24")
+                    ":" + xvfbDisplay,
+                    "-screen", "0,", xvfbWidth + "x" + xvfbHeight + "x24")
                     .inheritIO();
 
             this.xvfbServer = xvfbBuilder.start();
 
             Map<String, String> igvEnv = builder.environment();
-            igvEnv.put("DISPLAY", ":" + XVFB_DISPLAY);
+            igvEnv.put("DISPLAY", ":" + xvfbDisplay);
         }
 
         this.igvProcess = builder.start();
@@ -183,7 +186,7 @@ public class IGVVisualizer extends Thread {
             "new",
             "load " + bamName,
             "collapse",
-            "goto " + chr + ":" + (bp - VIEW_RANGE) + "-" + (bp + VIEW_RANGE),
+            "goto " + chr + ":" + (bp - viewRange) + "-" + (bp + viewRange),
             "snapshot " + imageFileName
         };
 

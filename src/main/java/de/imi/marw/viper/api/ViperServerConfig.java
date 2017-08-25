@@ -28,11 +28,12 @@ package de.imi.marw.viper.api;
  */
 public class ViperServerConfig {
 
-    private String analysisCsvFile;
+    private String analysisFile;
     private int viperPort = 8090;
     private int igvPort = 9090;
     private char csvDelimiter = ';';
-    private String propertyCollectionDelimiter = ",";
+    private String collectionDelimiter = ",";
+    private int breakpointTolerance = 3;
     private String workDir = "/tmp/viper";
     private String fastaRef = "/tmp/ref.fa";
     private String igvJar = "../igv/igv.jar";
@@ -41,9 +42,13 @@ public class ViperServerConfig {
     private boolean excludeNonRefVcfCalls = true;
     private int numPrecomputedSnapshots = 10;
     private int xslxExportWindowSize = 1000;
+    private int viewRange = 25;
+    private int xvfbDisplay = 4499;
+    private int xvfbWidth = 1280;
+    private int xvfbHeight = 1680;
 
     public ViperServerConfig(String csvFile) {
-        this.analysisCsvFile = csvFile;
+        this.analysisFile = csvFile;
     }
 
     public char getCsvDelimiter() {
@@ -54,12 +59,12 @@ public class ViperServerConfig {
         this.csvDelimiter = csvDelimiter;
     }
 
-    public String getPropertyCollectionDelimiter() {
-        return propertyCollectionDelimiter;
+    public String getCollectionDelimiter() {
+        return collectionDelimiter;
     }
 
-    public void setPropertyCollectionDelimiter(String propertyCollectionDelimiter) {
-        this.propertyCollectionDelimiter = propertyCollectionDelimiter;
+    public void setCollectionDelimiter(String collectionDelimiter) {
+        this.collectionDelimiter = collectionDelimiter;
     }
 
     public int getViperPort() {
@@ -70,12 +75,12 @@ public class ViperServerConfig {
         this.viperPort = viperPort;
     }
 
-    public String getAnalysisCsvFile() {
-        return analysisCsvFile;
+    public String getAnalysisFile() {
+        return analysisFile;
     }
 
-    public void setAnalysisCsvFile(String analysisCsvFile) {
-        this.analysisCsvFile = analysisCsvFile;
+    public void setAnalysisFile(String analysisFile) {
+        this.analysisFile = analysisFile;
     }
 
     public String getWorkDir() {
@@ -148,6 +153,46 @@ public class ViperServerConfig {
 
     public void setXslxExportWindowSize(int xslxExportWindowSize) {
         this.xslxExportWindowSize = xslxExportWindowSize;
+    }
+
+    public int getViewRange() {
+        return viewRange;
+    }
+
+    public void setViewRange(int viewRange) {
+        this.viewRange = viewRange;
+    }
+
+    public int getXvfbDisplay() {
+        return xvfbDisplay;
+    }
+
+    public void setXvfbDisplay(int xvfbDisplay) {
+        this.xvfbDisplay = xvfbDisplay;
+    }
+
+    public int getXvfbWidth() {
+        return xvfbWidth;
+    }
+
+    public void setXvfbWidth(int xvfbWidth) {
+        this.xvfbWidth = xvfbWidth;
+    }
+
+    public int getXvfbHeight() {
+        return xvfbHeight;
+    }
+
+    public void setXvfbHeight(int xvfbHeight) {
+        this.xvfbHeight = xvfbHeight;
+    }
+
+    public int getBreakpointTolerance() {
+        return breakpointTolerance;
+    }
+
+    public void setBreakpointTolerance(int breakpointTolerance) {
+        this.breakpointTolerance = breakpointTolerance;
     }
 
 }

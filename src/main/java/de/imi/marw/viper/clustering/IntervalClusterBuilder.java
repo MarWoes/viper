@@ -43,10 +43,7 @@ import java.util.stream.IntStream;
  */
 public class IntervalClusterBuilder {
 
-    private int tolerance = 3;
-
-    public IntervalClusterBuilder() {
-    }
+    private int tolerance;
 
     public IntervalClusterBuilder(int tolerance) {
         this.tolerance = tolerance;

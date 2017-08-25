@@ -37,7 +37,7 @@ public class TableReaderMultiplexer implements TableReader {
     private final VcfTableReader vcfReader;
 
     public TableReaderMultiplexer(ViperServerConfig config) {
-        this.csvReader = new CsvTableReader(config.getCsvDelimiter(), config.getPropertyCollectionDelimiter());
+        this.csvReader = new CsvTableReader(config.getCsvDelimiter(), config.getCollectionDelimiter());
         this.vcfReader = new VcfTableReader(config.isKeepingVcfSimple(), config.isExcludingNonRefVcfCalls());
     }
 

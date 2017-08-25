@@ -76,11 +76,11 @@ public class ViperServer {
 
         this.config = config;
         this.gson = new Gson();
-        this.clusterer = new VariantClusterBuilder();
+        this.clusterer = new VariantClusterBuilder(config.getBreakpointTolerance());
         this.progressManager = new ProgressManager(config.getWorkDir());
         this.filterManager = new FilterManager();
-        this.csvWriter = new CsvTableWriter(config.getCsvDelimiter(), config.getPropertyCollectionDelimiter());
-        this.xlsxWriter = new XLSXWriter(config.getPropertyCollectionDelimiter(), config.getXslxExportWindowSize());
+        this.csvWriter = new CsvTableWriter(config.getCsvDelimiter(), config.getCollectionDelimiter());
+        this.xlsxWriter = new XLSXWriter(config.getCollectionDelimiter(), config.getXslxExportWindowSize());
     }
 
     public void start() {
@@ -100,7 +100,7 @@ public class ViperServer {
     private VariantTableCluster loadVariants() {
         TableReaderMultiplexer reader = new TableReaderMultiplexer(config);
 
-        VariantTable unclusteredTable = reader.readTable(config.getAnalysisCsvFile());
+        VariantTable unclusteredTable = reader.readTable(config.getAnalysisFile());
         VariantTableCluster cluster = clusterer.clusterVariantTable(unclusteredTable);
 
         return cluster;
@@ -336,6 +336,10 @@ public class ViperServer {
                 this.config.getFastaRef(),
                 this.config.getIgvPort(),
                 this.config.getWorkDir(),
-                this.config.getBamDir());
+                this.config.getBamDir(),
+                this.config.getViewRange(),
+                this.config.getXvfbDisplay(),
+                this.config.getXvfbWidth(),
+                this.config.getXvfbHeight());
     }
 }
