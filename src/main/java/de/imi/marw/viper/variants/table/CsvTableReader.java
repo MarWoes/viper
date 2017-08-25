@@ -63,7 +63,7 @@ public class CsvTableReader implements TableReader {
             return VariantPropertyType.NUMERIC;
         }
 
-        String numericCollectionRegex = doubleRegex + "(" + this.propertyDelimiter + "\\s*" + doubleRegex + ")*";
+        String numericCollectionRegex = "^$|" +  doubleRegex + "(" + this.propertyDelimiter + "\\s*" + doubleRegex + ")*";
 
         boolean isNumericCollectionColumn = columnValues.stream()
                 .allMatch((str) -> str.matches(numericCollectionRegex));
@@ -119,7 +119,7 @@ public class CsvTableReader implements TableReader {
     }
 
     private Double parseDouble(String str) {
-        if (str.equals("NA")) {
+        if (str.equals("NA") || str.isEmpty()) {
             return null;
         } else {
             return Double.parseDouble(str);
