@@ -91,7 +91,7 @@ public class ProgressManager {
                 .toArray(String[]::new);
 
         int analysisHash = Arrays.hashCode(bp1);
-        int size = cluster.getClusteredTable().getNumberOfCalls();
+        int size = cluster.getClusteredTable().getRawCalls().size();
 
         String fileName = "progress." + analysisHash + "." + size + ".txt";
         return workDir.resolve(fileName);
