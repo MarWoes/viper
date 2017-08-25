@@ -23,6 +23,7 @@
 package de.imi.marw.viper.visualization;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -226,6 +227,14 @@ public class IGVVisualizer extends Thread {
         if (this.xvfbServer != null) {
             this.xvfbServer.destroy();
             this.xvfbServer = null;
+        }
+
+        File workDir = new File(this.workDir);
+
+        for (File file : workDir.listFiles()) {
+            if (file.getName().endsWith(".png")) {
+                file.deleteOnExit();
+            }
         }
     }
 

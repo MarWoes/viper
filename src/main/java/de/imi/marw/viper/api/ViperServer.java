@@ -228,18 +228,18 @@ public class ViperServer {
 
         }, gson::toJson);
 
-        get("/api/variant-table/export-clustered-csv", exportToCsv("viper-all.csv", "text/csv", csvWriter::writeAllToCSV));
-        get("/api/variant-table/export-clustered-filtered-csv", exportToCsv("viper-filtered.csv", "text/csv", csvWriter::writeFilteredToCSV));
-        get("/api/variant-table/export-clustered-xlsx", exportToCsv("viper-all.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", xlsxWriter::writeAllToXSLX));
-        get("/api/variant-table/export-clustered-filtered-xlsx", exportToCsv("viper-filtered.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", xlsxWriter::writeFilteredToXSLX));
+        get("/api/variant-table/export-clustered-csv", exportToFile("viper-all.csv", "text/csv", csvWriter::writeAllToCSV));
+        get("/api/variant-table/export-clustered-filtered-csv", exportToFile("viper-filtered.csv", "text/csv", csvWriter::writeFilteredToCSV));
+        get("/api/variant-table/export-clustered-xlsx", exportToFile("viper-all.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", xlsxWriter::writeAllToXSLX));
+        get("/api/variant-table/export-clustered-filtered-xlsx", exportToFile("viper-filtered.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", xlsxWriter::writeFilteredToXSLX));
     }
 
-    private Route exportToCsv(String fileName, String mimeType, BiConsumer<VariantTableCluster, String> exportFunction) {
+    private Route exportToFile(String fileName, String mimeType, BiConsumer<VariantTableCluster, String> exporter) {
 
         return (req, res) -> {
             String exportedFile = config.getWorkDir() + "/" + fileName;
 
-            exportFunction.accept(this.variantTableCluster, exportedFile);
+            exporter.accept(this.variantTableCluster, exportedFile);
 
             res.raw().setHeader("Content-Disposition", "attachment; filename=" + fileName);
 
