@@ -1,3 +1,12 @@
+<h3>Breakpoint:
+  <small>
+    {{ igvImageController.variant['sample'] }},
+    {{ igvImageController.variant[igvImageController.chrColumn] }}
+    :
+    {{ igvImageController.variant[igvImageController.bpColumn] }}
+  </small>
+</h3>
+
 <div ng-if="igvImageController.breakpointImageLink != null" >
   <img class="breakpoint-image" ng-src="{{ igvImageController.breakpointImageLink }}">
 </div>
