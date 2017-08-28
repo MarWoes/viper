@@ -28,7 +28,17 @@
         <span class="btn btn-success" ng-click="inspectorCtrl.sendDecision('approved')">approved</span>
       </div>
 
-      <br>
+      <div ng-if="inspectorCtrl.relatedVariants.length > 1">
+        <hr>
+        <strong>Select related call to inspect:</strong>
+
+        <rzslider
+          rz-slider-model="inspectorCtrl.relatedCallIndex"
+          rz-slider-options="inspectorCtrl.sliderOptions">
+        </rzslider>
+      </div>
+
+      <hr>
 
       <table class="table table-bordered table-condensed">
 
@@ -72,16 +82,6 @@
         </div>
 
         <hr>
-
-        <div ng-if="inspectorCtrl.relatedVariants.length > 1">
-
-          <strong>Select related call to inspect:</strong>
-
-          <rzslider
-            rz-slider-model="inspectorCtrl.relatedCallIndex"
-            rz-slider-options="inspectorCtrl.sliderOptions">
-          </rzslider>
-        </div>
 
       </uib-tab>
       <uib-tab heading="related calls">
