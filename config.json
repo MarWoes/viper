@@ -1,5 +1,5 @@
 {
-  "analysisFile": "../results-unit-test/all_analysis.csv",
+  "analysisFile": "../results/all_analysis.csv",
   "viperPort": 8090,
   "igvPort": 9090,
   "csvDelimiter": ";",
@@ -14,7 +14,7 @@
   "numPrecomputedSnapshots": 10,
   "xslxExportWindowSize": 1000,
   "viewRange": 25,
-  "xvfbDisplay": 4499,
+  "xvfbDisplay": 1234,
   "xvfbWidth": 1280,
   "xvfbHeight": 1680
 }

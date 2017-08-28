@@ -60,10 +60,10 @@ public class IntervalClusterBuilder {
     private List<IndexContainingPoint> findPointsInRange(IndexContainingPoint point, TwoDTree tree) {
 
         IRectangle searchArea = new TwoDRectangle(
-                point.getX() - tolerance,
-                point.getY() - tolerance,
-                point.getX() + tolerance,
-                point.getY() + tolerance
+                point.getX() - tolerance - 0.5,
+                point.getY() - tolerance - 0.5,
+                point.getX() + tolerance + 0.5,
+                point.getY() + tolerance + 0.5
         );
 
         Iterator<IPoint> pointsInRangeIterator = tree.range(searchArea);
@@ -91,17 +91,15 @@ public class IntervalClusterBuilder {
 
             Set<Integer> newCluster = new HashSet<>();
 
-            clusterIndices[point.getIndex()] = clusters.size();
-            for (IndexContainingPoint pointInRange : pointsInRange) {
-                clusterIndices[pointInRange.getIndex()] = clusters.size();
-            }
-
             newCluster.add(point.getIndex());
             for (int otherCluster : otherClusterIndices) {
 
                 newCluster.addAll(clusters.get(otherCluster));
                 clusters.get(otherCluster).clear();
+            }
 
+            for (int pointInRangeIndex : newCluster) {
+                clusterIndices[pointInRangeIndex] = clusters.size();
             }
 
             clusters.add(newCluster);
