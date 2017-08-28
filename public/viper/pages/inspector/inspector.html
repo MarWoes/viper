@@ -91,7 +91,7 @@
           <thead>
             <tr>
               <th ng-repeat="key in inspectorCtrl.columnNames">
-                {{ key }}
+                <span uib-tooltip="{{ key }}">{{ key | limitTo: 7 }}{{ key.length > 7 ? '&hellip;' : '' }}</span>
               </th>
             </tr>
           </thead>
