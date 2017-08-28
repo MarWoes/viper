@@ -49,6 +49,7 @@ public class IGVVisualizer extends Thread {
     private final int xvfbDisplay;
     private final int xvfbWidth;
     private final int xvfbHeight;
+    private final int jvmMBSpace;
 
     private final Map<String, Boolean> visualizationProgressMap;
     private final PriorityBlockingQueue<IGVCommand> commandQueue;
@@ -61,7 +62,7 @@ public class IGVVisualizer extends Thread {
     private Process xvfbServer;
     private Socket client;
 
-    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir, int viewRange, int xvfbDisplay, int xvfbWidth, int xvfbHeight) {
+    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir, int viewRange, int xvfbDisplay, int xvfbWidth, int xvfbHeight, int jvmMBSpace) {
         this.port = port;
         this.fastaRef = fastaRef;
         this.igvJar = igvJar;
@@ -73,6 +74,7 @@ public class IGVVisualizer extends Thread {
         this.xvfbDisplay = xvfbDisplay;
         this.xvfbWidth = xvfbWidth;
         this.xvfbHeight = xvfbHeight;
+        this.jvmMBSpace = jvmMBSpace;
     }
 
     @Override
@@ -115,10 +117,17 @@ public class IGVVisualizer extends Thread {
     }
 
     private void startIGVProcess() throws IOException {
-        ProcessBuilder builder = new ProcessBuilder("java", "-jar", this.igvJar,
+        ProcessBuilder builder = new ProcessBuilder("java",
+                "-Xmx" + this.jvmMBSpace + "m",
+                "-Dproduction=true",
+                "-Dsun.java2d.noddraw=true",
+                "-Dapple.laf.useScreenMenuBar=true",
+                "-Djava.net.preferIPv4Stack=true",
+                "-jar", this.igvJar,
                 "-p", "" + port,
                 "-g", this.fastaRef,
-                "-o", "igv.properties")
+                "-o", "igv.properties"
+        )
                 .inheritIO();
 
         if (isXvfbInstalled()) {

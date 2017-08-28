@@ -340,6 +340,7 @@ public class ViperServer {
                 this.config.getViewRange(),
                 this.config.getXvfbDisplay(),
                 this.config.getXvfbWidth(),
-                this.config.getXvfbHeight());
+                this.config.getXvfbHeight(),
+                this.config.getIgvMaxMemory());
     }
 }

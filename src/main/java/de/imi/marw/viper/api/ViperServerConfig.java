@@ -46,6 +46,7 @@ public class ViperServerConfig {
     private int xvfbDisplay = 4499;
     private int xvfbWidth = 1280;
     private int xvfbHeight = 1680;
+    private int igvMaxMemory = 1200;
 
     public ViperServerConfig(String csvFile) {
         this.analysisFile = csvFile;
@@ -193,6 +194,14 @@ public class ViperServerConfig {
 
     public void setBreakpointTolerance(int breakpointTolerance) {
         this.breakpointTolerance = breakpointTolerance;
+    }
+
+    public int getIgvMaxMemory() {
+        return this.igvMaxMemory;
+    }
+
+    public void setIgvMaxMemory(int igvMaxMemory) {
+        this.igvMaxMemory = igvMaxMemory;
     }
 
 }
