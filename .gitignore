@@ -6,3 +6,4 @@
 /.gradle/
 /build/
 /public/bower_components
+/src/main/resources
