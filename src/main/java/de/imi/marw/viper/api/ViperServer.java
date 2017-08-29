@@ -23,6 +23,7 @@
 package de.imi.marw.viper.api;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import de.imi.marw.viper.util.Util;
 import de.imi.marw.viper.variants.VariantCallFilter;
@@ -75,7 +76,7 @@ public class ViperServer {
     public ViperServer(ViperServerConfig config) {
 
         this.config = config;
-        this.gson = new Gson();
+        this.gson = new GsonBuilder().serializeNulls().create();
         this.clusterer = new VariantClusterBuilder(config.getBreakpointTolerance());
         this.progressManager = new ProgressManager(config.getWorkDir());
         this.filterManager = new FilterManager();
