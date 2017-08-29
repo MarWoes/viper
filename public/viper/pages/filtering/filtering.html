@@ -4,25 +4,30 @@
 
     <div class="col-md-12">
       <h4>Variants: {{ filteringPageCtrl.tableSize }}</h4>
-      <table class="table table-bordered table-condensed table-striped table-small-font">
-        <thead>
-          <tr>
-            <th ng-repeat="columnName in filteringPageCtrl.columnNames">
-              <span uib-tooltip="{{ columnName }}" tooltip-popup-delay="500">{{ columnName | limitTo: 8 }}{{ columnName.length > 8 ? '&hellip;' : '' }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr ng-repeat="variantCall in filteringPageCtrl.currentVariants track by $index">
-            <td ng-repeat="variantColumn in variantCall track by $index">
-              <a ng-show="::($index == 0)" href="#!inspector" ng-click="filteringPageCtrl.onInspectorLinkClicked($parent.$index)">{{ variantColumn }}</a>
-              <span ng-show="::($index != 0)"
-                uib-tooltip="{{ variantColumn }}"
-                tooltip-popup-delay="500">{{ variantColumn | limitTo: 15 }}{{ variantColumn.length > 15 ? '&hellip;' : '' }}</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+
+      <div class="horizontal-scroll-overflow">
+
+        <table class="table table-bordered table-condensed table-striped table-small-font">
+          <thead>
+            <tr>
+              <th ng-repeat="columnName in filteringPageCtrl.columnNames">
+                <span uib-tooltip="{{ columnName }}" tooltip-popup-delay="500">{{ columnName | limitTo: 8 }}{{ columnName.length > 8 ? '&hellip;' : '' }}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="variantCall in filteringPageCtrl.currentVariants track by $index">
+              <td ng-repeat="variantColumn in variantCall track by $index">
+                <a ng-show="::($index == 0)" href="#!inspector" ng-click="filteringPageCtrl.onInspectorLinkClicked($parent.$index)">{{ variantColumn }}</a>
+                <span ng-show="::($index != 0)"
+                  uib-tooltip="{{ variantColumn }}"
+                  tooltip-popup-delay="500">{{ variantColumn | limitTo: 15 }}{{ variantColumn.length > 15 ? '&hellip;' : '' }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
       <div>
         <ul uib-pagination
           ng-model="filteringPageCtrl.currentPage"

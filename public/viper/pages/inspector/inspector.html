@@ -28,8 +28,10 @@
         <span class="btn btn-success" ng-click="inspectorCtrl.sendDecision('approved')">approved</span>
       </div>
 
+      <br>
+
       <div ng-if="inspectorCtrl.relatedVariants.length > 1">
-        <hr>
+
         <strong>Select related call to inspect:</strong>
 
         <rzslider
@@ -86,24 +88,28 @@
       </uib-tab>
       <uib-tab heading="related calls">
 
-        <table class = "table table-bordered table-condensed table-small-font">
+        <div class="horizontal-scroll-overflow">
 
-          <thead>
-            <tr>
-              <th ng-repeat="key in inspectorCtrl.columnNames">
-                <span uib-tooltip="{{ key }}">{{ key | limitTo: 7 }}{{ key.length > 7 ? '&hellip;' : '' }}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="relatedVariant in inspectorCtrl.relatedVariants">
-              <td ng-repeat="key in inspectorCtrl.columnNames">
-                {{ inspectorCtrl.variantPropertyToString(relatedVariant[key]) }}
-              </td>
-            </tr>
-          </tbody>
+          <table class = "table table-bordered table-condensed table-small-font">
 
-        </table>
+            <thead>
+              <tr>
+                <th ng-repeat="key in inspectorCtrl.columnNames">
+                  <span uib-tooltip="{{ key }}">{{ key | limitTo: 7 }}{{ key.length > 7 ? '&hellip;' : '' }}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="relatedVariant in inspectorCtrl.relatedVariants">
+                <td ng-repeat="key in inspectorCtrl.columnNames">
+                  {{ inspectorCtrl.variantPropertyToString(relatedVariant[key]) }}
+                </td>
+              </tr>
+            </tbody>
+
+          </table>
+
+        </div>
 
       </uib-tab>
     </uib-tabset>
