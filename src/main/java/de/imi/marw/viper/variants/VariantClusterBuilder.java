@@ -26,6 +26,7 @@ import de.imi.marw.viper.clustering.Interval;
 import de.imi.marw.viper.clustering.IntervalClusterBuilder;
 import de.imi.marw.viper.variants.table.VariantTable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +40,11 @@ import java.util.stream.IntStream;
 public class VariantClusterBuilder {
 
     private final IntervalClusterBuilder intervalClusterer;
+    private final boolean useIdentityIndices;
 
-    public VariantClusterBuilder(int tolerance) {
+    public VariantClusterBuilder(int tolerance, boolean useIdendityIndices) {
         this.intervalClusterer = new IntervalClusterBuilder(tolerance);
+        this.useIdentityIndices = useIdendityIndices;
     }
 
     private String getSequenceKey(List variantCall, Map<String, Integer> indexMap) {
@@ -93,6 +96,13 @@ public class VariantClusterBuilder {
     }
 
     private List<Collection<Integer>> computeClusterIndices(VariantTable unclustered) {
+
+        if (this.useIdentityIndices) {
+            return IntStream.range(0, unclustered.getNumberOfCalls())
+                    .boxed()
+                    .map(index -> Arrays.asList(new Integer[]{index}))
+                    .collect(Collectors.toList());
+        }
 
         Collection<String> sequenceKeys = getSequenceKeys(unclustered);
 

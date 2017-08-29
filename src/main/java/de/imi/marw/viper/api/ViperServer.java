@@ -77,7 +77,7 @@ public class ViperServer {
 
         this.config = config;
         this.gson = new GsonBuilder().serializeNulls().create();
-        this.clusterer = new VariantClusterBuilder(config.getBreakpointTolerance());
+        this.clusterer = new VariantClusterBuilder(config.getBreakpointTolerance(), !config.isClusteringEnabled());
         this.progressManager = new ProgressManager(config.getWorkDir());
         this.filterManager = new FilterManager();
         this.csvWriter = new CsvTableWriter(config.getCsvDelimiter(), config.getCollectionDelimiter());

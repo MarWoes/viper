@@ -33,6 +33,7 @@ public class ViperServerConfig {
     private int igvPort = 9090;
     private char csvDelimiter = ';';
     private String collectionDelimiter = ",";
+    private boolean enableClustering = true;
     private int breakpointTolerance = 3;
     private String workDir = "/tmp/viper";
     private String fastaRef = "/tmp/ref.fa";
@@ -202,6 +203,14 @@ public class ViperServerConfig {
 
     public void setIgvMaxMemory(int igvMaxMemory) {
         this.igvMaxMemory = igvMaxMemory;
+    }
+
+    public boolean isClusteringEnabled() {
+        return enableClustering;
+    }
+
+    public void setEnableClustering(boolean enableClustering) {
+        this.enableClustering = enableClustering;
     }
 
 }
