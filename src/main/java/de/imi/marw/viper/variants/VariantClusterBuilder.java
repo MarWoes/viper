@@ -132,10 +132,11 @@ public class VariantClusterBuilder {
         return val;
     }
 
-    private <T> Object combineCollection(Collection<Collection<T>> values, VariantPropertyType type) {
+    private <T> Object combineCollections(Collection<Collection<T>> values) {
 
         Collection<T> combinedCollection = values.stream()
                 .flatMap((collection) -> collection.stream())
+                .distinct()
                 .collect(Collectors.toList());
 
         return combinedCollection;
@@ -147,11 +148,11 @@ public class VariantClusterBuilder {
             case STRING:
                 return combineStrings((Collection<String>) values);
             case STRING_COLLECTION:
-                return combineCollection((Collection<Collection<String>>) values, type);
+                return combineCollections((Collection<Collection<String>>) values);
             case NUMERIC:
                 return combineNumeric((Collection<Double>) values);
             case NUMERIC_COLLECTION:
-                return combineCollection((Collection<Collection<Double>>) values, type);
+                return combineCollections((Collection<Collection<Double>>) values);
             default:
                 throw new IllegalStateException("Unrecognized variant type " + type + " when combining multiple variant properties.");
         }
