@@ -286,27 +286,33 @@ public class ViperServer {
     }
 
     private Object takeSnapshot(Request req, Response res) {
+
+        int precomputeRange = config.getNumPrecomputedSnapshots();
         int queryIndex = gson.fromJson(req.queryParams("index"), Integer.class);
         int selectedRelatedCall = gson.fromJson(req.queryParams("relatedCallIndex"), Integer.class);
-        int maxIndex = Util.clamp(queryIndex + config.getNumPrecomputedSnapshots(), 0, variantTableCluster.getClusteredTable().getNumberOfCalls());
+        int clusteredPrecomputeHigh = Util.clamp(queryIndex + precomputeRange, 0, variantTableCluster.getClusteredTable().getNumberOfCalls());
 
-        for (int i = queryIndex; queryIndex < maxIndex; queryIndex++) {
+        for (int i = queryIndex; queryIndex < clusteredPrecomputeHigh; queryIndex++) {
 
             List<Map<String, Object>> relatedCalls = variantTableCluster.getUnclusteredCalls(queryIndex);
 
-            int relatedCallIndex = i == queryIndex ? selectedRelatedCall : 0;
-            Map<String, Object> relatedCall = relatedCalls.get(relatedCallIndex);
+            int relatedPrecomputeHigh = Util.clamp(selectedRelatedCall + precomputeRange, 0, relatedCalls.size());
+            for (int j = selectedRelatedCall; j < relatedPrecomputeHigh; j++) {
 
-            String sample = relatedCall.get(VariantTable.SAMPLE_COLUMN_NAME).toString();
+                Map<String, Object> relatedCall = relatedCalls.get(j);
 
-            String chr1 = relatedCall.get(VariantTable.CHR1_COLUMN_NAME).toString();
-            String chr2 = relatedCall.get(VariantTable.CHR2_COLUMN_NAME).toString();
+                String sample = relatedCall.get(VariantTable.SAMPLE_COLUMN_NAME).toString();
 
-            int bp1 = ((Double) relatedCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
-            int bp2 = ((Double) relatedCall.get(VariantTable.BP2_COLUMN_NAME)).intValue();
+                String chr1 = relatedCall.get(VariantTable.CHR1_COLUMN_NAME).toString();
+                String chr2 = relatedCall.get(VariantTable.CHR2_COLUMN_NAME).toString();
 
-            this.igv.scheduleSnapshot(sample, chr1, bp1, i == queryIndex);
-            this.igv.scheduleSnapshot(sample, chr2, bp2, i == queryIndex);
+                int bp1 = ((Double) relatedCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
+                int bp2 = ((Double) relatedCall.get(VariantTable.BP2_COLUMN_NAME)).intValue();
+
+                this.igv.scheduleSnapshot(sample, chr1, bp1, i == queryIndex && j == selectedRelatedCall);
+                this.igv.scheduleSnapshot(sample, chr2, bp2, i == queryIndex && j == selectedRelatedCall);
+
+            }
         }
 
         return "OK";
