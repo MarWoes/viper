@@ -176,6 +176,10 @@ public class VariantTable {
         return columnNames;
     }
 
+    public synchronized List<VariantPropertyType> getColumnTypes() {
+        return types;
+    }
+
     public synchronized Map<String, Integer> getColumnIndexMap() {
         return indexMap;
     }

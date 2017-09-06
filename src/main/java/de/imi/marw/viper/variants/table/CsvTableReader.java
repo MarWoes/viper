@@ -24,7 +24,6 @@ package de.imi.marw.viper.variants.table;
 
 import de.imi.marw.viper.util.Util;
 import de.imi.marw.viper.variants.VariantPropertyType;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -32,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.csv.CSVFormat;
@@ -101,7 +102,18 @@ public class CsvTableReader implements TableReader {
 
     private VariantPropertyType[] determineTypes(String[] columnNames, List<String[]> stringTable) {
 
-        VariantPropertyType[] guessedTypes = guessTypes(stringTable);
+        VariantPropertyType[] guessedTypes;
+
+        if (stringTable.isEmpty()) {
+
+            guessedTypes = new VariantPropertyType[columnNames.length];
+
+            for (int i = 0; i < columnNames.length; i++) {
+                guessedTypes[i] = VariantPropertyType.NUMERIC;
+            }
+        } else {
+            guessedTypes = guessTypes(stringTable);
+        }
 
         List<String> mandatoryFields = Arrays.asList(VariantTable.MANDATORY_FIELDS);
 
@@ -200,11 +212,8 @@ public class CsvTableReader implements TableReader {
 
             return new VariantTable(parsedCalls, Arrays.asList(header), Arrays.asList(types));
 
-        } catch (FileNotFoundException ex) {
-            System.out.println("[ERROR] File " + fileName + " not found!");
         } catch (IOException ex) {
-            System.out.println("[ERROR] IOException when reading csv file:");
-            System.err.print(ex);
+            Logger.getLogger(CsvTableReader.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;

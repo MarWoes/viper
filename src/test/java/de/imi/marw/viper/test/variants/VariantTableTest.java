@@ -159,6 +159,47 @@ public class VariantTableTest {
 
     }
 
+    @Test
+    public void breakpointOrderIsChangedIfNecessary() {
+
+        List<List<Object>> calls = new ArrayList<>();
+        List<VariantPropertyType> types = new ArrayList<>(Arrays.asList(VariantTable.MANDATORY_FIELDS_TYPES));
+        types.add(VariantPropertyType.STRING_COLLECTION);
+        types.add(VariantPropertyType.NUMERIC_COLLECTION);
+
+        List<String> colNames = new ArrayList<>(Arrays.asList(VariantTable.MANDATORY_FIELDS));
+        colNames.add("strColl");
+        colNames.add("numColl");
+
+        List<Object> call = new ArrayList<>();
+        call.add("SAMPLE1");
+        call.add("DELETION");
+        call.add("17");
+        call.add(12524565.0);
+        call.add("19");
+        call.add(12341234.0);
+        call.add(Arrays.asList(new String[]{"blub", "Halhalo"}));
+        call.add(Arrays.asList(new Double[]{13.0, 37.0}));
+
+        List<Object> call2 = new ArrayList<>();
+        call2.add("SAMPLE2");
+        call2.add("DELETION");
+        call2.add("17");
+        call2.add(12524565.5321);
+        call2.add("18");
+        call2.add(12341234.1234);
+        call2.add(Arrays.asList(new String[]{}));
+        call2.add(Arrays.asList(new Double[]{}));
+
+        calls.add(call);
+        calls.add(call2);
+
+        VariantTable simpleTable = new VariantTable(calls, colNames, types);
+
+        assertEquals(simpleTable.getUnfilteredColumn(VariantTable.BP1_COLUMN_NAME), Arrays.asList(new Double[]{12341234.0, 12341234.1234}));
+        assertEquals(simpleTable.getUnfilteredColumn(VariantTable.BP2_COLUMN_NAME), Arrays.asList(new Double[]{12524565.0, 12524565.5321}));
+    }
+
     private VariantTable createSimpleTable() {
         List<List<Object>> calls = new ArrayList<>();
         List<VariantPropertyType> types = new ArrayList<>(Arrays.asList(VariantTable.MANDATORY_FIELDS_TYPES));
