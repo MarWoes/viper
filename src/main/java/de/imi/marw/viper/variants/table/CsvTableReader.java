@@ -154,7 +154,7 @@ public class CsvTableReader implements TableReader {
             case STRING_COLLECTION:
 
                 Collection<String> strings = Arrays.stream(rawValue.split(this.propertyDelimiter))
-                        .map(str -> str.isEmpty() ? "NA" : str)
+                        .map(str -> str.isEmpty() ? "NA" : str.trim())
                         .collect(Collectors.toList());
 
                 return strings;
