@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -238,6 +240,19 @@ public class VariantTableTest {
         return simpleTable;
     }
 
+    private final static Map<String, Object> EXPECTED_CALL_MAP = new LinkedHashMap<>();
+
+    static {
+        EXPECTED_CALL_MAP.put(VariantTable.SAMPLE_COLUMN_NAME, "SAMPLE2");
+        EXPECTED_CALL_MAP.put(VariantTable.TYPE_COLUMN_NAME, "DELETION");
+        EXPECTED_CALL_MAP.put(VariantTable.CHR1_COLUMN_NAME, "17");
+        EXPECTED_CALL_MAP.put(VariantTable.BP1_COLUMN_NAME, 12341234.1234);
+        EXPECTED_CALL_MAP.put(VariantTable.CHR2_COLUMN_NAME, "18");
+        EXPECTED_CALL_MAP.put(VariantTable.BP2_COLUMN_NAME, 12524565.5321);
+        EXPECTED_CALL_MAP.put("strColl", Arrays.asList(new String[]{}));
+        EXPECTED_CALL_MAP.put("numColl", Arrays.asList(new Double[]{}));
+    }
+
     @Test
     public void correctTableIsCreated() {
 
@@ -251,6 +266,8 @@ public class VariantTableTest {
 
         simpleTable.setCallProperty(0, VariantTable.BP1_COLUMN_NAME, 37.0);
         assertEquals(simpleTable.getCall(0).get(VariantTable.BP1_COLUMN_NAME), 37.0);
+
+        assertEquals(EXPECTED_CALL_MAP, simpleTable.getCall(1));
     }
 
     @Test
@@ -262,8 +279,12 @@ public class VariantTableTest {
         StringFilter filter = new StringFilter(VariantTable.SAMPLE_COLUMN_NAME);
         filter.setAllowedValues(allowedStringValues);
         VariantTable filteredTable = createSimpleTable();
+
+        assertEquals(EXPECTED_CALL_MAP, filteredTable.getCall(1));
+
         filteredTable.filter(Arrays.asList(filter));
 
+        assertEquals(EXPECTED_CALL_MAP, filteredTable.getCall(0));
         assertEquals(filteredTable.getNumberOfCalls(), 1);
         assertEquals(filteredTable.getUnfilteredColumn(VariantTable.BP1_COLUMN_NAME), Arrays.asList(new Double[]{12341234.0, 12341234.1234}));
         assertEquals(filteredTable.getUnfilteredColumn(VariantTable.SAMPLE_COLUMN_NAME), Arrays.asList(new String[]{"SAMPLE1", "SAMPLE2"}));
