@@ -11,7 +11,7 @@
   "bamDir": "/home/marius/workspace/sftp-share/Analyses/Nijmegen_MDS_sequencing/MDS-Triage/Netherlands_illumina_1/alignment2/alignment",
   "igvJar": "../igv/igv.jar",
   "keepVcfSimple": true,
-  "excludeNonRefVcfCalls": true,
+  "excludeRefVcfCalls": true,
   "numPrecomputedSnapshots": 10,
   "xslxExportWindowSize": 1000,
   "viewRange": 25,

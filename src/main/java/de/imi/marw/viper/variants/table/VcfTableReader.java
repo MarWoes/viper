@@ -35,6 +35,7 @@ import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -186,10 +187,21 @@ public class VcfTableReader implements TableReader {
         List<String> altAlleles = context.getAlternateAlleles().stream()
                 .map(allele -> allele.getDisplayString())
                 .collect(Collectors.toList());
-        vcfFieldValues.add(altAlleles);
+
+        if (altAlleles.isEmpty()) {
+            vcfFieldValues.add(new ArrayList<>(Arrays.asList("NA")));
+        } else {
+            vcfFieldValues.add(altAlleles);
+        }
 
         vcfFieldValues.add(context.getPhredScaledQual());
-        vcfFieldValues.add(context.getFilters());
+
+        Collection<String> filters = new ArrayList<>(context.getFilters());
+        if (filters.isEmpty()) {
+            filters = new ArrayList<>(Arrays.asList("PASS"));
+        }
+
+        vcfFieldValues.add(filters);
 
         return vcfFieldValues;
     }
@@ -209,17 +221,24 @@ public class VcfTableReader implements TableReader {
                 }
             }
             case NUMERIC_COLLECTION: {
-                return values.stream().map(Double::parseDouble).collect(Collectors.toList());
+                Collection<Double> coll = values.stream()
+                        .map(Double::parseDouble)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                return coll.isEmpty() ? new ArrayList<>(Arrays.asList((Object) null)) : coll;
             }
             case STRING: {
                 if (isDefinedPerSample) {
-                    return values.get(sampleIndex);
+                    return values.get(sampleIndex) == null ? "NA" : values.get(sampleIndex);
                 } else {
                     return values.isEmpty() ? "NA" : values.get(0);
                 }
             }
             case STRING_COLLECTION: {
-                return values;
+                return values == null || values.isEmpty() ? new ArrayList<>(Arrays.asList("NA")) : values.stream()
+                        .distinct()
+                        .collect(Collectors.toList());
             }
 
             default:
@@ -234,8 +253,10 @@ public class VcfTableReader implements TableReader {
 
         switch (type) {
             case NUMERIC_COLLECTION:
+                defaultValue = new ArrayList<>(Arrays.asList((Object) null));
+                break;
             case STRING_COLLECTION:
-                defaultValue = new ArrayList<>();
+                defaultValue = new ArrayList<>(Arrays.asList("NA"));
                 break;
             case STRING:
                 defaultValue = "NA";
@@ -265,10 +286,11 @@ public class VcfTableReader implements TableReader {
 
         if (type == VariantPropertyType.NUMERIC_COLLECTION) {
             List<Double> parsed = (List<Double>) splitValues.stream()
-                    .map((str) -> ".".equals(str.toString()) ? null : Double.parseDouble(str.toString()))
+                    .map((str) -> (".".equals(str.toString()) || str.toString().isEmpty()) ? null : Double.parseDouble(str.toString()))
+                    .distinct()
                     .collect(Collectors.toList());
 
-            return parsed;
+            return parsed.isEmpty() ? new ArrayList<>(Arrays.asList((Object) null)) : parsed;
         }
 
         throw new IllegalStateException("unexpected type " + type + " when extracting genotype values");

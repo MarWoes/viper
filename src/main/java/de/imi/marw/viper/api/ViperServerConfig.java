@@ -40,7 +40,7 @@ public class ViperServerConfig {
     private String igvJar = "../igv/igv.jar";
     private String bamDir = "/tmp/bam";
     private boolean keepVcfSimple = true;
-    private boolean excludeNonRefVcfCalls = true;
+    private boolean excludeRefVcfCalls = true;
     private int numPrecomputedSnapshots = 10;
     private int xslxExportWindowSize = 1000;
     private int viewRange = 25;
@@ -134,11 +134,11 @@ public class ViperServerConfig {
     }
 
     public boolean isExcludingNonRefVcfCalls() {
-        return excludeNonRefVcfCalls;
+        return excludeRefVcfCalls;
     }
 
-    public void setExcludeNonRefVcfCalls(boolean excludeNonRefVcfCalls) {
-        this.excludeNonRefVcfCalls = excludeNonRefVcfCalls;
+    public void setExcludeRefVcfCalls(boolean excludeRefVcfCalls) {
+        this.excludeRefVcfCalls = excludeRefVcfCalls;
     }
 
     public int getNumPrecomputedSnapshots() {
