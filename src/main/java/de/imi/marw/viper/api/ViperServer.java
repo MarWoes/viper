@@ -37,7 +37,7 @@ import de.imi.marw.viper.variants.filters.StringCollectionFilter;
 import de.imi.marw.viper.variants.filters.StringFilter;
 import de.imi.marw.viper.variants.table.CsvTableWriter;
 import de.imi.marw.viper.variants.table.VariantTable;
-import de.imi.marw.viper.variants.table.ProgressManager;
+import de.imi.marw.viper.variants.table.DecisionManager;
 import de.imi.marw.viper.variants.table.XLSXWriter;
 import de.imi.marw.viper.visualization.IGVVisualizer;
 import java.io.File;
@@ -65,7 +65,7 @@ public class ViperServer {
     private final ViperServerConfig config;
     private final Gson gson;
     private final VariantClusterBuilder clusterer;
-    private final ProgressManager progressManager;
+    private final DecisionManager progressManager;
     private final FilterManager filterManager;
     private VariantTableCluster variantTableCluster;
     private final CsvTableWriter csvWriter;
@@ -78,7 +78,7 @@ public class ViperServer {
         this.config = config;
         this.gson = new GsonBuilder().serializeNulls().create();
         this.clusterer = new VariantClusterBuilder(config.getBreakpointTolerance(), !config.isClusteringEnabled());
-        this.progressManager = new ProgressManager(config.getWorkDir());
+        this.progressManager = new DecisionManager(config.getWorkDir());
         this.filterManager = new FilterManager();
         this.csvWriter = new CsvTableWriter(config.getCsvDelimiter(), config.getCollectionDelimiter());
         this.xlsxWriter = new XLSXWriter(config.getCollectionDelimiter(), config.getXslxExportWindowSize());
@@ -90,7 +90,7 @@ public class ViperServer {
         this.igv.start();
 
         this.variantTableCluster = this.loadVariants();
-        progressManager.loadProgress(this.variantTableCluster);
+        progressManager.loadDecisions(this.variantTableCluster.getClusteredTable());
         filterManager.loadFromTable(this.variantTableCluster.getClusteredTable());
 
         this.igv.awaitStartup();
@@ -195,7 +195,7 @@ public class ViperServer {
 
         post("/api/variant-table/save", (req, res) -> {
 
-            boolean success = progressManager.saveProgress(variantTableCluster);
+            boolean success = progressManager.saveDecisions(variantTableCluster.getClusteredTable());
 
             if (success) {
                 return "OK";

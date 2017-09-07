@@ -22,7 +22,6 @@
  */
 package de.imi.marw.viper.variants.table;
 
-import de.imi.marw.viper.variants.VariantTableCluster;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -38,34 +37,34 @@ import java.util.stream.Collectors;
  *
  * @author marius
  */
-public class ProgressManager {
+public class DecisionManager {
 
     private final Path workDir;
 
-    public ProgressManager(String workDir) {
+    public DecisionManager(String workDir) {
         this.workDir = Paths.get(workDir);
     }
 
-    public boolean saveProgress(VariantTableCluster cluster) {
+    public boolean saveDecisions(VariantTable table) {
 
-        List<String> decisions = cluster.getClusteredTable().getUnfilteredColumn(VariantTable.DECISION_COLUMN_NAME).stream()
+        List<String> decisions = table.getUnfilteredColumn(VariantTable.DECISION_COLUMN_NAME).stream()
                 .map(decision -> (String) decision)
                 .collect(Collectors.toList());
 
-        Path saveFilePath = getSavePath(cluster);
+        Path saveFilePath = getSavePath(table);
 
         try {
             Files.write(saveFilePath, decisions, Charset.forName("UTF-8"));
             return true;
         } catch (IOException ex) {
-            Logger.getLogger(ProgressManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DecisionManager.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
 
-    public void loadProgress(VariantTableCluster cluster) {
+    public void loadDecisions(VariantTable table) {
 
-        Path saveFilePath = getSavePath(cluster);
+        Path saveFilePath = getSavePath(table);
 
         if (!saveFilePath.toFile().exists()) {
             return;
@@ -75,23 +74,23 @@ public class ProgressManager {
             List<String> decisions = Files.readAllLines(saveFilePath, Charset.forName("UTF-8"));
 
             for (int i = 0; i < decisions.size(); i++) {
-                cluster.getClusteredTable().setCallProperty(i, VariantTable.DECISION_COLUMN_NAME, decisions.get(i));
+                table.setCallProperty(i, VariantTable.DECISION_COLUMN_NAME, decisions.get(i));
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(ProgressManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DecisionManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private Path getSavePath(VariantTableCluster cluster) {
+    private Path getSavePath(VariantTable table) {
 
-        String[] bp1 = cluster.getClusteredTable().getUnfilteredColumn(VariantTable.BP1_COLUMN_NAME)
+        String[] bp1 = table.getUnfilteredColumn(VariantTable.BP1_COLUMN_NAME)
                 .stream()
                 .map(bp -> bp.toString())
                 .toArray(String[]::new);
 
         int analysisHash = Arrays.hashCode(bp1);
-        int size = cluster.getClusteredTable().getRawCalls().size();
+        int size = table.getRawCalls().size();
 
         String fileName = "progress." + analysisHash + "." + size + ".txt";
         return workDir.resolve(fileName);
