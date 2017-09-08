@@ -23,33 +23,19 @@
 package de.imi.marw.viper.variants.filters;
 
 import de.imi.marw.viper.variants.VariantPropertyType;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
  * @author marius
  */
-public class StringFilter extends SingleColumnFilter<String> {
-
-    private Set<String> allowedValues;
+public class StringFilter extends AbstractStringFilter<String> {
 
     public StringFilter(String columnName) {
         super(columnName, VariantPropertyType.STRING);
-        this.allowedValues = new HashSet<>();
     }
 
     @Override
-    protected boolean isSingleValuePassing(String value) {
-        return allowedValues.isEmpty() || allowedValues.contains(value);
+    protected boolean isSingleColumnValuePassing(String value) {
+        return getAllowedValues().isEmpty() || getAllowedValues().contains(value);
     }
-
-    public Set<String> getAllowedValues() {
-        return allowedValues;
-    }
-
-    public void setAllowedValues(Set<String> allowedValues) {
-        this.allowedValues = allowedValues;
-    }
-
 }

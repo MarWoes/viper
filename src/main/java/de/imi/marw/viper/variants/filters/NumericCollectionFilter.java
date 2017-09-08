@@ -29,47 +29,17 @@ import java.util.Collection;
  *
  * @author marius
  */
-public class NumericCollectionFilter extends SingleColumnFilter<Collection<Double>> {
-
-    private double selectedMin, selectedMax;
-    private final double possibleMin, possibleMax;
+public class NumericCollectionFilter extends AbstractNumericalFilter<Collection<Double>> {
 
     public NumericCollectionFilter(String columnName, double possibleMin, double possibleMax) {
-        super(columnName, VariantPropertyType.NUMERIC_COLLECTION);
-        this.possibleMin = possibleMin;
-        this.possibleMax = possibleMax;
-        this.selectedMin = possibleMin;
-        this.selectedMax = possibleMax;
-        setNullAllowed(true);
+        super(columnName, VariantPropertyType.NUMERIC_COLLECTION, possibleMin, possibleMax);
     }
 
     @Override
-    protected boolean isSingleValuePassing(Collection<Double> values) {
-        return values.stream().anyMatch((val) -> (val == null && isNullAllowed()) || (val != null && (val >= selectedMin && val <= selectedMax)));
-    }
+    protected boolean isSingleColumnValuePassing(Collection<Double> value) {
 
-    public double getSelectedMin() {
-        return selectedMin;
-    }
+        return value.stream().anyMatch(super::isNumericValuePassing);
 
-    public void setSelectedMin(double selectedMin) {
-        this.selectedMin = selectedMin;
-    }
-
-    public double getSelectedMax() {
-        return selectedMax;
-    }
-
-    public void setSelectedMax(double selectedMax) {
-        this.selectedMax = selectedMax;
-    }
-
-    public double getPossibleMin() {
-        return possibleMin;
-    }
-
-    public double getPossibleMax() {
-        return possibleMax;
     }
 
 }

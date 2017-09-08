@@ -24,34 +24,21 @@ package de.imi.marw.viper.variants.filters;
 
 import de.imi.marw.viper.variants.VariantPropertyType;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
  * @author marius
  */
-public class StringCollectionFilter extends SingleColumnFilter<Collection<String>> {
-
-    private Set<String> allowedValues;
+public class StringCollectionFilter extends AbstractStringFilter<Collection<String>> {
 
     public StringCollectionFilter(String columnName) {
         super(columnName, VariantPropertyType.STRING_COLLECTION);
-        this.allowedValues = new HashSet<>();
     }
 
     @Override
-    protected boolean isSingleValuePassing(Collection<String> values) {
-        return allowedValues.isEmpty() || allowedValues.stream()
+    protected boolean isSingleColumnValuePassing(Collection<String> values) {
+        return getAllowedValues().isEmpty() || getAllowedValues().stream()
                 .anyMatch((allowedValue) -> values.contains(allowedValue));
-    }
-
-    public Set<String> getAllowedValues() {
-        return allowedValues;
-    }
-
-    public void setAllowedValues(Set<String> allowedValues) {
-        this.allowedValues = allowedValues;
     }
 
 }

@@ -22,30 +22,29 @@
  */
 package de.imi.marw.viper.variants.filters;
 
-import de.imi.marw.viper.variants.VariantCallFilter;
 import de.imi.marw.viper.variants.VariantPropertyType;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
  * @author marius
  */
-public abstract class SingleColumnFilter<T> implements VariantCallFilter {
+public abstract class AbstractStringFilter<T> extends SingleColumnFilter<T> {
 
-    private final String columnName;
-    private final VariantPropertyType columnType;
+    private Set<String> allowedValues;
 
-    public SingleColumnFilter(String columnName, VariantPropertyType columnType) {
-        this.columnName = columnName;
-        this.columnType = columnType;
+    public AbstractStringFilter(String columnName, VariantPropertyType type) {
+        super(columnName, type);
+        this.allowedValues = new HashSet<>();
     }
 
-    @Override
-    public boolean isPassing(List values, Map<String, Integer> indexMap) {
-        T value = (T) values.get(indexMap.get(columnName));
-        return isSingleColumnValuePassing(value);
+    public Set<String> getAllowedValues() {
+        return allowedValues;
     }
 
-    protected abstract boolean isSingleColumnValuePassing(T value);
+    public void setAllowedValues(Set<String> allowedValues) {
+        this.allowedValues = allowedValues;
+    }
+
 }
