@@ -123,7 +123,7 @@ public class CsvTableReader implements TableReader {
             int foundIndex = mandatoryFields.indexOf(columnName);
 
             if (foundIndex != -1) {
-                guessedTypes[foundIndex] = VariantTable.MANDATORY_FIELDS_TYPES[foundIndex];
+                guessedTypes[i] = VariantTable.MANDATORY_FIELDS_TYPES[foundIndex];
             }
         }
 
