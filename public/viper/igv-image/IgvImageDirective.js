@@ -39,7 +39,7 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
 
       if (currentKey === key && res.data === 'true') {
 
-        Ctrl.breakpointImageLink = '/api/variant-table/snapshot/' + currentKey;
+        Ctrl.breakpointImageLink = '/api/snapshots/' + currentKey;
 
       } else if (currentKey === key && res.data === 'false') {
 
@@ -56,7 +56,7 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
   }
 
   function isSnapshotAvailable(snapshotKey) {
-    var promise = $http.get('/api/variant-table/is-snapshot-available', {
+    var promise = $http.get('/api/snapshots/is-available', {
       params: { key: snapshotKey }
     });
 

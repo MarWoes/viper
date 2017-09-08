@@ -40,7 +40,6 @@ import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -173,7 +172,7 @@ public class APITest {
     @Test
     public void correctlyHandlesDecisionMaking() throws UnirestException, IOException {
 
-        assertEquals("OK", Unirest.put(URL_BASE + "/api/variant-table/decision")
+        assertEquals("OK", Unirest.put(URL_BASE + "/api/decisions/change")
                 .queryString("index", "69")
                 .queryString("decision", "maybe")
                 .asString()
@@ -181,7 +180,7 @@ public class APITest {
 
         List<Map<String, String>> calls = getCalls();
 
-        assertEquals("OK", Unirest.post(URL_BASE + "/api/variant-table/save")
+        assertEquals("OK", Unirest.post(URL_BASE + "/api/decisions/save")
                 .asString()
                 .getBody()
         );
@@ -212,7 +211,7 @@ public class APITest {
             assertEquals(expectedDecision, savedDecision);
         }
 
-        assertEquals("OK", Unirest.put(URL_BASE + "/api/variant-table/decision/all")
+        assertEquals("OK", Unirest.put(URL_BASE + "/api/decisions/all")
                 .queryString("decision", "approved")
                 .asString()
                 .getBody()
@@ -221,7 +220,7 @@ public class APITest {
         calls = getCalls();
         calls.forEach(call -> assertEquals("approved", call.get(VariantTable.DECISION_COLUMN_NAME)));
 
-        assertEquals("OK", Unirest.put(URL_BASE + "/api/variant-table/decision/all")
+        assertEquals("OK", Unirest.put(URL_BASE + "/api/decisions/all")
                 .queryString("decision", "NA")
                 .asString()
                 .getBody()
@@ -253,7 +252,7 @@ public class APITest {
     }
 
     private void waitUntilSnapshotFinished(String key) throws InterruptedException, UnirestException {
-        while ("false".equals(Unirest.get(URL_BASE + "/api/variant-table/is-snapshot-available")
+        while ("false".equals(Unirest.get(URL_BASE + "/api/snapshots/is-available")
                 .queryString("key", key)
                 .asString()
                 .getBody())) {
@@ -266,20 +265,20 @@ public class APITest {
 
         String expectedKey = "SIM1-2-25459763";
 
-        assertEquals("false", Unirest.get(URL_BASE + "/api/variant-table/is-snapshot-available")
+        assertEquals("false", Unirest.get(URL_BASE + "/api/snapshots/is-available")
                 .queryString("key", expectedKey)
                 .asString()
                 .getBody()
         );
 
-        assertEquals("OK", Unirest.post(URL_BASE + "/api/variant-table/snapshot")
+        assertEquals("OK", Unirest.post(URL_BASE + "/api/snapshots/take-snapshot")
                 .field("index", "2")
                 .field("relatedCallIndex", "2")
                 .asString()
                 .getBody()
         );
 
-        assertEquals("OK", Unirest.post(URL_BASE + "/api/variant-table/snapshot")
+        assertEquals("OK", Unirest.post(URL_BASE + "/api/snapshots/take-snapshot")
                 .field("index", "3")
                 .field("relatedCallIndex", "0")
                 .asString()
@@ -292,13 +291,13 @@ public class APITest {
     @Test
     public void filtersAreAppliedCorrectly() throws IOException, UnirestException {
 
-        String startFilters = Unirest.get(URL_BASE + "/api/variant-table/current-filters")
+        String startFilters = Unirest.get(URL_BASE + "/api/filters/current")
                 .asString()
                 .getBody();
 
         String exampleDecisionFilter = readFromFile("api/example-filters.json");
 
-        assertEquals("OK", Unirest.post(URL_BASE + "/api/variant-table/apply-filters")
+        assertEquals("OK", Unirest.post(URL_BASE + "/api/filters/apply")
                 .body(exampleDecisionFilter)
                 .asString()
                 .getBody()
@@ -314,7 +313,7 @@ public class APITest {
                 .getBody()
         );
 
-        assertEquals("OK", Unirest.post(URL_BASE + "/api/variant-table/apply-filters")
+        assertEquals("OK", Unirest.post(URL_BASE + "/api/filters/apply")
                 .body(startFilters)
                 .asString()
                 .getBody()

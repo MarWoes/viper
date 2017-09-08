@@ -25,7 +25,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.variantPropertyToString = variantPropertyToString;
 
   function applyFilters (filters) {
-    var promise = $http.post('/api/variant-table/apply-filters',filters)
+    var promise = $http.post('/api/filters/apply',filters)
     .then(function (res) {
       return res.data;
     })
@@ -42,7 +42,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   }
 
   function getCurrentFilters () {
-    return performRequest('/api/variant-table/current-filters');
+    return performRequest('/api/filters/current');
   }
 
   function getColumnNames () {
@@ -113,13 +113,13 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   }
 
   function saveProgress() {
-    var promise = $http.post("/api/variant-table/save");
+    var promise = $http.post("/api/decisions/save");
     return promise;
   }
 
   function scheduleSnapshot(index, relatedCallIndex) {
 
-    var promise = $http.post("/api/variant-table/snapshot", {}, {
+    var promise = $http.post("/api/snapshots/take-snapshot", {}, {
       params: {
         index: index,
         relatedCallIndex: relatedCallIndex
@@ -130,7 +130,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   }
 
   function sendAllDecisions (decision) {
-    return $http.put('/api/variant-table/decision/all', {}, {
+    return $http.put('/api/decisions/all', {}, {
       params: {
         decision: decision
       }
@@ -141,7 +141,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
 
   function sendDecision (index, decision) {
 
-    return $http.put('/api/variant-table/decision', {}, {
+    return $http.put('/api/decisions/change', {}, {
       params: {
         index: index,
         decision: decision
