@@ -1,0 +1,6 @@
+[{
+"allowedValues":["VAR01"],
+"columnName":"viperId",
+"nullAllowed":false,
+"columnType":"STRING"
+}]

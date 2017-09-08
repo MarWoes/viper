@@ -53,6 +53,7 @@ import javax.servlet.http.HttpServletResponse;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import spark.Spark;
 
 import static spark.Spark.*;
 
@@ -96,6 +97,17 @@ public class ViperServer {
         this.igv.awaitStartup();
 
         this.setupRoutes();
+
+        awaitInitialization();
+    }
+
+    public void stop() {
+        this.igv.shutdown();
+        Spark.stop();
+    }
+
+    public ViperServerConfig getConfig() {
+        return this.config;
     }
 
     private VariantTableCluster loadVariants() {
