@@ -1,0 +1,57 @@
+<div class="container">
+  <h3>Export:</h3>
+  <div class="row">
+    <div class="col-md-6">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Export as CSV file</div>
+        <div class="panel-body">
+
+          <strong>All</strong> variants: {{ exportPageCtrl.unfilteredSize }}
+
+          <div class="pull-right">
+            <a href="/api/exports/clustered-csv" download="viper-all.csv" target="_blank" class="btn btn-default">
+              <span class="glyphicon glyphicon-download-alt"></span> download
+            </a>
+          </div>
+          <hr>
+
+          <strong>Filtered</strong> variants: {{ exportPageCtrl.size }}
+
+          <div class="pull-right">
+            <a href="/api/exports/clustered-filtered-csv" download="viper-filtered.csv" target="_blank" class="btn btn-default">
+              <span class="glyphicon glyphicon-download-alt"></span> download
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">Export as XLSX file</div>
+        <div class="panel-body">
+
+          <strong>All</strong> variants: {{ exportPageCtrl.unfilteredSize }}
+
+          <div class="pull-right">
+            <a href="/api/exports/clustered-xlsx" download="viper-all.xlsx" target="_blank" class="btn btn-default">
+              <span class="glyphicon glyphicon-download-alt"></span> download
+            </a>
+          </div>
+          <hr>
+
+          <strong>Filtered</strong> variants: {{ exportPageCtrl.size }}
+
+          <div class="pull-right">
+            <a href="/api/exports/clustered-filtered-xlsx" download="viper-filtered.xlsx" target="_blank" class="btn btn-default">
+              <span class="glyphicon glyphicon-download-alt"></span> download
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

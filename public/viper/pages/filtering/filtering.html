@@ -1,0 +1,57 @@
+<div class="container-fluid">
+
+  <div class="row">
+
+    <div class="col-md-12">
+      <h4>Variants: {{ filteringPageCtrl.tableSize }}</h4>
+
+      <div class="horizontal-scroll-overflow">
+
+        <table class="table table-bordered table-condensed table-striped table-small-font">
+          <thead>
+            <tr>
+              <th ng-repeat="columnName in filteringPageCtrl.columnNames">
+                <span uib-tooltip="{{ columnName }}" tooltip-popup-delay="500">{{ columnName | limitTo: 8 }}{{ columnName.length > 8 ? '&hellip;' : '' }}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="variantCall in filteringPageCtrl.currentVariants track by $index">
+              <td ng-repeat="variantColumn in variantCall track by $index">
+                <a ng-show="::($index == 0)" href="#!inspector" ng-click="filteringPageCtrl.onInspectorLinkClicked($parent.$index)">{{ variantColumn }}</a>
+                <span ng-show="::($index != 0)"
+                  uib-tooltip="{{ variantColumn }}"
+                  tooltip-popup-delay="500">{{ variantColumn | limitTo: 15 }}{{ variantColumn.length > 15 ? '&hellip;' : '' }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+      <div>
+        <ul uib-pagination
+          ng-model="filteringPageCtrl.currentPage"
+          class="pagination-sm variant-pagination"
+          total-items="filteringPageCtrl.tableSize"
+          items-per-page="filteringPageCtrl.pageSize"
+          max-size="10"
+          boundary-link-numbers="true"
+          ng-change="filteringPageCtrl.onPageChange()"
+        ></ul>
+        <div class="pull-right">
+          <em>Decide for all: </em>
+          <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-default" ng-click="filteringPageCtrl.decideAll('NA')">NA</button>
+            <button type="button" class="btn btn-sm btn-danger"  ng-click="filteringPageCtrl.decideAll('declined')">declined</button>
+            <button type="button" class="btn btn-sm btn-warning" ng-click="filteringPageCtrl.decideAll('maybe')">maybe</button>
+            <button type="button" class="btn btn-sm btn-success" ng-click="filteringPageCtrl.decideAll('approved')">approved</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <column-filters on-filter-applied="filteringPageCtrl.onFilterApplied">
+  </column-filters>
+
+</div>

@@ -1,0 +1,119 @@
+<div ng-if="inspectorCtrl.tableSize == 0">
+  No variant available, please adjust filters.
+</div>
+
+<div class="container-fluid" ng-if="inspectorCtrl.tableSize > 0">
+
+  <div class="col-sm-3">
+
+    <div class="well">
+
+      <h3 class="variant-well-header">variants: {{ inspectorCtrl.tableSize }}</h3>
+
+      <hr>
+
+      <div class="form-group">
+        <label for="variantIndexInput">index:</label>
+        <input class="form-control"
+          type="number"
+          ng-model="inspectorCtrl.index"
+          ng-change="inspectorCtrl.onIndexChange()"
+          min="0"
+          max="{{inspectorCtrl.tableSize - 1}}">
+      </div>
+
+      <div class="btn-group btn-group-justified">
+        <span class="btn btn-danger"  ng-click="inspectorCtrl.sendDecision('declined')">declined</span>
+        <span class="btn btn-warning" ng-click="inspectorCtrl.sendDecision('maybe')">maybe</span>
+        <span class="btn btn-success" ng-click="inspectorCtrl.sendDecision('approved')">approved</span>
+      </div>
+
+      <br>
+
+      <div ng-if="inspectorCtrl.relatedVariants.length > 1">
+
+        <strong>Select related call to inspect:</strong>
+
+        <rzslider
+          rz-slider-model="inspectorCtrl.relatedCallIndex"
+          rz-slider-options="inspectorCtrl.sliderOptions">
+        </rzslider>
+      </div>
+
+      <hr>
+
+      <table class="table table-bordered table-condensed">
+
+        <thead>
+          <tr>
+            <th>key</th>
+            <th>value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="(key, value) in inspectorCtrl.currentVariant">
+            <td class="col-sm-1">{{ key }}</td>
+            <td>
+              {{ inspectorCtrl.variantPropertyToString(value) }}
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+  </div>
+
+  <div class="col-sm-9">
+
+    <uib-tabset>
+      <uib-tab heading="breakpoints">
+
+        <div class="row">
+
+          <div class="col-md-6">
+            <igv-image variant="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]" chr-column="'chr1'", bp-column="'bp1'">
+            </igv-image>
+          </div>
+
+          <div class="col-md-6">
+            <igv-image variant="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]" chr-column="'chr2'", bp-column="'bp2'">
+            </igv-image>
+          </div>
+
+        </div>
+
+        <hr>
+
+      </uib-tab>
+      <uib-tab heading="related calls">
+
+        <div class="horizontal-scroll-overflow">
+
+          <table class = "table table-bordered table-condensed table-small-font">
+
+            <thead>
+              <tr>
+                <th ng-repeat="key in inspectorCtrl.columnNames">
+                  <span uib-tooltip="{{ key }}">{{ key | limitTo: 7 }}{{ key.length > 7 ? '&hellip;' : '' }}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="relatedVariant in inspectorCtrl.relatedVariants">
+                <td ng-repeat="key in inspectorCtrl.columnNames">
+                  {{ inspectorCtrl.variantPropertyToString(relatedVariant[key]) }}
+                </td>
+              </tr>
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </uib-tab>
+    </uib-tabset>
+
+  </div>
+
+</div>

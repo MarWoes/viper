@@ -1,0 +1,38 @@
+/* see https://angular-ui.github.io/bootstrap/ */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+#viper-logo {
+  margin-top: -10px;
+  margin-left: -10px;
+}
+
+.variant-well-header {
+  margin-top: 0;
+}
+
+.table-small-font {
+  font-size: 12px;
+}
+
+.breakpoint-image {
+  width: 100%;
+}
+
+.btn-space {
+  margin-right: 5px;
+}
+
+.variant-pagination {
+
+  margin-top: 0px;
+  margin-bottom: 5px;
+
+}
+
+.inline-checkbox {
+  display: inline;
+}
+
+.horizontal-scroll-overflow {
+  overflow-x: auto;
+}

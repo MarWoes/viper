@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <!-- Copyright (c) 2017 Marius Wöste
+
+  Permission is hereby granted, free of charge, to any person obtaining
+  a copy of this software and associated documentation files (the
+  "Software"), to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify, merge, publish,
+  distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to
+  the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  -->
+  <title>VIPER - Variant Inspector and Expert Rating tool</title>
+  <link href="bower_components/bootstrap/dist/css/bootstrap.min.css"  rel="stylesheet">
+  <link href="bower_components/angularjs-slider/dist/rzslider.min.css"  rel="stylesheet">
+  <link href="bower_components/angular-ui-select/dist/select.min.css"  rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+
+  <script type="text/javascript" src="viper/util/polyfills.js"></script>
+  <script type="text/javascript" src="bower_components/numeral/numeral.js"></script>
+  <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+  <script type="text/javascript" src="bower_components/angular-filter/dist/angular-filter.js"></script>
+  <script type="text/javascript" src="bower_components/angularjs-slider/dist/rzslider.min.js"></script>
+  <script type="text/javascript" src="bower_components/angular-route/angular-route.min.js"></script>
+  <script type="text/javascript" src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+  <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+  <script type="text/javascript" src="bower_components/angular-ui-select/dist/select.js"></script>
+  <script type="text/javascript" src="viper/util/NumeralService.js"></script>
+  <script type="text/javascript" src="viper/variant-table/VariantTableService.js"></script>
+  <script type="text/javascript" src="viper/igv-image/IgvImageDirective.js"></script>
+  <script type="text/javascript" src="viper/pages/inspector/controller.js"></script>
+  <script type="text/javascript" src="viper/pages/filtering/filtering.js"></script>
+  <script type="text/javascript" src="viper/pages/export/controller.js"></script>
+  <script type="text/javascript" src="viper/main.js"></script>
+</head>
+
+<body ng-app="de.imi.marw.viper" ng-cloak ng-controller="ViperMainController as viperMainCtrl">
+
+  <nav class="navbar navbar-default navbar-static-top">
+
+      <div class="navbar-header">
+        <div class="navbar-brand">
+          <span><img id="viper-logo" src="images/logo.png"></span>
+          VIPER
+        </div>
+      </div>
+
+      <div class="navbar-collapse">
+        <ul class="nav navbar-nav ">
+          <li ng-class="{ active: viperMainCtrl.getCurrentRoute() == '/inspector' }"><a href="#!inspector">Inspector</a></li>
+          <li ng-class="{ active: viperMainCtrl.getCurrentRoute() == '/filtering' }"><a href="#!filtering">Filtering</a></li>
+          <li ng-class="{ active: viperMainCtrl.getCurrentRoute() == '/export' }"><a href="#!export">Export</a></li>
+        </ul>
+
+        <ul class="nav navbar-nav pull-right">
+          <li>
+              <button type="button" class="btn btn-default btn-small navbar-btn btn-space" ng-click="viperMainCtrl.saveProgress()">
+                <span class="glyphicon glyphicon-floppy-disk"></span> save progress
+              </button>
+          </li>
+        </ul>
+      </div>
+  </nav>
+
+  <div ng-view>
+  </div>
+</body>
+</html>

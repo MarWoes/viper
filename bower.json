@@ -1,0 +1,30 @@
+{
+  "name": "viper",
+  "authors": [
+    "Marius Wöste <mar.w@wwu.de>"
+  ],
+  "description": "Variant inspector and expert rating tool",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "directory": "public/bower_components",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.6.5",
+    "bootstrap": "^3.3.7",
+    "angular-bootstrap": "^2.5.0",
+    "angular-route": "^1.6.5",
+    "numeral": "^2.0.6",
+    "angular-filter": "^0.5.16",
+    "angularjs-slider": "^6.4.0",
+    "angular-sanitize": "^1.6.5",
+    "angular-ui-select": "^0.19.8"
+  }
+}
