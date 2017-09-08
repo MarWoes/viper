@@ -34,6 +34,8 @@ import de.imi.marw.viper.variants.VariantTableCluster;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.visualization.IGVVisualizer;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import spark.Spark;
 
 import static spark.Spark.*;
@@ -91,10 +93,15 @@ public class ViperServer {
     }
 
     private void setupRoutes() {
+
+        if (Files.exists(Paths.get("public"))) {
+            staticFiles.externalLocation("public");
+        } else {
+            staticFiles.location("public");
+        }
+
         ipAddress("127.0.0.1");
         port(config.getViperPort());
-
-        staticFiles.externalLocation("public");
 
         setupTableApi();
 
