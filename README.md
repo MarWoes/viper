@@ -57,7 +57,7 @@ These parameters are optional and may be omitted using the default values:
 
 ### Examples
 
-Some example `.bam` files and sample `.csv`call files can be found on [Sciebo](https://uni-muenster.sciebo.de/index.php/s/BG4J42vk87d6mcS).
+Some example `.bam` files and sample `.csv`call files can be found on [Sciebo](https://uni-muenster.sciebo.de/index.php/s/Qf6xIn2WDOyHhFN).
 
 ---
 The VIPER icon was provided by courtesy of [Niké Jenny Bruinsma](https://thenounproject.com/search/?q=snake&i=158882).
