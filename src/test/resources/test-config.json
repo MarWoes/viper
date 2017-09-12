@@ -1,0 +1,5 @@
+{
+  "workDir": "/my/spacy/tmp/dir",
+  "enableClustering": true,
+  "breakpointTolerance": 3
+}

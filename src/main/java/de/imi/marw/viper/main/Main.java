@@ -31,6 +31,20 @@ import java.util.logging.Logger;
 
 public class Main {
 
+    public static ViperServerConfig loadConfig(String fileName) throws IOException {
+
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+
+        try (Reader reader = new FileReader(fileName)) {
+
+            ViperServerConfig config = gson.fromJson(reader, ViperServerConfig.class);
+
+            return config;
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -44,12 +58,9 @@ public class Main {
             configFileName = "config.json";
         }
 
-        Gson gson = new GsonBuilder()
-                .create();
+        try {
 
-        try (Reader reader = new FileReader(configFileName)) {
-
-            ViperServerConfig config = gson.fromJson(reader, ViperServerConfig.class);
+            ViperServerConfig config = loadConfig(configFileName);
 
             ViperServer server = new ViperServer(config);
             server.start();

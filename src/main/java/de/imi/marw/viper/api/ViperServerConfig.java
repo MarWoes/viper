@@ -24,7 +24,7 @@ package de.imi.marw.viper.api;
  */
 public class ViperServerConfig {
 
-    private String analysisFile;
+    private String analysisFile = "/tmp/analysis/file";
     private int viperPort = 8090;
     private int igvPort = 9090;
     private char csvDelimiter = ';';
@@ -33,7 +33,7 @@ public class ViperServerConfig {
     private int breakpointTolerance = 3;
     private String workDir = "/tmp/viper";
     private String fastaRef = "/tmp/ref.fa";
-    private String igvJar = "../igv/igv.jar";
+    private String igvJar = "igv.jar";
     private String bamDir = "/tmp/bam";
     private boolean keepVcfSimple = true;
     private boolean excludeRefVcfCalls = true;
@@ -45,8 +45,7 @@ public class ViperServerConfig {
     private int xvfbHeight = 1680;
     private int igvMaxMemory = 1200;
 
-    public ViperServerConfig(String csvFile) {
-        this.analysisFile = csvFile;
+    public ViperServerConfig() {
     }
 
     public char getCsvDelimiter() {
@@ -207,6 +206,11 @@ public class ViperServerConfig {
 
     public void setEnableClustering(boolean enableClustering) {
         this.enableClustering = enableClustering;
+    }
+
+    @Override
+    public String toString() {
+        return "ViperServerConfig{" + "analysisFile=" + analysisFile + ", viperPort=" + viperPort + ", igvPort=" + igvPort + ", csvDelimiter=" + csvDelimiter + ", collectionDelimiter=" + collectionDelimiter + ", enableClustering=" + enableClustering + ", breakpointTolerance=" + breakpointTolerance + ", workDir=" + workDir + ", fastaRef=" + fastaRef + ", igvJar=" + igvJar + ", bamDir=" + bamDir + ", keepVcfSimple=" + keepVcfSimple + ", excludeRefVcfCalls=" + excludeRefVcfCalls + ", numPrecomputedSnapshots=" + numPrecomputedSnapshots + ", xslxExportWindowSize=" + xslxExportWindowSize + ", viewRange=" + viewRange + ", xvfbDisplay=" + xvfbDisplay + ", xvfbWidth=" + xvfbWidth + ", xvfbHeight=" + xvfbHeight + ", igvMaxMemory=" + igvMaxMemory + '}';
     }
 
 }

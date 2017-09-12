@@ -62,7 +62,8 @@ public class APITest {
     @BeforeClass
     public static void setUp() {
 
-        ViperServerConfig conf = new ViperServerConfig(TestUtil.getResourceFile("examples.csv"));
+        ViperServerConfig conf = new ViperServerConfig();
+        conf.setAnalysisFile(TestUtil.getResourceFile("examples.csv"));
         conf.setViperPort(13337);
         conf.setIgvPort(13338);
         conf.setFastaRef(TestUtil.getResourceFile("api/mock-ref.fa"));
