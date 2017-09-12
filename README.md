@@ -10,7 +10,7 @@ If you are using Linux, it is recommended to install `Xvfb` with
 `sudo apt-get install xvfb`
 You can then run VIPER with
 `java -jar VIPER.jar config.json`
-to start the VIPER server, and open `http://localhost:<your-config-port>` in a browser tab.
+to start the VIPER server, and open `http://localhost:8090` in a browser tab.
 
 To build VIPER from source, `bower` and `gradle` need to be installed.
 You can then use `./build.sh` to create an executable version of the VIPER server.
