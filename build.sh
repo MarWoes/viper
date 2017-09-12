@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm -rf src/main/resources
 mkdir -p src/main/resources
 
 bower install
