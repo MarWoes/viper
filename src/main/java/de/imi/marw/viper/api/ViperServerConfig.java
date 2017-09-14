@@ -32,7 +32,7 @@ public class ViperServerConfig {
     private boolean enableClustering = true;
     private int breakpointTolerance = 3;
     private String workDir = "/tmp/viper";
-    private String fastaRef = "/tmp/ref.fa";
+    private String fastaRef = "hg19";
     private String igvJar = "igv.jar";
     private String bamDir = "/tmp/bam";
     private boolean keepVcfSimple = true;

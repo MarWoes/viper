@@ -1,6 +1,5 @@
 {
   "analysisFile": "/path/to/analysis",
   "workDir": "/path/to/work/dir",
-  "bamDir": "/path/to/bam/files",
-  "fastaRef": "/path/to/fasta"
+  "bamDir": "/path/to/bam/files"
 }
