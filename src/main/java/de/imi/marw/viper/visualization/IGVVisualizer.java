@@ -62,7 +62,7 @@ public class IGVVisualizer extends Thread {
         this.port = port;
         this.fastaRef = fastaRef;
         this.igvJar = igvJar;
-        this.commandQueue = new PriorityBlockingQueue<>(20, Comparator.reverseOrder());
+        this.commandQueue = new PriorityBlockingQueue<>(100, Comparator.reverseOrder());
         this.workDir = workDir;
         this.visualizationProgressMap = new ConcurrentHashMap<>();
         this.bamDir = bamDir;
@@ -172,11 +172,12 @@ public class IGVVisualizer extends Thread {
         return this.visualizationProgressMap.getOrDefault(key, false);
     }
 
-    public void scheduleSnapshot(String sample, String chr, int bp, boolean isUrgent) {
+    public synchronized void scheduleSnapshot(String sample, String chr, int bp, boolean isUrgent) {
 
         String key = sample + "-" + chr + "-" + bp;
+        boolean snapshotAlreadyScheduled = this.visualizationProgressMap.containsKey(key);
 
-        if (this.visualizationProgressMap.containsKey(key) && (!isUrgent || this.visualizationProgressMap.get(key))) {
+        if (snapshotAlreadyScheduled && (!isUrgent || this.visualizationProgressMap.get(key))) {
             return;
         }
 
@@ -199,10 +200,21 @@ public class IGVVisualizer extends Thread {
         IGVCommand command = new IGVCommand(key, subCommands, isUrgent, () -> this.visualizationProgressMap.put(key, true));
 
         if (isUrgent) {
-            this.commandQueue.remove(command);
+
+            boolean commandWasInQueue = this.commandQueue.remove(command);
+
+            // prevents race condition when command was already removed by
+            // visualization thread and added again
+            if (!snapshotAlreadyScheduled || commandWasInQueue) {
+                this.enqueueCommand(command);
+            }
+
+        } else {
+
+            this.enqueueCommand(command);
+
         }
 
-        this.enqueueCommand(command);
     }
 
     public void enqueueCommand(IGVCommand command) {
