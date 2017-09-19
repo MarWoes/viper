@@ -181,8 +181,6 @@ public class IGVVisualizer extends Thread {
             return;
         }
 
-        this.visualizationProgressMap.put(key, false);
-
         Path workdir = Paths.get(this.workDir);
         String imageFileName = workdir.resolve(key + ".png").toString();
 
@@ -206,11 +204,15 @@ public class IGVVisualizer extends Thread {
             // prevents race condition when command was already removed by
             // visualization thread and added again
             if (!snapshotAlreadyScheduled || commandWasInQueue) {
+
+                this.visualizationProgressMap.put(key, false);
                 this.enqueueCommand(command);
+
             }
 
         } else {
 
+            this.visualizationProgressMap.put(key, false);
             this.enqueueCommand(command);
 
         }
