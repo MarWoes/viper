@@ -1,0 +1,5 @@
+build-and-test-viper:
+  script:
+    - docker build --no-cache -t viper-docker-build .
+    - docker run --rm viper-docker-build
+    - docker rmi viper-docker-build
