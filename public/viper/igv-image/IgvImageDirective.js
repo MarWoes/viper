@@ -18,7 +18,8 @@
  */
 var module = angular.module('de.imi.marw.viper.igv.image', [
 ])
-.controller('IgvImageController', function ($scope, $timeout, $http) {
+.controller('IgvImageController', [ '$scope', '$timeout', '$http',
+                          function ( $scope,   $timeout,   $http) {
   var Ctrl = this;
 
   Ctrl.sleepMillis = 1000;
@@ -85,8 +86,8 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
     return variant['sample'] + '-' + variant[Ctrl.chrColumn] + '-' + variant[Ctrl.bpColumn];
   }
 
-})
-.directive('igvImage', function () {
+}])
+.directive('igvImage', [ function () {
   return {
     scope: {
       variant: '=variant',
@@ -99,4 +100,4 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
     templateUrl: 'viper/igv-image/igv-image.tpl.html',
     bindToController: true
   }
-})
+}]);

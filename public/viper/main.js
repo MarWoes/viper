@@ -27,7 +27,8 @@ var module = angular.module('de.imi.marw.viper',
     'ui.bootstrap'
   ]
 )
-.controller('ViperMainController', function($location, VariantTableService) {
+.controller('ViperMainController', [ '$location', 'VariantTableService',
+                             function($location,   VariantTableService) {
   var Ctrl = this;
 
   Ctrl.getCurrentRoute = getCurrentRoute;
@@ -45,8 +46,9 @@ var module = angular.module('de.imi.marw.viper',
       alert('An error occurred during saving.');
     })
   }
-})
-.config(function ($routeProvider) {
+}])
+.config([  '$routeProvider',
+  function ($routeProvider) {
   $routeProvider
     .when('/inspector', {
       templateUrl : 'viper/pages/inspector/inspector.html',
@@ -64,4 +66,4 @@ var module = angular.module('de.imi.marw.viper',
       controllerAs: 'exportPageCtrl'
     })
     .otherwise({redirectTo : '/inspector'})
-});
+}]);

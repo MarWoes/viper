@@ -19,7 +19,8 @@
 var module = angular.module('de.imi.marw.viper.export', [
   'de.imi.marw.viper.variant-table.service'
 ])
-.controller('ExportPageCtrl', function ($q, VariantTableService) {
+.controller('ExportPageCtrl',[ '$q', 'VariantTableService',
+                      function ($q,   VariantTableService) {
 
   var Ctrl = this;
 
@@ -34,4 +35,4 @@ var module = angular.module('de.imi.marw.viper.export', [
     Ctrl.unfilteredSize = data[1];
   })
 
-});
+}]);

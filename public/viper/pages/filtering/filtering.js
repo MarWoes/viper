@@ -23,7 +23,8 @@ var module = angular.module('de.imi.marw.viper.filtering', [
   'rzModule',
   'ui.select'
 ])
-.controller('FilteringPageCtrl', function (VariantTableService, $http) {
+.controller('FilteringPageCtrl', [ 'VariantTableService', '$http',
+                          function (VariantTableService,   $http) {
 
   var Ctrl = this;
 
@@ -107,8 +108,9 @@ var module = angular.module('de.imi.marw.viper.filtering', [
     })
   }
 
-})
-.controller('ColumnFiltersController', function (VariantTableService, $timeout, $scope) {
+}])
+.controller('ColumnFiltersController', [ 'VariantTableService', '$timeout', '$scope',
+                                function (VariantTableService,   $timeout,   $scope) {
   var Ctrl = this;
 
   Ctrl.filters = undefined;
@@ -182,8 +184,8 @@ var module = angular.module('de.imi.marw.viper.filtering', [
     Ctrl.applyFilters();
 
   }
-})
-.directive('columnFilters', function () {
+}])
+.directive('columnFilters', [ function () {
   return {
     scope: {
       onFilterApplied: "="
@@ -194,4 +196,4 @@ var module = angular.module('de.imi.marw.viper.filtering', [
     templateUrl: 'viper/pages/filtering/column-filters.tpl.html',
     bindToController: true
   }
-})
+}]);

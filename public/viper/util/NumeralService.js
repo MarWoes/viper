@@ -19,7 +19,8 @@
 var module = angular.module('de.imi.marw.viper.util.NumeralService', [
 
 ])
-.factory('NumeralService', function ($window) {
+.factory('NumeralService', [ '$window',
+                    function ($window) {
 
   var Service = { };
   Service.numeral = null;
@@ -65,4 +66,4 @@ var module = angular.module('de.imi.marw.viper.util.NumeralService', [
   }
 
   return Service;
-})
+}]);

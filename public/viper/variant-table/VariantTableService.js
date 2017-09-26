@@ -20,7 +20,8 @@
 var module = angular.module('de.imi.marw.viper.variant-table.service', [
   'de.imi.marw.viper.util.NumeralService'
 ])
-.factory('VariantTableService', function ($http, NumeralService) {
+.factory('VariantTableService', [ '$http', 'NumeralService',
+                         function ($http,   NumeralService) {
 
   var Service = { };
 
@@ -201,4 +202,4 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   }
 
   return Service;
-})
+}]);

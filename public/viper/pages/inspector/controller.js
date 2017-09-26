@@ -21,7 +21,8 @@ var module = angular.module('de.imi.marw.viper.inspector', [
   'de.imi.marw.viper.variant-table.service',
   'rzModule',
 ])
-.controller('InspectorPageCtrl', function (VariantTableService, $q, $http, $interval) {
+.controller('InspectorPageCtrl', [ 'VariantTableService', '$q', '$http', '$interval',
+                          function (VariantTableService,   $q,   $http,   $interval) {
 
   var Ctrl = this;
 
@@ -104,4 +105,4 @@ var module = angular.module('de.imi.marw.viper.inspector', [
 
   }
 
-})
+}]);
