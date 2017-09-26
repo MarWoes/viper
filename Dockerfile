@@ -8,7 +8,8 @@ RUN apt-get update && \
   curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
   apt-get install -y nodejs && \
   npm config set registry http://registry.npmjs.org/ && \
-  npm install -g bower
+  npm install -g bower && \
+  npm install -g grunt-cli
 
 RUN cd /viper && \
   curl -o igv.jar https://uni-muenster.sciebo.de/index.php/s/7YptrvcDLz56tn7/download && \

@@ -24,11 +24,15 @@
 
   -->
   <title>VIPER - Variant Inspector and Expert Rating tool</title>
+
+  <!-- build:css assets/css/style.min.css -->
   <link href="bower_components/bootstrap/dist/css/bootstrap.min.css"  rel="stylesheet">
   <link href="bower_components/angularjs-slider/dist/rzslider.min.css"  rel="stylesheet">
   <link href="bower_components/angular-ui-select/dist/select.min.css"  rel="stylesheet">
   <link href="css/main.css" rel="stylesheet">
+  <!-- endbuild -->
 
+  <!-- build:js assets/js/scripts.min.js -->
   <script type="text/javascript" src="viper/util/polyfills.js"></script>
   <script type="text/javascript" src="bower_components/numeral/numeral.js"></script>
   <script type="text/javascript" src="bower_components/angular/angular.js"></script>
@@ -45,6 +49,7 @@
   <script type="text/javascript" src="viper/pages/filtering/filtering.js"></script>
   <script type="text/javascript" src="viper/pages/export/controller.js"></script>
   <script type="text/javascript" src="viper/main.js"></script>
+  <!-- endbuild -->
 </head>
 
 <body ng-app="de.imi.marw.viper" ng-cloak ng-controller="ViperMainController as viperMainCtrl">

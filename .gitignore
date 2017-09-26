@@ -8,3 +8,5 @@ igv.jar
 /build/
 /public/bower_components
 /src/main/resources
+/node_modules/
+.tmp

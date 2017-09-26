@@ -1,8 +1,11 @@
 #!/bin/bash
 rm -rf src/main/resources
+rm -rf build/grunt
 mkdir -p src/main/resources
 
 bower --allow-root install
-cp -r public src/main/resources/public
+npm install
+grunt
+cp -r build/grunt src/main/resources/public
 
 gradle fatJar
