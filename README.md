@@ -31,8 +31,6 @@ These parameters act as input to the VIPER server and must be specified by the u
 | *analysisFile* | File containing variant calls (must be a `.csv` or `.vcf` file). `.csv` files must include a header with column names. Columns `sample`, `svType`, `chr1`, `bp1`, `chr2` and `bp2` are mandatory.
 | *workDir* | Directory that stores images by igv and decision progress. **WARNING: Do not delete this directory, or your progress will be lost** |
 | *bamDir* | Directory containing your `.bam`/`.bai`  sample files. |
-| *fastaRef* | `.fasta` reference file or IGV reference key (e.g. `hg19`). |
-
 
 ### Optional parameters
 
@@ -56,6 +54,7 @@ These parameters are optional and may be omitted using the default values:
 | *xvfbHeight* | When using `Xvfb`, create a window with this height. | `1680` |
 | *igvMaxMemory* | Maximum heap size of the IGV process. | `1200` |
 | *xslxExportWindowSize* | When creating `.xlsx` files, this improves memory usage. Only change if exceptions occur during `.xlsx` export. | `1000` |
+| *fastaRef* | `.fasta` reference file or IGV reference key (e.g. `hg19`). |
 
 ### Examples
 
