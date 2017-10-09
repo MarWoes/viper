@@ -2,7 +2,7 @@
 "viperId":"VAR01",
 "viperDecision":"NA",
 "sample":["SIM1"],
-"svType":["DELETION"],
+"type":["DELETION"],
 "chr1":["1"],
 "bp1":3.6933582E7,
 "chr2":["1"],

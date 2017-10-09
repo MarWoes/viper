@@ -28,7 +28,7 @@ These parameters act as input to the VIPER server and must be specified by the u
 
 | parameter | description |
 |-------| ----------- |
-| *analysisFile* | File containing variant calls (must be a `.csv` or `.vcf` file). `.csv` files must include a header with column names. Columns `sample`, `svType`, `chr1`, `bp1`, `chr2` and `bp2` are mandatory.
+| *analysisFile* | File containing variant calls (must be a `.csv` or `.vcf` file). `.csv` files must include a header with column names. Columns `sample`, `type`, `chr1`, `bp1`, `chr2` and `bp2` are mandatory.
 | *workDir* | Directory that stores images by igv and decision progress. **WARNING: Do not delete this directory, or your progress will be lost** |
 | *bamDir* | Directory containing your `.bam`/`.bai`  sample files. |
 

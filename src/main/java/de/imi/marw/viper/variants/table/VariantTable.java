@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  */
 public class VariantTable {
 
-    public static final String TYPE_COLUMN_NAME = "svType";
+    public static final String TYPE_COLUMN_NAME = "type";
     public static final String SAMPLE_COLUMN_NAME = "sample";
     public static final String CHR1_COLUMN_NAME = "chr1";
     public static final String CHR2_COLUMN_NAME = "chr2";

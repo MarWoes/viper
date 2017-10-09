@@ -1,6 +1,6 @@
 [{
 "sample":"SIM1",
-"svType":"DELETION",
+"type":"DELETION",
 "chr1":"2",
 "bp1":2.5459763E7,
 "chr2":"2",
@@ -16,7 +16,7 @@
 "combinedValue":[null]
 },{
 "sample":"SIM1",
-"svType":"DELETION",
+"type":"DELETION",
 "chr1":"2",
 "bp1":2.5459763E7,
 "chr2":"2",
@@ -32,7 +32,7 @@
 "combinedValue":[null]
 },{
 "sample":"SIM1",
-"svType":"DELETION",
+"type":"DELETION",
 "chr1":"2",
 "bp1":2.5459764E7,
 "chr2":"2",

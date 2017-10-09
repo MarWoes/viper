@@ -41,7 +41,7 @@ public class CallStringifierTest {
         VariantTable table = new CsvTableReader(';', ",").readTable(TestUtil.getResourceFile("examples-small.csv"));
 
         List<List<String>> expectedStrings = Arrays.asList(
-                Arrays.asList("sample", "svType", "chr1", "bp1", "chr2", "bp2", "strColl", "numColl", "naColl"),
+                Arrays.asList("sample", "type", "chr1", "bp1", "chr2", "bp2", "strColl", "numColl", "naColl"),
                 Arrays.asList("SAMPLE1", "DELETION", "X", "1000000", "X", "2000000", "hallo, huhu", "1", "NA"),
                 Arrays.asList("SAMPLE1", "DELETION", "1", "1000000", "1", "2000000", "blub", "1, 2, 3, 4", "NA"),
                 Arrays.asList("SAMPLE2", "DELETION", "2", "1000000", "2", "2000000", "NA", "NA", "NA"),
