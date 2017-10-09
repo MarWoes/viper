@@ -29,7 +29,7 @@ public class ViperServerConfig {
     private int igvPort = 9090;
     private char csvDelimiter = ';';
     private String collectionDelimiter = ",";
-    private boolean enableClustering = true;
+    private boolean enableGrouping = true;
     private int breakpointTolerance = 3;
     private String workDir = "/tmp/viper";
     private String fastaRef = "hg19";
@@ -201,16 +201,16 @@ public class ViperServerConfig {
     }
 
     public boolean isClusteringEnabled() {
-        return enableClustering;
+        return enableGrouping;
     }
 
-    public void setEnableClustering(boolean enableClustering) {
-        this.enableClustering = enableClustering;
+    public void setEnableGrouping(boolean enableGrouping) {
+        this.enableGrouping = enableGrouping;
     }
 
     @Override
     public String toString() {
-        return "ViperServerConfig{" + "analysisFile=" + analysisFile + ", viperPort=" + viperPort + ", igvPort=" + igvPort + ", csvDelimiter=" + csvDelimiter + ", collectionDelimiter=" + collectionDelimiter + ", enableClustering=" + enableClustering + ", breakpointTolerance=" + breakpointTolerance + ", workDir=" + workDir + ", fastaRef=" + fastaRef + ", igvJar=" + igvJar + ", bamDir=" + bamDir + ", keepVcfSimple=" + keepVcfSimple + ", excludeRefVcfCalls=" + excludeRefVcfCalls + ", numPrecomputedSnapshots=" + numPrecomputedSnapshots + ", xslxExportWindowSize=" + xslxExportWindowSize + ", viewRange=" + viewRange + ", xvfbDisplay=" + xvfbDisplay + ", xvfbWidth=" + xvfbWidth + ", xvfbHeight=" + xvfbHeight + ", igvMaxMemory=" + igvMaxMemory + '}';
+        return "ViperServerConfig{" + "analysisFile=" + analysisFile + ", viperPort=" + viperPort + ", igvPort=" + igvPort + ", csvDelimiter=" + csvDelimiter + ", collectionDelimiter=" + collectionDelimiter + ", enableClustering=" + enableGrouping + ", breakpointTolerance=" + breakpointTolerance + ", workDir=" + workDir + ", fastaRef=" + fastaRef + ", igvJar=" + igvJar + ", bamDir=" + bamDir + ", keepVcfSimple=" + keepVcfSimple + ", excludeRefVcfCalls=" + excludeRefVcfCalls + ", numPrecomputedSnapshots=" + numPrecomputedSnapshots + ", xslxExportWindowSize=" + xslxExportWindowSize + ", viewRange=" + viewRange + ", xvfbDisplay=" + xvfbDisplay + ", xvfbWidth=" + xvfbWidth + ", xvfbHeight=" + xvfbHeight + ", igvMaxMemory=" + igvMaxMemory + '}';
     }
 
 }

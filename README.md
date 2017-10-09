@@ -38,7 +38,7 @@ These parameters are optional and may be omitted using the default values:
 
 | parameter | description | default value |
 |-------| ----------- |-----|
-| *enableClustering* | Group together calls with same chromosome values and similar breakpoint values | `true` |
+| *enableGrouping* | Group together calls with same chromosome values and similar breakpoint values | `true` |
 | *breakpointTolerance* | If grouping is enabled, this is the maximum distance where two breakpoints are considered similar. | `3` |
 | *csvDelimiter* | Character that delimits csv columns. | `";"` |
 | *collectionDelimiter* | A single cell in a csv table may have multiple values. These values are seperated by this character. |`","` |
