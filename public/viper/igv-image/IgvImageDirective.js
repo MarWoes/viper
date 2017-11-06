@@ -58,7 +58,9 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
 
       if (currentKey === key && res.data === 'true') {
 
-        Ctrl.breakpointImageLink = '/api/snapshots/' + currentKey;
+        // key might contain url component parameters such as '&' or '?' so we
+        // need to escape those characters
+        Ctrl.breakpointImageLink = '/api/snapshots/' + encodeURIComponent(currentKey);
 
       } else if (currentKey === key && res.data === 'false') {
 
