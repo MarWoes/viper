@@ -52,7 +52,29 @@ public class SnapshotRoutes extends ViperRoutes {
 
         get("/is-available", this::isAvailable, gson::toJson);
 
+        get("/configuration", this::getIGVConfiguration, gson::toJson);
+
+        get("/configuration-hash", this::getIGVConfigurationHash);
+
+        post("/configuration", this::setIGVConfigurationValue);
+
         get("/:key", this::getSnapshotByKey);
+    }
+
+    private Object getIGVConfigurationHash(Request req, Response res) {
+        return igv.getConfigurationHash();
+    }
+
+    private Object setIGVConfigurationValue(Request req, Response res) {
+
+        String key = req.queryParams("key");
+        String value = req.queryParams("value");
+
+        return igv.setConfigurationValue(key, value);
+    }
+
+    private Object getIGVConfiguration(Request req, Response res) {
+        return igv.getConfiguration();
     }
 
     private Object isAvailable(Request req, Response res) {

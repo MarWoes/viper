@@ -260,7 +260,23 @@ public class APITest {
     @Test(timeout = 30000)
     public void snapshotCorrectlyCreated() throws IOException, UnirestException, InterruptedException {
 
-        String expectedKey = "SIM1-2-25459763";
+        String expectedHash = "65b579ebab70e1a613eeefdd89dd7317";
+
+        assertEquals(expectedHash, Unirest.get(URL_BASE + "/api/snapshots/configuration-hash")
+                .asString()
+                .getBody()
+        );
+
+        expectedHash = "bb902a22c58612ab398edebf960bc16d";
+
+        assertEquals(expectedHash, Unirest.post(URL_BASE + "/api/snapshots/configuration")
+                .field("key", "SAM.SHOW_SOFT_CLIPPED")
+                .field("value", "false")
+                .asString()
+                .getBody()
+        );
+
+        String expectedKey = "SIM1-2-25459763-" + expectedHash;
 
         assertEquals("false", Unirest.get(URL_BASE + "/api/snapshots/is-available")
                 .queryString("key", expectedKey)

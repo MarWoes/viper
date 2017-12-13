@@ -24,16 +24,23 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  *
@@ -41,12 +48,15 @@ import java.util.logging.Logger;
  */
 public class IGVVisualizer extends Thread {
 
+    private static final String IGV_PROPERTY_FILE = "igv.properties";
+
     private final int viewRange;
     private final int xvfbDisplay;
     private final int xvfbWidth;
     private final int xvfbHeight;
     private final int jvmMBSpace;
 
+    private final Map<String, String> igvConfiguration;
     private final Map<String, Boolean> visualizationProgressMap;
     private final PriorityBlockingQueue<IGVCommand> commandQueue;
     private final int port;
@@ -71,6 +81,7 @@ public class IGVVisualizer extends Thread {
         this.xvfbWidth = xvfbWidth;
         this.xvfbHeight = xvfbHeight;
         this.jvmMBSpace = jvmMBSpace;
+        this.igvConfiguration = new HashMap<>();
     }
 
     @Override
@@ -78,6 +89,7 @@ public class IGVVisualizer extends Thread {
         try {
             Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
             startIGVProcess();
+            loadIGVConfiguration();
             this.client = connectToIGV();
             this.setupViewer();
 
@@ -122,7 +134,7 @@ public class IGVVisualizer extends Thread {
                 "-jar", this.igvJar,
                 "-p", "" + port,
                 "-g", this.fastaRef,
-                "-o", "igv.properties"
+                "-o", IGV_PROPERTY_FILE
         )
                 .inheritIO();
 
@@ -174,7 +186,7 @@ public class IGVVisualizer extends Thread {
 
     public synchronized void scheduleSnapshot(String sample, String chr, int bp, boolean isUrgent) {
 
-        String key = sample + "-" + chr + "-" + bp;
+        String key = sample + "-" + chr + "-" + bp + "-" + this.getConfigurationHash();
         boolean snapshotAlreadyScheduled = this.visualizationProgressMap.containsKey(key);
 
         if (snapshotAlreadyScheduled && (!isUrgent || this.visualizationProgressMap.get(key))) {
@@ -268,6 +280,57 @@ public class IGVVisualizer extends Thread {
             return exitVal == 0;
         } catch (IOException | InterruptedException ex) {
             return false;
+        }
+    }
+
+    public synchronized String setConfigurationValue(String key, String value) {
+
+        List<IGVCommand> commandsInProgress = new ArrayList<>();
+        this.commandQueue.drainTo(commandsInProgress);
+        this.commandQueue.clear();
+
+        for (IGVCommand commandInProgress : commandsInProgress) {
+            this.visualizationProgressMap.remove(commandInProgress.getKey());
+        }
+
+        this.igvConfiguration.put(key, value);
+
+        IGVCommand command = new IGVCommand("pref-change", new String[]{"preference " + key + " " + value}, true, () -> {
+        });
+
+        this.enqueueCommand(command);
+
+        return this.getConfigurationHash();
+    }
+
+    public Map<String, String> getConfiguration() {
+        return this.igvConfiguration;
+    }
+
+    public String getConfigurationHash() {
+
+        String stringToBeHashed = this.igvConfiguration.entrySet()
+                .stream()
+                .map((entry) -> entry.getKey() + entry.getValue())
+                .sorted()
+                .reduce((a, b) -> a + b)
+                .orElse("");
+
+        return DigestUtils.md5Hex(stringToBeHashed);
+    }
+
+    private void loadIGVConfiguration() throws IOException {
+
+        try (Stream<String> stream = Files.lines(Paths.get(IGV_PROPERTY_FILE))) {
+
+            Map<String, String> configurationValues = stream.sorted()
+                    .map(line -> line.split("="))
+                    .collect(Collectors.toMap(splitPair -> splitPair[0], splitPair -> splitPair[1]));
+
+            this.igvConfiguration.putAll(configurationValues);
+
+        } catch (IOException ex) {
+            Logger.getLogger(IGVVisualizer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
