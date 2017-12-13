@@ -62,6 +62,8 @@
 
       <hr>
 
+      <h4>Details</h4>
+
       <table class="table table-bordered table-condensed">
 
         <thead>
@@ -80,6 +82,35 @@
         </tbody>
 
       </table>
+
+      <hr>
+
+      <h4>Visualization settings</h4>
+
+      <form>
+        <div class="form-group">
+          <label>Color by:</label>
+          <select class="form-control" ng-model="inspectorCtrl.configuration['SAM.COLOR_BY']" ng-change="inspectorCtrl.changeIGVSetting('SAM.COLOR_BY')">
+            <option value="NONE">no color</option>
+            <option value="READ_STRAND">read strand</option>
+            <option value="INSERT_SIZE">insert size</option>
+            <option value="PAIR_ORIENTATION">pair orientation</option>
+            <option value="UNEXPECTED_PAIR">insert size and pair orientation</option>
+            <option value="FIRST_OF_PAIR_STRAND">first-of-pair strand</option>
+            <option value="READ_GROUP">read group</option>
+          </select>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input
+              type="checkbox"
+              ng-model="inspectorCtrl.configuration['SAM.SHOW_SOFT_CLIPPED']"
+              ng-change="inspectorCtrl.changeIGVSetting('SAM.SHOW_SOFT_CLIPPED')"
+              ng-true-value="'true'"
+              ng-false-value="'false'"> Show soft clips
+          </label>
+        </div>
+      </form>
     </div>
 
   </div>
@@ -92,12 +123,20 @@
         <div class="row">
 
           <div class="col-md-6">
-            <igv-image variant="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]" chr-column="'chr1'", bp-column="'bp1'">
+            <igv-image
+              variant="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]"
+              chr-column="'chr1'"
+              bp-column="'bp1'"
+              igv-configuration-hash="inspectorCtrl.configurationHash">
             </igv-image>
           </div>
 
           <div class="col-md-6">
-            <igv-image variant="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]" chr-column="'chr2'", bp-column="'bp2'">
+            <igv-image
+              variant="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]"
+              chr-column="'chr2'"
+              bp-column="'bp2'"
+              igv-configuration-hash="inspectorCtrl.configurationHash">
             </igv-image>
           </div>
 

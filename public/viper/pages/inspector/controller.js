@@ -37,24 +37,43 @@ var module = angular.module('de.imi.marw.viper.inspector', [
   Ctrl.onIndexChange = onIndexChange;
   Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
   Ctrl.sendDecision = sendDecision;
+  Ctrl.changeIGVSetting = changeIGVSetting;
+
   Ctrl.init();
 
   function init() {
     $q.all([
       VariantTableService.getSize(),
-      VariantTableService.getRelatedColumnNames()
+      VariantTableService.getRelatedColumnNames(),
+      VariantTableService.getIGVConfiguration(),
+      VariantTableService.getIGVConfigurationHash()
     ]).then(function (data) {
 
       var tableSize = data[0];
       var columnNames = data[1];
+      var configuration = data[2];
+      var configurationHash = data[3];
 
       Ctrl.tableSize = tableSize;
       Ctrl.index     = VariantTableService.currentVariantIndex;
       Ctrl.columnNames = columnNames;
 
+      Ctrl.configuration = configuration;
+      Ctrl.configurationHash = configurationHash;
+
       Ctrl.onIndexChange();
     });
 
+  }
+
+  function changeIGVSetting(key) {
+    var value = Ctrl.configuration[key];
+    var promise = VariantTableService.setIGVConfigurationValue(key, value);
+
+    promise.then(function (newHash) {
+      Ctrl.configurationHash = newHash.data;
+      VariantTableService.scheduleSnapshot(Ctrl.index, Ctrl.relatedCallIndex);
+    });
   }
 
   function sendDecision (decision) {

@@ -31,6 +31,8 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.applyFilters = applyFilters;
   Service.getColumnNames = getColumnNames;
   Service.getCurrentFilters = getCurrentFilters;
+  Service.getIGVConfiguration = getIGVConfiguration;
+  Service.getIGVConfigurationHash = getIGVConfigurationHash;
   Service.getRelatedCalls = getRelatedCalls;
   Service.getRelatedColumnNames = getRelatedColumnNames;
   Service.getSize = getSize;
@@ -42,6 +44,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.searchStringColumn = searchStringColumn
   Service.sendAllDecisions = sendAllDecisions;
   Service.sendDecision = sendDecision;
+  Service.setIGVConfigurationValue = setIGVConfigurationValue;
   Service.variantPropertyToString = variantPropertyToString;
 
   function applyFilters (filters) {
@@ -143,6 +146,26 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
       params: {
         index: index,
         relatedCallIndex: relatedCallIndex
+      }
+    });
+
+    return promise;
+  }
+
+  function getIGVConfiguration() {
+    return performRequest("/api/snapshots/configuration");
+  }
+
+  function getIGVConfigurationHash() {
+    return performRequest("/api/snapshots/configuration-hash");
+  }
+
+  function setIGVConfigurationValue(key, value) {
+
+    var promise = $http.post("/api/snapshots/configuration", {}, {
+      params: {
+        key: key,
+        value: value
       }
     });
 

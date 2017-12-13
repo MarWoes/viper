@@ -28,10 +28,11 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
   Ctrl.chrColumn    = null;
   Ctrl.bpColumn     = null;
   Ctrl.breakpointImageLink = null;
+  Ctrl.igvConfigurationHash = null;
 
   Ctrl.getSnapshotKey = getSnapshotKey;
   Ctrl.isSnapshotAvailable = isSnapshotAvailable;
-  Ctrl.onVariantChange = onVariantChange;
+  Ctrl.onUpdate = onUpdate;
 
   Ctrl.init = init;
 
@@ -39,22 +40,25 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
 
   function init () {
 
-    $scope.$watch(function () { return Ctrl.variant}, Ctrl.onVariantChange);
+    $scope.$watch(function () { return { variant: Ctrl.variant, hash: Ctrl.igvConfigurationHash }; }, Ctrl.onUpdate, true);
 
   }
 
-  function onVariantChange (newVal, oldVal) {
+  function onUpdate (newVal, oldVal) {
 
-    if (newVal == null) return;
+    var variant = newVal.variant;
+    var hash = newVal.hash;
 
-    var key = Ctrl.getSnapshotKey(newVal);
+    if (variant == null || hash == null) return;
+
+    var key = Ctrl.getSnapshotKey(variant, hash);
 
     Ctrl.isSnapshotAvailable(key)
     .then(function (res) {
 
       var isAvailable = res.data;
 
-      var currentKey = Ctrl.getSnapshotKey(Ctrl.variant);
+      var currentKey = Ctrl.getSnapshotKey(Ctrl.variant, Ctrl.igvConfigurationHash);
 
       if (currentKey === key && res.data === 'true') {
 
@@ -67,7 +71,7 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
         Ctrl.breakpointImageLink = null;
 
         $timeout(function () {
-          Ctrl.onVariantChange(newVal, oldVal);
+          Ctrl.onUpdate(newVal, oldVal);
         }, Ctrl.sleepMillis);
 
       }
@@ -84,8 +88,8 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
     return promise;
   }
 
-  function getSnapshotKey(variant) {
-    return variant['sample'] + '-' + variant[Ctrl.chrColumn] + '-' + variant[Ctrl.bpColumn];
+  function getSnapshotKey(variant, hash) {
+    return variant['sample'] + '-' + variant[Ctrl.chrColumn] + '-' + variant[Ctrl.bpColumn] + "-" + hash;
   }
 
 }])
@@ -94,7 +98,8 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
     scope: {
       variant: '=variant',
       chrColumn: '=chrColumn',
-      bpColumn: '=bpColumn'
+      bpColumn: '=bpColumn',
+      igvConfigurationHash: '=igvConfigurationHash'
     },
     restrict: 'E',
     controller: 'IgvImageController',
