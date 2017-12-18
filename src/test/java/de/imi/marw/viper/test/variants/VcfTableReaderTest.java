@@ -34,12 +34,12 @@ import org.junit.Test;
 public class VcfTableReaderTest {
 
     //TODO: check all combinations
-    private void checkVcfCorrectness(boolean simple, boolean excludeReferenceCalls, String expectedFileName) {
+    private void checkVcfCorrectness(boolean simple, boolean excludeReferenceCalls, String targetVcf, String expectedFileName) {
 
         CsvTableReader rd = new CsvTableReader(';', ",");
         CallStringifier strf = new CallStringifier(",");
         VariantTable expected = rd.readTable(TestUtil.getResourceFile(expectedFileName));
-        VariantTable actual = new VcfTableReader(simple, excludeReferenceCalls).readTable(TestUtil.getResourceFile("examples.vcf"));
+        VariantTable actual = new VcfTableReader(simple, excludeReferenceCalls).readTable(TestUtil.getResourceFile(targetVcf));
 
         assertEquals(expected.getNumberOfCalls(), actual.getNumberOfCalls());
 
@@ -56,21 +56,28 @@ public class VcfTableReaderTest {
     @Test
     public void allSimpleCallsCorrectlyLoaded() {
 
-        checkVcfCorrectness(true, false, "vcf-import-simple-all.csv");
+        checkVcfCorrectness(true, false, "examples.vcf", "vcf-import-simple-all.csv");
 
     }
 
     @Test
     public void allNonRefCallsCorrectlyLoaded() {
 
-        checkVcfCorrectness(true, true, "vcf-import-simple-nonref.csv");
+        checkVcfCorrectness(true, true, "examples.vcf", "vcf-import-simple-nonref.csv");
 
     }
 
     @Test
     public void allNonRefComplexCallsCorrectlyLoaded() {
 
-        checkVcfCorrectness(false, true, "vcf-import-complex-nonref.csv");
+        checkVcfCorrectness(false, true, "examples.vcf", "vcf-import-complex-nonref.csv");
+
+    }
+
+    @Test
+    public void minimalVcfNonRefComplexCallsCorrectlyLoaded() {
+
+        checkVcfCorrectness(false, false, "example-minimal.vcf", "vcf-import-minimal-complex-nonref.csv");
 
     }
 

@@ -1,0 +1,13 @@
+##fileformat=VCFv4.1
+##fileDate=20090805
+##source=myImputationProgramV3.1
+##reference=file:///seq/references/1000GenomesPilot-NCBI36.fasta
+##contig=<ID=20,length=62435964,assembly=B36,md5=f126cdf8a6e0c7f379d618ff66beb2da,species="Homo sapiens",taxonomy=x>
+##phasing=partial
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
+##INFO=<ID=BQ,Number=A,Type=Float,Description="Base quality">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=GN,Number=.,Type=String,Description="Gene name">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA00001
+20	14370	rs6054257	G	A	29	.	DP=14;AF=0.5;BQ=42	GT:GN	0|1	COOKIES

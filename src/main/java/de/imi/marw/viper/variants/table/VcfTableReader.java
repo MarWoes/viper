@@ -46,7 +46,6 @@ public class VcfTableReader implements TableReader {
     private List<String> columns;
     private List<String> prefixedColumns;
     private List<VariantPropertyType> types;
-    private List<Boolean> valuesDefinedPerSample;
     private boolean simple;
     private boolean excludeReferenceCalls;
 
@@ -106,7 +105,6 @@ public class VcfTableReader implements TableReader {
         columns.add(info.getID());
         prefixedColumns.add(prefix + ":" + info.getID());
         types.add(convertVcfToVariantType(info));
-        valuesDefinedPerSample.add(info.getCountType() == VCFHeaderLineCount.G);
     }
 
     private void extractColumnsAndTypes(VCFHeader header) {
@@ -203,19 +201,14 @@ public class VcfTableReader implements TableReader {
         return vcfFieldValues;
     }
 
-    private Object extractAttributeValues(VariantContext context, String sample, String attribute, VariantPropertyType type, boolean isDefinedPerSample) {
+    private Object extractAttributeValues(VariantContext context, String attribute, VariantPropertyType type) {
 
-        int sampleIndex = context.getSampleNamesOrderedByName().indexOf(sample);
         List<String> values = context.getAttributeAsStringList(attribute, null);
 
         switch (type) {
 
             case NUMERIC: {
-                if (isDefinedPerSample) {
-                    return Double.parseDouble(values.get(sampleIndex));
-                } else {
-                    return values.isEmpty() ? null : Double.parseDouble(values.get(0));
-                }
+                return values.isEmpty() ? null : Double.parseDouble(values.get(0));
             }
             case NUMERIC_COLLECTION: {
                 Collection<Double> coll = values.stream()
@@ -226,11 +219,7 @@ public class VcfTableReader implements TableReader {
                 return coll.isEmpty() ? new ArrayList<>(Arrays.asList((Object) null)) : coll;
             }
             case STRING: {
-                if (isDefinedPerSample) {
-                    return values.get(sampleIndex) == null ? "NA" : values.get(sampleIndex);
-                } else {
-                    return values.isEmpty() ? "NA" : values.get(0);
-                }
+                return values.isEmpty() ? "NA" : values.get(0);
             }
             case STRING_COLLECTION: {
                 return values == null || values.isEmpty() ? new ArrayList<>(Arrays.asList("NA")) : values.stream()
@@ -314,7 +303,7 @@ public class VcfTableReader implements TableReader {
             String attribute = columns.get(i);
             VariantPropertyType type = types.get(i);
 
-            call.add(extractAttributeValues(context, sample, attribute, type, valuesDefinedPerSample.get(i)));
+            call.add(extractAttributeValues(context, attribute, type));
 
         }
 
@@ -352,15 +341,10 @@ public class VcfTableReader implements TableReader {
 
         List<String> newColumns = new ArrayList<>(Arrays.asList(VariantTable.MANDATORY_FIELDS));
         List<VariantPropertyType> newTypes = new ArrayList<>(Arrays.asList(VariantTable.MANDATORY_FIELDS_TYPES));
-        List<Boolean> newValuesDefinedPerSample = IntStream.range(0, VariantTable.MANDATORY_FIELDS.length)
-                .boxed()
-                .map(i -> false)
-                .collect(Collectors.toList());
 
         this.columns = newColumns;
         this.prefixedColumns = new ArrayList<>();
         this.types = newTypes;
-        this.valuesDefinedPerSample = newValuesDefinedPerSample;
 
         extractColumnsAndTypes(header);
 
