@@ -35,7 +35,7 @@ public class ViperServerConfig {
     private String fastaRef = "hg19";
     private String igvJar = "igv.jar";
     private String bamDir = "/tmp/bam";
-    private boolean keepVcfSimple = true;
+    private boolean keepVcfSimple = false;
     private boolean excludeRefVcfCalls = true;
     private int numPrecomputedSnapshots = 10;
     private int xslxExportWindowSize = 1000;
