@@ -19,6 +19,7 @@
 package de.imi.marw.viper.variants.table;
 
 import de.imi.marw.viper.variants.VariantPropertyType;
+import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFCompoundHeaderLine;
@@ -47,11 +48,11 @@ public class VcfTableReader implements TableReader {
     private List<VariantPropertyType> types;
     private List<Boolean> valuesDefinedPerSample;
     private boolean simple;
-    private boolean excludeNonReferenceCalls;
+    private boolean excludeReferenceCalls;
 
-    public VcfTableReader(boolean simple, boolean excludeNonReferenceCalls) {
+    public VcfTableReader(boolean simple, boolean excludeReferenceCalls) {
         this.simple = simple;
-        this.excludeNonReferenceCalls = excludeNonReferenceCalls;
+        this.excludeReferenceCalls = excludeReferenceCalls;
     }
 
     private static final String VCF_ID_FIELD = "ID";
@@ -369,9 +370,12 @@ public class VcfTableReader implements TableReader {
 
             for (String sample : context.getSampleNamesOrderedByName()) {
 
-                boolean hasNonReferenceAlleles = context.getGenotype(sample).getAlleles().stream().anyMatch(allele -> allele.isNonReference());
+                List<Allele> alleles = context.getGenotype(sample).getAlleles();
 
-                if (!hasNonReferenceAlleles && isExcludingNonReferenceCalls()) {
+                boolean hasSampleGenotype = alleles.stream().anyMatch(allele -> allele.isCalled());
+                boolean hasNonReferenceAlleles = alleles.stream().anyMatch(allele -> allele.isNonReference());
+
+                if (!hasSampleGenotype || (!hasNonReferenceAlleles && isExcludingReferenceCalls())) {
                     continue;
                 }
 
@@ -393,12 +397,12 @@ public class VcfTableReader implements TableReader {
         this.simple = simple;
     }
 
-    public boolean isExcludingNonReferenceCalls() {
-        return excludeNonReferenceCalls;
+    public boolean isExcludingReferenceCalls() {
+        return excludeReferenceCalls;
     }
 
-    public void setExcludeNonReferenceCalls(boolean excludeNonReferenceCalls) {
-        this.excludeNonReferenceCalls = excludeNonReferenceCalls;
+    public void setExcludeReferenceCalls(boolean excludeReferenceCalls) {
+        this.excludeReferenceCalls = excludeReferenceCalls;
     }
 
 }
