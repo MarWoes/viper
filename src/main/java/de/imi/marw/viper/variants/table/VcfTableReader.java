@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  *
@@ -135,7 +134,7 @@ public class VcfTableReader implements TableReader {
         }
 
         for (VCFFormatHeaderLine formatHeaderLine : header.getFormatHeaderLines()) {
-            extractColumnAndType(formatHeaderLine, "FORMAT");
+            extractColumnAndType(formatHeaderLine, "GT");
         }
 
     }
@@ -312,22 +311,8 @@ public class VcfTableReader implements TableReader {
             String columnName = columns.get(i);
             Genotype genotype = context.getGenotype(sample);
 
-            if (columnName.equals("GT")) {
-
-                String delimiter = genotype.isPhased() ? "|" : "/";
-
-                String genotypeString = genotype.getAlleles().stream()
-                        .map(allele -> allele.getDisplayString())
-                        .collect(Collectors.joining(delimiter));
-
-                call.add(genotypeString);
-
-            } else {
-
-                Object genotypeAttribute = genotype.getAnyAttribute(columnName);
-                call.add(extractGenotypeValues(genotypeAttribute, types.get(i)));
-
-            }
+            Object genotypeAttribute = genotype.getAnyAttribute(columnName);
+            call.add(extractGenotypeValues(genotypeAttribute, types.get(i)));
 
         }
 
