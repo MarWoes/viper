@@ -49,7 +49,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class IGVVisualizer extends Thread {
 
     private static final double DEFAULT_VIEW_RANGE = 25.00;
-    private static final int DEFAULT_PANEL_HEIGHT = 1000;
+    private static final double DEFAULT_PANEL_HEIGHT = 1000.00;
 
     private static final String IGV_PROPERTY_FILE = "igv.properties";
 
@@ -313,7 +313,9 @@ public class IGVVisualizer extends Thread {
             }
             case CONFIG_PANEL_HEIGHT_KEY: {
 
-                IGVCommand command = new IGVCommand("pref-change", new String[]{"maxPanelHeight " + value}, true, () -> {
+                int panelHeight = ((Double) configurationMap.get(CONFIG_PANEL_HEIGHT_KEY)).intValue();
+
+                IGVCommand command = new IGVCommand("pref-change", new String[]{"maxPanelHeight " + panelHeight}, true, () -> {
                 });
 
                 this.enqueueCommand(command);
