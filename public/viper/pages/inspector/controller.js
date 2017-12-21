@@ -67,7 +67,11 @@ var module = angular.module('de.imi.marw.viper.inspector', [
   }
 
   function changeIGVSetting(key) {
+
     var value = Ctrl.configuration[key];
+
+    if (value == null) return;
+
     var promise = VariantTableService.setIGVConfigurationValue(key, value);
 
     promise.then(function (newHash) {

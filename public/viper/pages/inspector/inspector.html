@@ -110,14 +110,14 @@
               ng-false-value="'false'"> Show soft clips
           </label>
         </div>
-        <div class="form-group">
-          <label>Visualization range:</label>
+        <div class="form-group" ng-class="{ 'has-error': inspectorCtrl.configuration['VIPER.VIEW_RANGE'] == null}">
+          <label>Breakpoint visualization range:</label>
           <input
             type="number"
             class="form-control"
             min="5"
             ng-min="5"
-            ng-pattern="/^-?[0-9][^\.]*$/"
+            ng-pattern="/^[0-9]+$/"
             ng-model="inspectorCtrl.configuration['VIPER.VIEW_RANGE']"
             ng-change="inspectorCtrl.changeIGVSetting('VIPER.VIEW_RANGE')">
           </select>
