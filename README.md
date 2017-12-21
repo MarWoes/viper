@@ -3,7 +3,7 @@ VIPER (Variant InsPector and Expert Rating tool) can be utilised to view variant
 If you are using VIPER for the first time, you should have a look at at the [short tutorial](https://github.com/MarWoes/viper/wiki/Getting-started).
 
 ## Requirements
-To run the VIPER server, a Java version >= 1.8 is required. You can check your java version by running `java -version` in a console.
+To run the VIPER server, Java version 1.8 is required. You can check your java version by running `java -version` in a console.
 Make sure to use a modern web browser, as VIPER is heavily reliant on the browser's Javascript environment.
 
 ## Installation

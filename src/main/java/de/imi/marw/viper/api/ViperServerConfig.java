@@ -39,7 +39,6 @@ public class ViperServerConfig {
     private boolean excludeRefVcfCalls = true;
     private int numPrecomputedSnapshots = 10;
     private int xslxExportWindowSize = 1000;
-    private int viewRange = 25;
     private int xvfbDisplay = 4499;
     private int xvfbWidth = 1280;
     private int xvfbHeight = 1680;
@@ -152,14 +151,6 @@ public class ViperServerConfig {
         this.xslxExportWindowSize = xslxExportWindowSize;
     }
 
-    public int getViewRange() {
-        return viewRange;
-    }
-
-    public void setViewRange(int viewRange) {
-        this.viewRange = viewRange;
-    }
-
     public int getXvfbDisplay() {
         return xvfbDisplay;
     }
@@ -210,7 +201,7 @@ public class ViperServerConfig {
 
     @Override
     public String toString() {
-        return "ViperServerConfig{" + "analysisFile=" + analysisFile + ", viperPort=" + viperPort + ", igvPort=" + igvPort + ", csvDelimiter=" + csvDelimiter + ", collectionDelimiter=" + collectionDelimiter + ", enableClustering=" + enableGrouping + ", breakpointTolerance=" + breakpointTolerance + ", workDir=" + workDir + ", fastaRef=" + fastaRef + ", igvJar=" + igvJar + ", bamDir=" + bamDir + ", keepVcfSimple=" + keepVcfSimple + ", excludeRefVcfCalls=" + excludeRefVcfCalls + ", numPrecomputedSnapshots=" + numPrecomputedSnapshots + ", xslxExportWindowSize=" + xslxExportWindowSize + ", viewRange=" + viewRange + ", xvfbDisplay=" + xvfbDisplay + ", xvfbWidth=" + xvfbWidth + ", xvfbHeight=" + xvfbHeight + ", igvMaxMemory=" + igvMaxMemory + '}';
+        return "ViperServerConfig{" + "analysisFile=" + analysisFile + ", viperPort=" + viperPort + ", igvPort=" + igvPort + ", csvDelimiter=" + csvDelimiter + ", collectionDelimiter=" + collectionDelimiter + ", enableClustering=" + enableGrouping + ", breakpointTolerance=" + breakpointTolerance + ", workDir=" + workDir + ", fastaRef=" + fastaRef + ", igvJar=" + igvJar + ", bamDir=" + bamDir + ", keepVcfSimple=" + keepVcfSimple + ", excludeRefVcfCalls=" + excludeRefVcfCalls + ", numPrecomputedSnapshots=" + numPrecomputedSnapshots + ", xslxExportWindowSize=" + xslxExportWindowSize + ", xvfbDisplay=" + xvfbDisplay + ", xvfbWidth=" + xvfbWidth + ", xvfbHeight=" + xvfbHeight + ", igvMaxMemory=" + igvMaxMemory + '}';
     }
 
 }

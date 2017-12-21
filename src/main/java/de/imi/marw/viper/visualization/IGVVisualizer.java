@@ -48,15 +48,20 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class IGVVisualizer extends Thread {
 
+    private static final double DEFAULT_VIEW_RANGE = 25.00;
+    private static final int DEFAULT_PANEL_HEIGHT = 1000;
+
     private static final String IGV_PROPERTY_FILE = "igv.properties";
 
-    private final int viewRange;
+    private static final String CONFIG_VIEW_RANGE_KEY = "VIPER.VIEW_RANGE";
+    private static final String CONFIG_PANEL_HEIGHT_KEY = "VIPER.PANEL_HEIGHT";
+
     private final int xvfbDisplay;
     private final int xvfbWidth;
     private final int xvfbHeight;
     private final int jvmMBSpace;
 
-    private final Map<String, String> igvConfiguration;
+    private final Map<String, Object> configurationMap;
     private final Map<String, Boolean> visualizationProgressMap;
     private final PriorityBlockingQueue<IGVCommand> commandQueue;
     private final int port;
@@ -68,7 +73,7 @@ public class IGVVisualizer extends Thread {
     private Process xvfbServer;
     private Socket client;
 
-    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir, int viewRange, int xvfbDisplay, int xvfbWidth, int xvfbHeight, int jvmMBSpace) {
+    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir, int xvfbDisplay, int xvfbWidth, int xvfbHeight, int jvmMBSpace) {
         this.port = port;
         this.fastaRef = fastaRef;
         this.igvJar = igvJar;
@@ -76,12 +81,11 @@ public class IGVVisualizer extends Thread {
         this.workDir = workDir;
         this.visualizationProgressMap = new ConcurrentHashMap<>();
         this.bamDir = bamDir;
-        this.viewRange = viewRange;
         this.xvfbDisplay = xvfbDisplay;
         this.xvfbWidth = xvfbWidth;
         this.xvfbHeight = xvfbHeight;
         this.jvmMBSpace = jvmMBSpace;
-        this.igvConfiguration = new HashMap<>();
+        this.configurationMap = new HashMap<>();
     }
 
     @Override
@@ -199,11 +203,13 @@ public class IGVVisualizer extends Thread {
         Path bamDir = Paths.get(this.bamDir);
         String bamName = bamDir.resolve(sample + ".bam").toString();
 
+        int configViewRange = ((Double) (this.configurationMap.get(CONFIG_VIEW_RANGE_KEY))).intValue();
+
         String[] subCommands = new String[]{
             "new",
             "load " + bamName,
             "collapse",
-            "goto " + chr + ":" + (bp - viewRange) + "-" + (bp + viewRange),
+            "goto " + chr + ":" + (bp - configViewRange) + "-" + (bp + configViewRange),
             "snapshot " + imageFileName
         };
 
@@ -236,7 +242,7 @@ public class IGVVisualizer extends Thread {
     }
 
     private void setupViewer() {
-        this.enqueueCommand(new IGVCommand("setup", new String[]{"setSleepInterval 0"}, true, () -> {
+        this.enqueueCommand(new IGVCommand("pref-change", new String[]{"setSleepInterval 0"}, true, () -> {
         }));
     }
 
@@ -283,33 +289,54 @@ public class IGVVisualizer extends Thread {
         }
     }
 
-    public synchronized String setConfigurationValue(String key, String value) {
+    public synchronized String setConfigurationValue(String key, Object value) {
 
         List<IGVCommand> commandsInProgress = new ArrayList<>();
         this.commandQueue.drainTo(commandsInProgress);
         this.commandQueue.clear();
 
         for (IGVCommand commandInProgress : commandsInProgress) {
+
+            if ("pref-change".equals(commandInProgress.getKey())) {
+                continue;
+            }
+
             this.visualizationProgressMap.remove(commandInProgress.getKey());
         }
 
-        this.igvConfiguration.put(key, value);
+        this.configurationMap.put(key, value);
 
-        IGVCommand command = new IGVCommand("pref-change", new String[]{"preference " + key + " " + value}, true, () -> {
-        });
+        switch (key) {
+            // nothing to be done, only key in config is needed
+            case CONFIG_VIEW_RANGE_KEY: {
+                break;
+            }
+            case CONFIG_PANEL_HEIGHT_KEY: {
 
-        this.enqueueCommand(command);
+                IGVCommand command = new IGVCommand("pref-change", new String[]{"maxPanelHeight " + value}, true, () -> {
+                });
+
+                this.enqueueCommand(command);
+                break;
+            }
+            default: {
+                IGVCommand command = new IGVCommand("pref-change", new String[]{"preference " + key + " " + value}, true, () -> {
+                });
+
+                this.enqueueCommand(command);
+            }
+        }
 
         return this.getConfigurationHash();
     }
 
-    public Map<String, String> getConfiguration() {
-        return this.igvConfiguration;
+    public Map<String, Object> getConfiguration() {
+        return this.configurationMap;
     }
 
     public String getConfigurationHash() {
 
-        String stringToBeHashed = this.igvConfiguration.entrySet()
+        String stringToBeHashed = this.configurationMap.entrySet()
                 .stream()
                 .map((entry) -> entry.getKey() + entry.getValue())
                 .sorted()
@@ -327,7 +354,10 @@ public class IGVVisualizer extends Thread {
                     .map(line -> line.split("="))
                     .collect(Collectors.toMap(splitPair -> splitPair[0], splitPair -> splitPair[1]));
 
-            this.igvConfiguration.putAll(configurationValues);
+            this.configurationMap.putAll(configurationValues);
+
+            this.configurationMap.put(CONFIG_PANEL_HEIGHT_KEY, DEFAULT_PANEL_HEIGHT);
+            this.configurationMap.put(CONFIG_VIEW_RANGE_KEY, DEFAULT_VIEW_RANGE);
 
         } catch (IOException ex) {
             Logger.getLogger(IGVVisualizer.class.getName()).log(Level.SEVERE, null, ex);

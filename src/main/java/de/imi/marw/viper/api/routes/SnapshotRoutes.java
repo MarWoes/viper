@@ -68,7 +68,7 @@ public class SnapshotRoutes extends ViperRoutes {
     private Object setIGVConfigurationValue(Request req, Response res) {
 
         String key = req.queryParams("key");
-        String value = req.queryParams("value");
+        Object value = gson.fromJson(req.queryParams("value"), Object.class);
 
         return igv.setConfigurationValue(key, value);
     }

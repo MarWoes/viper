@@ -130,7 +130,6 @@ public class ViperServer {
                 this.config.getIgvPort(),
                 this.config.getWorkDir(),
                 this.config.getBamDir(),
-                this.config.getViewRange(),
                 this.config.getXvfbDisplay(),
                 this.config.getXvfbWidth(),
                 this.config.getXvfbHeight(),
