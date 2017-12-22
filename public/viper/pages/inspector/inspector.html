@@ -105,9 +105,7 @@
             <input
               type="checkbox"
               ng-model="inspectorCtrl.configuration['SAM.SHOW_SOFT_CLIPPED']"
-              ng-change="inspectorCtrl.changeIGVSetting('SAM.SHOW_SOFT_CLIPPED')"
-              ng-true-value="'true'"
-              ng-false-value="'false'"> Show soft clips
+              ng-change="inspectorCtrl.changeIGVSetting('SAM.SHOW_SOFT_CLIPPED')"> Show soft clips
           </label>
         </div>
         <div class="form-group" ng-class="{ 'has-error': inspectorCtrl.configuration['VIPER.VIEW_RANGE'] == null}">
@@ -122,8 +120,28 @@
             ng-change="inspectorCtrl.changeIGVSetting('VIPER.VIEW_RANGE')">
           </select>
         </div>
+        <div class="checkbox">
+          <label>
+            <input
+              type="checkbox"
+              ng-model="inspectorCtrl.configuration['SAM.DOWNSAMPLE_READS']"
+              ng-change="inspectorCtrl.changeIGVSetting('SAM.DOWNSAMPLE_READS')"> Downsample reads
+          </label>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error': inspectorCtrl.configuration['SAM.MAX_LEVELS'] == null}">
+          <label>Downsample coverage to maximum of:</label>
+          <input
+            type="number"
+            class="form-control"
+            min="10"
+            ng-min="10"
+            ng-pattern="/^[0-9]+$/"
+            ng-model="inspectorCtrl.configuration['SAM.MAX_LEVELS']"
+            ng-change="inspectorCtrl.changeIGVSetting('SAM.MAX_LEVELS')">
+          </select>
+        </div>
         <div class="form-group" ng-class="{ 'has-error': inspectorCtrl.configuration['VIPER.PANEL_HEIGHT'] == null}">
-          <label>Image height:</label>
+          <label>Maximum image panel height:</label>
           <input
             type="number"
             class="form-control"

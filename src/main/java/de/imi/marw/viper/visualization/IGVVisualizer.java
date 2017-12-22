@@ -48,8 +48,8 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class IGVVisualizer extends Thread {
 
-    private static final double DEFAULT_VIEW_RANGE = 25.00;
-    private static final double DEFAULT_PANEL_HEIGHT = 1000.00;
+    private static final int DEFAULT_VIEW_RANGE = 25;
+    private static final int DEFAULT_PANEL_HEIGHT = 1000;
 
     private static final String IGV_PROPERTY_FILE = "igv.properties";
 
@@ -203,7 +203,7 @@ public class IGVVisualizer extends Thread {
         Path bamDir = Paths.get(this.bamDir);
         String bamName = bamDir.resolve(sample + ".bam").toString();
 
-        int configViewRange = ((Double) (this.configurationMap.get(CONFIG_VIEW_RANGE_KEY))).intValue();
+        int configViewRange = (int) this.configurationMap.get(CONFIG_VIEW_RANGE_KEY);
 
         String[] subCommands = new String[]{
             "new",
@@ -313,7 +313,7 @@ public class IGVVisualizer extends Thread {
             }
             case CONFIG_PANEL_HEIGHT_KEY: {
 
-                int panelHeight = ((Double) configurationMap.get(CONFIG_PANEL_HEIGHT_KEY)).intValue();
+                int panelHeight = (int) configurationMap.get(CONFIG_PANEL_HEIGHT_KEY);
 
                 IGVCommand command = new IGVCommand("pref-change", new String[]{"maxPanelHeight " + panelHeight}, true, () -> {
                 });
@@ -352,9 +352,26 @@ public class IGVVisualizer extends Thread {
 
         try (Stream<String> stream = Files.lines(Paths.get(IGV_PROPERTY_FILE))) {
 
-            Map<String, String> configurationValues = stream.sorted()
+            Map<String, Object> configurationValues = stream.sorted()
                     .map(line -> line.split("="))
-                    .collect(Collectors.toMap(splitPair -> splitPair[0], splitPair -> splitPair[1]));
+                    .collect(Collectors.toMap(splitPair -> splitPair[0], splitPair -> {
+
+                        String rawString = splitPair[1];
+
+                        if ("true".equals(rawString)) {
+                            return true;
+                        }
+                        if ("FALSE".equals(rawString)) {
+                            return false;
+                        }
+
+                        try {
+                            return Integer.parseInt(rawString, 10);
+                        } catch (NumberFormatException ex) {
+                            return rawString;
+                        }
+
+                    }));
 
             this.configurationMap.putAll(configurationValues);
 

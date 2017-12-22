@@ -70,6 +70,10 @@ public class SnapshotRoutes extends ViperRoutes {
         String key = req.queryParams("key");
         Object value = gson.fromJson(req.queryParams("value"), Object.class);
 
+        if (value instanceof Double) {
+            value = ((Double) value).intValue();
+        }
+
         return igv.setConfigurationValue(key, value);
     }
 
