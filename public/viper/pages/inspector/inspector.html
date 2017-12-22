@@ -100,6 +100,17 @@
             <option value="READ_GROUP">read group</option>
           </select>
         </div>
+        <div class="form-group">
+          <label>Group by:</label>
+          <select class="form-control" ng-model="inspectorCtrl.configuration['SAM.GROUP_OPTION']" ng-change="inspectorCtrl.changeIGVSetting('SAM.GROUP_OPTION')">
+            <option value="NONE">none</option>
+            <option value="STRAND">read strand</option>
+            <option value="MATE_CHROMOSOME">chromosome of mate</option>
+            <option value="PAIR_ORIENTATION">pair orientation</option>
+            <option value="FIRST_OF_PAIR_STRAND">first-of-pair strand</option>
+            <option value="READ_GROUP">read group</option>
+          </select>
+        </div>
         <div class="checkbox">
           <label>
             <input
