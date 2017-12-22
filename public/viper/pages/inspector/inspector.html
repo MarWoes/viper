@@ -129,7 +129,7 @@
           </label>
         </div>
         <div class="form-group" ng-class="{ 'has-error': inspectorCtrl.configuration['SAM.MAX_LEVELS'] == null}">
-          <label>Downsample coverage to maximum of:</label>
+          <label>Downsample reads to window maximum of:</label>
           <input
             type="number"
             class="form-control"
@@ -139,6 +139,14 @@
             ng-model="inspectorCtrl.configuration['SAM.MAX_LEVELS']"
             ng-change="inspectorCtrl.changeIGVSetting('SAM.MAX_LEVELS')">
           </select>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input
+              type="checkbox"
+              ng-model="inspectorCtrl.configuration['SAM.FILTER_DUPLICATES']"
+              ng-change="inspectorCtrl.changeIGVSetting('SAM.FILTER_DUPLICATES')"> Filter duplicate reads
+          </label>
         </div>
         <div class="form-group" ng-class="{ 'has-error': inspectorCtrl.configuration['VIPER.PANEL_HEIGHT'] == null}">
           <label>Maximum image panel height:</label>
