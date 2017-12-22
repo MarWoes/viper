@@ -70,14 +70,16 @@ public class Main {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             System.err.println("[ERROR] File not found. Make sure your configuration paths are set correctly.");
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
 
             if (server != null) {
                 server.stop();
             }
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 
+            if (server != null) {
+                server.stop();
+            }
         }
     }
 }
