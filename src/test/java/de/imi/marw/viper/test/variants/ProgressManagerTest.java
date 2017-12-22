@@ -23,6 +23,7 @@ import de.imi.marw.viper.variants.VariantClusterBuilder;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.DecisionManager;
 import de.imi.marw.viper.variants.table.VariantTable;
+import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ import org.junit.Test;
  */
 public class ProgressManagerTest {
 
-    private VariantTable loadData() {
+    private VariantTable loadData() throws IOException {
         VariantTable unclustered = new CsvTableReader(';', ",").readTable(TestUtil.getResourceFile("examples-unclustered.csv"));
         VariantTable clustered = new VariantClusterBuilder(5, false).clusterVariantTable(unclustered).getClusteredTable();
 
@@ -40,7 +41,7 @@ public class ProgressManagerTest {
     }
 
     @Test
-    public void progressIsProperlySavedAndLoaded() {
+    public void progressIsProperlySavedAndLoaded() throws IOException {
 
         VariantTable clustered1 = loadData();
         VariantTable clustered2 = loadData();

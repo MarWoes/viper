@@ -18,10 +18,13 @@
  */
 package de.imi.marw.viper.variants.table;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /**
  *
  * @author marius
  */
 public interface TableReader {
-    VariantTable readTable(String fileName);
+    VariantTable readTable(String fileName) throws FileNotFoundException, IOException;
 }

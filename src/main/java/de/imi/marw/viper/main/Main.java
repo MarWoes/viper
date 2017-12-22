@@ -58,17 +58,26 @@ public class Main {
             configFileName = "config.json";
         }
 
+        ViperServer server = null;
+
         try {
 
             ViperServerConfig config = loadConfig(configFileName);
 
-            ViperServer server = new ViperServer(config);
+            server = new ViperServer(config);
             server.start();
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("[ERROR] File not found. Make sure your configuration paths are set correctly.");
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+
+            if (server != null) {
+                server.stop();
+            }
+
         }
     }
 }

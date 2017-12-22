@@ -60,7 +60,7 @@ public class APITest {
     }
 
     @BeforeClass
-    public static void setUp() {
+    public static void setUp() throws IOException {
 
         ViperServerConfig conf = new ViperServerConfig();
         conf.setAnalysisFile(TestUtil.getResourceFile("examples.csv"));

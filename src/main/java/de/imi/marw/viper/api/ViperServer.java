@@ -30,6 +30,8 @@ import de.imi.marw.viper.variants.VariantTableCluster;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.visualization.IGVVisualizer;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import spark.Spark;
@@ -46,6 +48,7 @@ public class ViperServer {
     private final Gson gson;
     private final VariantClusterBuilder clusterer;
     private VariantTableCluster variantTableCluster;
+    private boolean sparkInitDone;
 
     private IGVVisualizer igv;
 
@@ -54,32 +57,41 @@ public class ViperServer {
         this.config = config;
         this.gson = new GsonBuilder().serializeNulls().create();
         this.clusterer = new VariantClusterBuilder(config.getBreakpointTolerance(), !config.isClusteringEnabled());
+        this.sparkInitDone = false;
     }
 
-    public void start() {
+    public void start() throws FileNotFoundException, IOException {
+
+        this.variantTableCluster = this.loadVariants();
 
         this.igv = this.setupIGV();
         this.igv.start();
-
-        this.variantTableCluster = this.loadVariants();
 
         this.igv.awaitStartup();
 
         this.setupRoutes();
 
         awaitInitialization();
+
     }
 
     public void stop() {
-        this.igv.shutdown();
-        Spark.stop();
+
+        if (this.igv != null) {
+            this.igv.shutdown();
+        }
+
+        if (this.sparkInitDone) {
+            Spark.stop();
+        }
+
     }
 
     public ViperServerConfig getConfig() {
         return this.config;
     }
 
-    private VariantTableCluster loadVariants() {
+    private VariantTableCluster loadVariants() throws FileNotFoundException, IOException {
         TableReaderMultiplexer reader = new TableReaderMultiplexer(config);
 
         VariantTable unclusteredTable = reader.readTable(config.getAnalysisFile());
@@ -102,6 +114,8 @@ public class ViperServer {
         setupTableApi();
 
         init();
+
+        this.sparkInitDone = true;
     }
 
     private void setupTableApi() {

@@ -20,6 +20,7 @@ package de.imi.marw.viper.variants.table;
 
 import de.imi.marw.viper.util.Util;
 import de.imi.marw.viper.variants.VariantPropertyType;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -182,7 +183,7 @@ public class CsvTableReader implements TableReader {
     }
 
     @Override
-    public VariantTable readTable(String fileName) {
+    public VariantTable readTable(String fileName) throws FileNotFoundException, IOException {
         try (Reader reader = new FileReader(fileName)) {
 
             List<String[]> rawStrings = new ArrayList<>();
@@ -208,11 +209,7 @@ public class CsvTableReader implements TableReader {
 
             return new VariantTable(parsedCalls, Arrays.asList(header), Arrays.asList(types));
 
-        } catch (IOException ex) {
-            Logger.getLogger(CsvTableReader.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return null;
     }
 
 }

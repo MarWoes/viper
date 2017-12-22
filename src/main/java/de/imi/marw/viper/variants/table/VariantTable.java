@@ -275,7 +275,7 @@ public class VariantTable {
     private void checkDataIntegrity() {
 
         if (Arrays.stream(MANDATORY_FIELDS).anyMatch((mandatory) -> !columnNames.contains(mandatory))) {
-            throw new IllegalArgumentException("Data must contain all mandatory columns");
+            throw new IllegalArgumentException("Variant call tables must contain all mandatory columns: " + Arrays.toString(VariantTable.MANDATORY_FIELDS) + ". Make sure you use the correct delimiter.");
         }
 
         if (types.size() != columnNames.size()) {

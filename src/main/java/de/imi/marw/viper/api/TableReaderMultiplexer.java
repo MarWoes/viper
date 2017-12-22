@@ -22,6 +22,8 @@ import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.TableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.variants.table.VcfTableReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  *
@@ -38,7 +40,7 @@ public class TableReaderMultiplexer implements TableReader {
     }
 
     @Override
-    public VariantTable readTable(String fileName) {
+    public VariantTable readTable(String fileName) throws FileNotFoundException, IOException {
 
         if (fileName.endsWith(".vcf")) {
             return vcfReader.readTable(fileName);

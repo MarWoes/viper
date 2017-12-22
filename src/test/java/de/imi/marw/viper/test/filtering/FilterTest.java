@@ -26,6 +26,7 @@ import de.imi.marw.viper.variants.filters.StringCollectionFilter;
 import de.imi.marw.viper.variants.filters.StringFilter;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,7 +40,7 @@ import org.junit.Test;
  */
 public class FilterTest {
 
-    private VariantTable loadData() {
+    private VariantTable loadData() throws IOException {
         CsvTableReader reader = new CsvTableReader(';', ",");
         VariantTable table = reader.readTable(TestUtil.getResourceFile("examples-filtering.csv"));
 
@@ -58,7 +59,7 @@ public class FilterTest {
     }
 
     @Test
-    public void numericFiltersWorkingCorrectly() {
+    public void numericFiltersWorkingCorrectly() throws IOException {
 
         VariantTable table = loadData();
 
@@ -79,7 +80,7 @@ public class FilterTest {
     }
 
     @Test
-    public void numericCollectionFilterWorkingCorrectly() {
+    public void numericCollectionFilterWorkingCorrectly() throws IOException {
 
         VariantTable table = loadData();
 
@@ -100,7 +101,7 @@ public class FilterTest {
     }
 
     @Test
-    public void stringFilterWorkingCorrectly() {
+    public void stringFilterWorkingCorrectly() throws IOException {
 
         VariantTable table = loadData();
 
@@ -120,7 +121,7 @@ public class FilterTest {
     }
 
     @Test
-    public void stringCollectionFilterWorkingCorrectly() {
+    public void stringCollectionFilterWorkingCorrectly() throws IOException {
 
         VariantTable table = loadData();
 
@@ -144,7 +145,7 @@ public class FilterTest {
     }
 
     @Test
-    public void multipleFiltersWorkingCorrectly() {
+    public void multipleFiltersWorkingCorrectly() throws IOException {
 
         VariantTable table = loadData();
 

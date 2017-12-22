@@ -23,6 +23,7 @@ import de.imi.marw.viper.variants.VariantClusterBuilder;
 import de.imi.marw.viper.variants.VariantTableCluster;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,7 +43,7 @@ public class VariantTableClusterTest {
     }
 
     @Test
-    public void variantsAreCorrectlyClustered() {
+    public void variantsAreCorrectlyClustered() throws IOException {
 
         CsvTableReader reader = new CsvTableReader(';', ",");
 

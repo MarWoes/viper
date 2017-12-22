@@ -23,6 +23,7 @@ import de.imi.marw.viper.variants.table.CallStringifier;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.variants.table.VcfTableReader;
+import java.io.IOException;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -34,7 +35,7 @@ import org.junit.Test;
 public class VcfTableReaderTest {
 
     //TODO: check all combinations
-    private void checkVcfCorrectness(boolean simple, boolean excludeReferenceCalls, String targetVcf, String expectedFileName) {
+    private void checkVcfCorrectness(boolean simple, boolean excludeReferenceCalls, String targetVcf, String expectedFileName) throws IOException {
 
         CsvTableReader rd = new CsvTableReader(';', ",");
         CallStringifier strf = new CallStringifier(",");
@@ -54,28 +55,28 @@ public class VcfTableReaderTest {
     }
 
     @Test
-    public void allSimpleCallsCorrectlyLoaded() {
+    public void allSimpleCallsCorrectlyLoaded() throws IOException {
 
         checkVcfCorrectness(true, false, "examples.vcf", "vcf-import-simple-all.csv");
 
     }
 
     @Test
-    public void allNonRefCallsCorrectlyLoaded() {
+    public void allNonRefCallsCorrectlyLoaded() throws IOException {
 
         checkVcfCorrectness(true, true, "examples.vcf", "vcf-import-simple-nonref.csv");
 
     }
 
     @Test
-    public void allNonRefComplexCallsCorrectlyLoaded() {
+    public void allNonRefComplexCallsCorrectlyLoaded() throws IOException {
 
         checkVcfCorrectness(false, true, "examples.vcf", "vcf-import-complex-nonref.csv");
 
     }
 
     @Test
-    public void minimalVcfNonRefComplexCallsCorrectlyLoaded() {
+    public void minimalVcfNonRefComplexCallsCorrectlyLoaded() throws IOException {
 
         checkVcfCorrectness(false, false, "example-minimal.vcf", "vcf-import-minimal-complex-nonref.csv");
 

@@ -22,6 +22,7 @@ import de.imi.marw.viper.test.util.TestUtil;
 import de.imi.marw.viper.variants.VariantPropertyType;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,7 +47,7 @@ public class CsvTableReaderTest {
     }
 
     @Test
-    public void correctlyReadsSmallExample() {
+    public void correctlyReadsSmallExample() throws IOException {
 
         CsvTableReader reader = new CsvTableReader(';', ",");
 
@@ -81,7 +82,7 @@ public class CsvTableReaderTest {
     }
 
     @Test
-    public void correctlyReadsBiggerExample() {
+    public void correctlyReadsBiggerExample() throws IOException {
         CsvTableReader reader = new CsvTableReader(';', ",");
 
         VariantTable table = reader.readTable(TestUtil.getResourceFile("examples.csv"));
@@ -127,7 +128,7 @@ public class CsvTableReaderTest {
     }
 
     @Test
-    public void correctlyReadsEdgeCases() {
+    public void correctlyReadsEdgeCases() throws IOException {
         CsvTableReader reader = new CsvTableReader('\t', "_");
 
         VariantTable table = reader.readTable(TestUtil.getResourceFile("examples-edge-cases.csv"));
@@ -155,7 +156,7 @@ public class CsvTableReaderTest {
     }
 
     @Test
-    public void correctlyReadsEmptyTable() {
+    public void correctlyReadsEmptyTable() throws IOException {
 
         CsvTableReader reader = new CsvTableReader(';', ",");
 

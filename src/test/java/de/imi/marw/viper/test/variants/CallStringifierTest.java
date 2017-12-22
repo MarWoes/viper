@@ -22,6 +22,7 @@ import de.imi.marw.viper.test.util.TestUtil;
 import de.imi.marw.viper.variants.table.CallStringifier;
 import de.imi.marw.viper.variants.table.CsvTableReader;
 import de.imi.marw.viper.variants.table.VariantTable;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
@@ -34,7 +35,7 @@ import org.junit.Test;
 public class CallStringifierTest {
 
     @Test
-    public void callsAreCorrectlyTurnedIntoStrings() {
+    public void callsAreCorrectlyTurnedIntoStrings() throws IOException {
 
         CallStringifier callStringifier = new CallStringifier(",");
 
