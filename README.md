@@ -44,11 +44,10 @@ These parameters are optional and may be omitted using the default values:
 | *collectionDelimiter* | A single cell in a csv table may have multiple values. These values are seperated by this character. |`","` |
 | *viperPort* | Port that VIPER listens on. | `8090` |
 | *igvPort* | Port that IGV uses to communicate with VIPER | `9090` |
-| *keepVcfSimple* | Use only mandatory vcf columns and ignore additional INFO and genotype information | `true` |
+| *keepVcfSimple* | Use only mandatory vcf columns and ignore additional INFO and genotype information | `false` |
 | *excludeRefVcfCalls* | Ignore calls that are marked as reference calls. | `true`
 | *igvJar* | Path to IGV jar file. | `"igv.jar"`|
 | *numPrecomputedSnapshots* | Precompute this number of breakpoint images to minimize visualization waiting time. | `10` |
-| *viewRange* | A region of `[bp - viewRange, bp + viewRange]` is visualized using IGV. | `25` |
 | *xvfbDisplay* | When using `Xvfb`, use this number as display number. | `1234` |
 | *xvfbWidth* | When using `Xvfb`, create a window with this width. | `1280` |
 | *xvfbHeight* | When using `Xvfb`, create a window with this height. | `1680` |
