@@ -61,3 +61,11 @@ Some example `.bam` files and sample `.csv`call files can be found on [Sciebo](h
 
 ---
 The VIPER icon was provided by courtesy of [Niké Jenny Bruinsma](https://thenounproject.com/search/?q=snake&i=158882).
+
+### Improving VIPER
+You encountered any errors or have ideas that might improve VIPER?
+Feel free to open an [issue](https://github.com/MarWoes/viper/issues) or write me an e-mail: [mar.w@wwu.de](mailto:mar.w@wwu.de)
+
+### Citing
+Please make sure to cite the [applications note](https://doi.org/10.1093/bioinformatics/bty022) when using VIPER for research purposes:
+> Marius Wöste, Martin Dugas; VIPER: a web application for rapid expert review of variant calls, Bioinformatics
