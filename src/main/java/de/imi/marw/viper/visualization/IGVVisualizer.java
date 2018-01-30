@@ -361,7 +361,7 @@ public class IGVVisualizer extends Thread {
                         if ("true".equals(rawString)) {
                             return true;
                         }
-                        if ("FALSE".equals(rawString)) {
+                        if ("false".equals(rawString)) {
                             return false;
                         }
 
