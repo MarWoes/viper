@@ -106,7 +106,7 @@
           <input
             type="text"
             class="form-control"
-            ng-pattern="/^[a-zA-Z]{2}$/"
+            ng-pattern="/^[A-Za-z][A-Za-z0-9]$/"
             ng-model="inspectorCtrl.configuration['SAM.COLOR_BY_TAG']"
             ng-change="inspectorCtrl.changeIGVSetting('SAM.COLOR_BY_TAG')">
           </select>
