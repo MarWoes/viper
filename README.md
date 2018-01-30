@@ -53,19 +53,20 @@ These parameters are optional and may be omitted using the default values:
 | *xvfbHeight* | When using `Xvfb`, create a window with this height. | `1680` |
 | *igvMaxMemory* | Maximum heap size of the IGV process. | `1200` |
 | *xslxExportWindowSize* | When creating `.xlsx` files, this improves memory usage. Only change if exceptions occur during `.xlsx` export. | `1000` |
-| *fastaRef* | `.fasta` reference file or IGV reference key (e.g. `hg19`). |
+| *fastaRef* | `.fasta` reference file or IGV reference key (e.g. `hg19`). Set to a `.fasta` file for improved performance.|
 
-### Examples
+## Examples
 
 Some example `.bam` files and sample `.csv`call files can be found on [Sciebo](https://uni-muenster.sciebo.de/index.php/s/Qf6xIn2WDOyHhFN).
 
----
-The VIPER icon was provided by courtesy of [Niké Jenny Bruinsma](https://thenounproject.com/search/?q=snake&i=158882).
 
-### Improving VIPER
+## Improving VIPER
 You encountered any errors or have ideas that might improve VIPER?
 Feel free to open an [issue](https://github.com/MarWoes/viper/issues) or write me an e-mail: [mar.w@wwu.de](mailto:mar.w@wwu.de)
 
-### Citing
+## Citing
 Please make sure to cite the [applications note](https://doi.org/10.1093/bioinformatics/bty022) when using VIPER for research purposes:
 > Marius Wöste, Martin Dugas; VIPER: a web application for rapid expert review of variant calls, Bioinformatics
+
+---
+The VIPER icon was provided by courtesy of [Niké Jenny Bruinsma](https://thenounproject.com/search/?q=snake&i=158882).
