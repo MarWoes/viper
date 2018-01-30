@@ -101,7 +101,7 @@
             <option value="TAG">tag</option>
           </select>
         </div>
-        <div class="form-group" ng-class="{ 'has-error': inspectorCtrl.configuration['SAM.COLOR_BY_TAG'] == null}">
+        <div ng-if="inspectorCtrl.configuration['SAM.COLOR_BY'] == 'TAG'" class="form-group" ng-class="{ 'has-error': inspectorCtrl.configuration['SAM.COLOR_BY_TAG'] == null}">
           <label>Color reads by tag:</label>
           <input
             type="text"
