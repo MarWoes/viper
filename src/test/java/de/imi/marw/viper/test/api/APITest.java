@@ -66,7 +66,7 @@ public class APITest {
         conf.setAnalysisFile(TestUtil.getResourceFile("examples.csv"));
         conf.setViperPort(13337);
         conf.setIgvPort(13338);
-        conf.setFastaRef(TestUtil.getResourceFile("api/mock-ref.fa"));
+        conf.setFastaRef("hg19");
 
         testServer = new ViperServer(conf);
         testServer.start();
