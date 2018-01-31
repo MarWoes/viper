@@ -10,8 +10,9 @@ cp -r build/grunt src/main/resources/public
 
 gradle fatJar
 
-rm -rf build/zip
+rm -rf build/zip/
 mkdir -p build/zip
+
 cp build/libs/VIPER-all.jar build/zip/VIPER.jar
 cp config.json build/zip/
 cp igv.properties build/zip/

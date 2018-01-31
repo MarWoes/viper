@@ -1,5 +1,10 @@
 build-and-test-viper:
   script:
+    - rm -rf artifacts/ && mkdir artifacts/
     - docker build --no-cache -t viper-docker-build .
-    - docker run --rm viper-docker-build
+    - docker run --rm -v ${PWD}/artifacts:/artifacts viper-docker-build
     - docker rmi viper-docker-build
+  artifacts:
+    paths:
+    - artifacts/*.zip
+    expire_in: 1 month
