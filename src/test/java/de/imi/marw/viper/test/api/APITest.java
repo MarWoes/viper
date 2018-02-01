@@ -257,7 +257,7 @@ public class APITest {
         }
     }
 
-    @Test(timeout = 30000)
+    @Test(timeout = 120000)
     public void snapshotCorrectlyCreated() throws IOException, UnirestException, InterruptedException {
 
         String expectedHash = "9edf767920e6f0ce4217dc541a5c065f";
