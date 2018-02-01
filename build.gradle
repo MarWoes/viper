@@ -38,10 +38,15 @@ if (!hasProperty('mainClass')) {
     ext.mainClass = 'de.imi.marw.viper.main.Main'
 }
 
+def getVersionName() {
+    return "git describe --tags".execute(null, new File(""+projectDir)).text.trim()
+}
+
 //create a single Jar with all dependencies
 task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Title': 'Main',
+            'Implementation-Version': getVersionName(),
             'Main-Class': 'de.imi.marw.viper.main.Main'
     }
     baseName = project.name + '-all'

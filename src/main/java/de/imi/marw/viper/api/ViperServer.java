@@ -34,6 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import spark.Route;
 import spark.Spark;
 
 import static spark.Spark.*;
@@ -122,6 +123,8 @@ public class ViperServer {
 
         path("/api", () -> {
 
+            get("/version", (req, res) -> getViperVersion());
+
             path("/variant-table", new TableRoutes(variantTableCluster, gson, config));
 
             path("/snapshots", new SnapshotRoutes(igv, variantTableCluster, gson, config));
@@ -148,5 +151,12 @@ public class ViperServer {
                 this.config.getXvfbWidth(),
                 this.config.getXvfbHeight(),
                 this.config.getIgvMaxMemory());
+    }
+
+    private String getViperVersion() {
+
+        String version = getClass().getPackage().getImplementationVersion();
+
+        return version == null ? "DEV" : version;
     }
 }

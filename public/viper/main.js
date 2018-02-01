@@ -27,12 +27,28 @@ var module = angular.module('de.imi.marw.viper',
     'ui.bootstrap'
   ]
 )
-.controller('ViperMainController', [ '$location', 'VariantTableService',
-                             function($location,   VariantTableService) {
+.controller('ViperMainController', [ '$location', 'VariantTableService', '$http',
+                             function($location,   VariantTableService,   $http) {
   var Ctrl = this;
 
+  Ctrl.versionName = '';
+
+  Ctrl.init = init;
   Ctrl.getCurrentRoute = getCurrentRoute;
   Ctrl.saveProgress = saveProgress;
+
+  Ctrl.init();
+
+  function init() {
+
+    $http.get('api/version')
+    .then(function (res) {
+
+      Ctrl.versionName = res.data;
+
+    });
+
+  }
 
   function getCurrentRoute() {
     return $location.path();
