@@ -10,7 +10,10 @@ build-and-test-viper:
   script:
     - rm -rf ${PWD}/artifacts/ && mkdir ${PWD}/artifacts/
     - docker build --no-cache -t viper-docker-build .
-    - docker run --rm -v ${PWD}/artifacts:/artifacts viper-docker-build
+    - docker run --name "viper-build-instance" -d viper-docker-build
+    - docker cp viper-build-instance:/viper/build/zip/ artifacts
+    - docker rm -f viper-build-instance
+    - docker run --rm viper-docker-build
     - docker rmi viper-docker-build
   artifacts:
     paths:
