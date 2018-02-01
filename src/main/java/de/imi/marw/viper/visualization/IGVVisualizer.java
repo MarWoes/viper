@@ -48,6 +48,8 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class IGVVisualizer extends Thread {
 
+    private static final long IGV_START_TIMEOUT_MS = 120000;
+
     private static final int DEFAULT_VIEW_RANGE = 25;
     private static final int DEFAULT_PANEL_HEIGHT = 1000;
 
@@ -69,11 +71,12 @@ public class IGVVisualizer extends Thread {
     private final String igvJar;
     private final String workDir;
     private final String bamDir;
+    private final String logFile;
     private Process igvProcess;
     private Process xvfbServer;
     private Socket client;
 
-    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir, int xvfbDisplay, int xvfbWidth, int xvfbHeight, int jvmMBSpace) {
+    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir, String logFile, int xvfbDisplay, int xvfbWidth, int xvfbHeight, int jvmMBSpace) {
         this.port = port;
         this.fastaRef = fastaRef;
         this.igvJar = igvJar;
@@ -81,6 +84,7 @@ public class IGVVisualizer extends Thread {
         this.workDir = workDir;
         this.visualizationProgressMap = new ConcurrentHashMap<>();
         this.bamDir = bamDir;
+        this.logFile = logFile;
         this.xvfbDisplay = xvfbDisplay;
         this.xvfbWidth = xvfbWidth;
         this.xvfbHeight = xvfbHeight;
@@ -129,6 +133,9 @@ public class IGVVisualizer extends Thread {
     }
 
     private void startIGVProcess() throws IOException {
+
+        File logFile = new File(this.logFile);
+
         ProcessBuilder builder = new ProcessBuilder("java",
                 "-Xmx" + this.jvmMBSpace + "m",
                 "-Dproduction=true",
@@ -140,7 +147,8 @@ public class IGVVisualizer extends Thread {
                 "-g", this.fastaRef,
                 "-o", IGV_PROPERTY_FILE
         )
-                .inheritIO();
+                .redirectOutput(logFile)
+                .redirectError(logFile);
 
         if (isXvfbInstalled()) {
             ProcessBuilder xvfbBuilder = new ProcessBuilder("Xvfb",
@@ -160,7 +168,7 @@ public class IGVVisualizer extends Thread {
 
     private Socket connectToIGV() {
 
-        while (true) {
+        while (this.igvProcess != null) {
             try {
                 Socket client = new Socket("127.0.0.1", port);
                 return client;
@@ -172,12 +180,22 @@ public class IGVVisualizer extends Thread {
                 }
             }
         }
+
+        return null;
     }
 
     public void awaitStartup() {
+
+        long startedAt = System.currentTimeMillis();
+
         while (this.client == null || !this.client.isConnected()) {
             try {
                 Thread.sleep(100);
+
+                if (System.currentTimeMillis() - startedAt > IGV_START_TIMEOUT_MS) {
+                    throw new IllegalStateException("Connection to IGV failed, check the IGV log for possible exceptions");
+                }
+
             } catch (InterruptedException ex) {
                 Logger.getLogger(IGVVisualizer.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -35,6 +35,7 @@ public class ViperServerConfig {
     private String fastaRef = "hg19";
     private String igvJar = "igv.jar";
     private String bamDir = "/tmp/bam";
+    private String igvLog = "igv.log";
     private boolean keepVcfSimple = false;
     private boolean excludeRefVcfCalls = true;
     private int numPrecomputedSnapshots = 10;
@@ -69,6 +70,14 @@ public class ViperServerConfig {
 
     public void setViperPort(int viperPort) {
         this.viperPort = viperPort;
+    }
+
+    public String getIgvLog() {
+        return igvLog;
+    }
+
+    public void setIgvLog(String igvLog) {
+        this.igvLog = igvLog;
     }
 
     public String getAnalysisFile() {

@@ -34,7 +34,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import spark.Route;
 import spark.Spark;
 
 import static spark.Spark.*;
@@ -63,17 +62,22 @@ public class ViperServer {
 
     public void start() throws FileNotFoundException, IOException {
 
+        System.out.println("[INFO] Loading variants...");
+
         this.variantTableCluster = this.loadVariants();
 
+        System.out.println("[INFO] Loaded " + this.variantTableCluster.getUnclusteredTable().getNumberOfCalls() + " calls.");
+
+        System.out.println("[INFO] Starting IGV on port " + this.config.getIgvPort() + ", logging to " + this.config.getIgvLog());
         this.igv = this.setupIGV();
         this.igv.start();
 
         this.igv.awaitStartup();
-
+        System.out.println("[INFO] IGV started.");
         this.setupRoutes();
 
         awaitInitialization();
-
+        System.out.println("[INFO] VIPER started, listening in port " + this.config.getViperPort());
     }
 
     public void stop() {
@@ -147,6 +151,7 @@ public class ViperServer {
                 this.config.getIgvPort(),
                 this.config.getWorkDir(),
                 this.config.getBamDir(),
+                this.config.getIgvLog(),
                 this.config.getXvfbDisplay(),
                 this.config.getXvfbWidth(),
                 this.config.getXvfbHeight(),

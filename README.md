@@ -53,6 +53,7 @@ These parameters are optional and may be omitted using the default values:
 | *xvfbHeight* | When using `Xvfb`, create a window with this height. | `1680` |
 | *igvMaxMemory* | Maximum heap size of the IGV process. | `1200` |
 | *xslxExportWindowSize* | When creating `.xlsx` files, this improves memory usage. Only change if exceptions occur during `.xlsx` export. | `1000` |
+| *igvLog* | File containing IGV logs | `igv.log` |
 | *fastaRef* | `.fasta` reference file or IGV reference key (e.g. `hg19`). Set to a `.fasta` file for improved performance.|
 
 ## Examples

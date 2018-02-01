@@ -74,7 +74,8 @@ public class Main {
             if (server != null) {
                 server.stop();
             }
-        } catch (IOException ex) {
+        // Catch all exceptions here, only FileNotFoundException's may be handled properly atm
+        } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 
             if (server != null) {
