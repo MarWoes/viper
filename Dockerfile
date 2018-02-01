@@ -22,4 +22,4 @@ USER worker
 
 RUN cd /viper && ./build.sh
 
-CMD gradle test
+CMD cd /viper && gradle test
