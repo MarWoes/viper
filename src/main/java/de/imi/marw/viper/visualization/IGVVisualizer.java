@@ -206,9 +206,9 @@ public class IGVVisualizer extends Thread {
         return this.visualizationProgressMap.getOrDefault(key, false);
     }
 
-    public synchronized void scheduleSnapshot(String sample, String chr, int bp, boolean isUrgent) {
+    public synchronized void scheduleSnapshot(String sample, String chr, int pos, boolean isUrgent) {
 
-        String key = sample + "-" + chr + "-" + bp + "-" + this.getConfigurationHash();
+        String key = sample + "-" + chr + "-" + pos + "-" + this.getConfigurationHash();
         boolean snapshotAlreadyScheduled = this.visualizationProgressMap.containsKey(key);
 
         if (snapshotAlreadyScheduled && (!isUrgent || this.visualizationProgressMap.get(key))) {
@@ -227,7 +227,7 @@ public class IGVVisualizer extends Thread {
             "new",
             "load " + bamName,
             "collapse",
-            "goto " + chr + ":" + (bp - configViewRange) + "-" + (bp + configViewRange),
+            "goto " + chr + ":" + (pos - configViewRange) + "-" + (pos + configViewRange),
             "snapshot " + imageFileName
         };
 

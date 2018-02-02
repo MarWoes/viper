@@ -24,9 +24,9 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
 
   Ctrl.sleepMillis = 1000;
 
-  Ctrl.variant      = null;
-  Ctrl.chrColumn    = null;
-  Ctrl.bpColumn     = null;
+  Ctrl.sample       = null;
+  Ctrl.chr          = null;
+  Ctrl.pos          = null;
   Ctrl.breakpointImageLink = null;
   Ctrl.igvConfigurationHash = null;
 
@@ -40,25 +40,27 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
 
   function init () {
 
-    $scope.$watch(function () { return { variant: Ctrl.variant, hash: Ctrl.igvConfigurationHash }; }, Ctrl.onUpdate, true);
+    $scope.$watch(function () { return { sample: Ctrl.sample, chr: Ctrl.chr, pos: Ctrl.pos, hash: Ctrl.igvConfigurationHash }; }, Ctrl.onUpdate, true);
 
   }
 
   function onUpdate (newVal, oldVal) {
 
-    var variant = newVal.variant;
+    var sample = newVal.sample;
+    var chr = newVal.chr;
+    var pos = newVal.pos;
     var hash = newVal.hash;
 
-    if (variant == null || hash == null) return;
+    if (sample == null || chr == null || pos == null || hash == null) return;
 
-    var key = Ctrl.getSnapshotKey(variant, hash);
+    var key = Ctrl.getSnapshotKey(sample, chr, pos, hash);
 
     Ctrl.isSnapshotAvailable(key)
     .then(function (res) {
 
       var isAvailable = res.data;
 
-      var currentKey = Ctrl.getSnapshotKey(Ctrl.variant, Ctrl.igvConfigurationHash);
+      var currentKey = Ctrl.getSnapshotKey(Ctrl.sample, Ctrl.chr, Ctrl.pos, Ctrl.igvConfigurationHash);
 
       if (currentKey === key && res.data === 'true') {
 
@@ -88,17 +90,17 @@ var module = angular.module('de.imi.marw.viper.igv.image', [
     return promise;
   }
 
-  function getSnapshotKey(variant, hash) {
-    return variant['sample'] + '-' + variant[Ctrl.chrColumn] + '-' + variant[Ctrl.bpColumn] + "-" + hash;
+  function getSnapshotKey(sample, chr, pos, hash) {
+    return sample + '-' + chr + '-' + pos + "-" + hash;
   }
 
 }])
 .directive('igvImage', [ function () {
   return {
     scope: {
-      variant: '=variant',
-      chrColumn: '=chrColumn',
-      bpColumn: '=bpColumn',
+      sample: '=sample',
+      chr: '=chr',
+      pos: '=pos',
       igvConfigurationHash: '=igvConfigurationHash'
     },
     restrict: 'E',
