@@ -107,6 +107,11 @@ public class ViperServer {
 
     private void setupRoutes() {
 
+        // Setting Jetty logger implementation and level (DEBUG | INFO | WARN | IGNORE)
+        System.setProperty("org.eclipse.jetty.util.log.class",
+                "org.eclipse.jetty.util.log.JavaUtilLog");
+        System.setProperty("org.eclipse.jetty.LEVEL", "WARN");
+
         if (Files.exists(Paths.get("public"))) {
             staticFiles.externalLocation("public");
         } else {

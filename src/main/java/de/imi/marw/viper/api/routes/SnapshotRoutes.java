@@ -24,6 +24,7 @@ import de.imi.marw.viper.util.Util;
 import de.imi.marw.viper.variants.VariantTableCluster;
 import de.imi.marw.viper.variants.table.VariantTable;
 import de.imi.marw.viper.visualization.IGVVisualizer;
+import de.imi.marw.viper.visualization.SamplePartners;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,12 @@ import static spark.Spark.post;
 public class SnapshotRoutes extends ViperRoutes {
 
     private final IGVVisualizer igv;
+    private final SamplePartners partners;
 
     public SnapshotRoutes(IGVVisualizer igv, VariantTableCluster cluster, Gson gson, ViperServerConfig config) {
         super(cluster, gson, config);
         this.igv = igv;
+        this.partners = config.getPartnerFile() == null ? new SamplePartners() : SamplePartners.loadFromCsv(config.getPartnerFile(), config.getPartnerDelimiter());
     }
 
     @Override
@@ -56,9 +59,15 @@ public class SnapshotRoutes extends ViperRoutes {
 
         get("/configuration-hash", this::getIGVConfigurationHash);
 
+        get("/partners", this::getPartners, gson::toJson);
+
         post("/configuration", this::setIGVConfigurationValue);
 
         get("/:key", this::getSnapshotByKey);
+    }
+
+    private Object getPartners(Request req, Response res) {
+        return partners.getMap();
     }
 
     private Object getIGVConfigurationHash(Request req, Response res) {

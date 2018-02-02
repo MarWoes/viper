@@ -1,0 +1,10 @@
+{
+"Superman":["Kryptonite"],
+"Iron Man":["Money"],
+"Money":["Iron Man"],
+"kali":["Elliot Alderson"],
+"Kryptonite":["Superman"],
+"Batman":["Robin"],
+"Robin":["Batman"],
+"Elliot Alderson":["kali"]
+}

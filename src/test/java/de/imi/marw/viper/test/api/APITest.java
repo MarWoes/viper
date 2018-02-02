@@ -67,6 +67,7 @@ public class APITest {
         conf.setViperPort(13337);
         conf.setIgvPort(13338);
         conf.setFastaRef("hg19");
+        conf.setPartnerFile(TestUtil.getResourceFile("partners/some-simple-partners.csv"));
 
         testServer = new ViperServer(conf);
         testServer.start();
@@ -255,6 +256,17 @@ public class APITest {
                 .getBody())) {
             Thread.sleep(250);
         }
+    }
+
+    @Test
+    public void correctlyLoadsPartners() throws Exception {
+        String response = Unirest.get(URL_BASE + "/api/snapshots/partners")
+                .asString()
+                .getBody();
+
+        String expectedJson = readFromFile("api/partners.json");
+
+        assertEquals(expectedJson, response);
     }
 
     @Test(timeout = 120000)

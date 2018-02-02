@@ -31,6 +31,8 @@ public class ViperServerConfig {
     private String collectionDelimiter = ",";
     private boolean enableGrouping = true;
     private int breakpointTolerance = 3;
+    private String partnerFile = null;
+    private char partnerDelimiter = ',';
     private String workDir = "/tmp/viper";
     private String fastaRef = "hg19";
     private String igvJar = "igv.jar";
@@ -46,6 +48,22 @@ public class ViperServerConfig {
     private int igvMaxMemory = 1200;
 
     public ViperServerConfig() {
+    }
+
+    public String getPartnerFile() {
+        return partnerFile;
+    }
+
+    public void setPartnerFile(String partnerFile) {
+        this.partnerFile = partnerFile;
+    }
+
+    public char getPartnerDelimiter() {
+        return partnerDelimiter;
+    }
+
+    public void setPartnerDelimiter(char partnerDelimiter) {
+        this.partnerDelimiter = partnerDelimiter;
     }
 
     public char getCsvDelimiter() {

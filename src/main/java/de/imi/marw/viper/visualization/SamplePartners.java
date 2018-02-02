@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.commons.csv.CSVFormat;
@@ -43,9 +45,17 @@ public class SamplePartners {
 
     private final Map<String, List<String>> samplePartnerMap;
 
+    public SamplePartners() {
+        this.samplePartnerMap = new HashMap<>();
+    }
+
     private SamplePartners(Map<String, List<String>> samplePartnerMap) {
 
         this.samplePartnerMap = samplePartnerMap;
+    }
+
+    public Map<String, List<String>> getMap() {
+        return Collections.unmodifiableMap(samplePartnerMap);
     }
 
     public List<String> getPartners(String sample) {
@@ -86,7 +96,7 @@ public class SamplePartners {
         return partnerMap;
     }
 
-    public static SamplePartners loadFromCsv(String fileName, char delimiter) throws FileNotFoundException, IOException {
+    public static SamplePartners loadFromCsv(String fileName, char delimiter) {
 
         CSVFormat csvFormat = CSVFormat.RFC4180
                 .withDelimiter(delimiter);
@@ -103,6 +113,13 @@ public class SamplePartners {
 
             return new SamplePartners(samplePartnerMap);
 
+        } catch (FileNotFoundException ex) {
+            System.err.println("[WARNING] File " + fileName + " not found, partnering is ignored.");
+            return new SamplePartners();
+        } catch (IOException ex) {
+            System.err.println("[ERROR] Error reading file " + fileName + ":");
+            Logger.getLogger(SamplePartners.class.getName()).log(Level.SEVERE, null, ex);
+            return new SamplePartners();
         }
 
     }

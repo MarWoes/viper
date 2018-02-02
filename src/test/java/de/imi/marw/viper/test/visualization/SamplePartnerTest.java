@@ -20,7 +20,6 @@ package de.imi.marw.viper.test.visualization;
 
 import de.imi.marw.viper.test.util.TestUtil;
 import de.imi.marw.viper.visualization.SamplePartners;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import org.junit.Assert;
@@ -43,11 +42,12 @@ public class SamplePartnerTest {
 
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test
     public void nonExistentFileTest() throws IOException {
 
         SamplePartners partners = SamplePartners.loadFromCsv("this-file-better-be-non-existent.csv", ',');
 
+        assertEquals(0, partners.getPartners("Grinch").size());
     }
 
     @Test
