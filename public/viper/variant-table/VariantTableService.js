@@ -39,6 +39,7 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   Service.getTableRange = getTableRange;
   Service.getTableRow = getTableRow;
   Service.getUnfilteredSize = getUnfilteredSize;
+  Service.getPartnerMap = getPartnerMap;
   Service.saveProgress = saveProgress;
   Service.scheduleSnapshot = scheduleSnapshot;
   Service.searchStringColumn = searchStringColumn
@@ -138,6 +139,10 @@ var module = angular.module('de.imi.marw.viper.variant-table.service', [
   function saveProgress() {
     var promise = $http.post("/api/decisions/save");
     return promise;
+  }
+
+  function getPartnerMap() {
+    return performRequest("/api/snapshots/partners");
   }
 
   function scheduleSnapshot(index, relatedCallIndex) {

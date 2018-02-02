@@ -55,7 +55,7 @@ public class SamplePartners {
     }
 
     public Map<String, List<String>> getMap() {
-        return Collections.unmodifiableMap(samplePartnerMap);
+        return Collections.unmodifiableMap(this.samplePartnerMap);
     }
 
     public List<String> getPartners(String sample) {

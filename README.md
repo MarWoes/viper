@@ -42,19 +42,21 @@ These parameters are optional and may be omitted using the default values:
 | *breakpointTolerance* | If grouping is enabled, this is the maximum distance where two breakpoints are considered similar. | `3` |
 | *csvDelimiter* | Character that delimits csv columns. | `";"` |
 | *collectionDelimiter* | A single cell in a csv table may have multiple values. These values are seperated by this character. |`","` |
+| *partnerFile* | CSV file containing partnering information (i.e., control-tumor pairs, trios). When used, VIPER offers to inspect the partner samples as well as the sample the respective variant was called in. | `null` |
+| *partnerDelimiter* | Delimiter used when reading partnering information. | `","` |
 | *viperPort* | Port that VIPER listens on. | `8090` |
 | *igvPort* | Port that IGV uses to communicate with VIPER | `9090` |
+| *fastaRef* | `.fasta` reference file or IGV reference key (e.g. `hg19`). Set to a `.fasta` file for improved performance.| `"hg19"` |
+| *numPrecomputedSnapshots* | Precompute this number of breakpoint images to minimize visualization waiting time. | `10` |
 | *keepVcfSimple* | Use only mandatory vcf columns and ignore additional INFO and genotype information | `false` |
 | *excludeRefVcfCalls* | Ignore calls that are marked as reference calls. | `true`
 | *igvJar* | Path to IGV jar file. | `"igv.jar"`|
-| *numPrecomputedSnapshots* | Precompute this number of breakpoint images to minimize visualization waiting time. | `10` |
 | *xvfbDisplay* | When using `Xvfb`, use this number as display number. | `1234` |
 | *xvfbWidth* | When using `Xvfb`, create a window with this width. | `1280` |
 | *xvfbHeight* | When using `Xvfb`, create a window with this height. | `1680` |
 | *igvMaxMemory* | Maximum heap size of the IGV process. | `1200` |
 | *xslxExportWindowSize* | When creating `.xlsx` files, this improves memory usage. Only change if exceptions occur during `.xlsx` export. | `1000` |
 | *igvLog* | File containing IGV logs | `igv.log` |
-| *fastaRef* | `.fasta` reference file or IGV reference key (e.g. `hg19`). Set to a `.fasta` file for improved performance.|
 
 ## Examples
 

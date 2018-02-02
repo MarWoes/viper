@@ -50,9 +50,33 @@
 
       <br>
 
+      <div ng-if="inspectorCtrl.getCurrentPartners().length > 0">
+
+        <strong>Select sample to inspect:</strong>
+
+        <br>
+
+        <div class="radio">
+          <label>
+            <input type="radio" ng-model="inspectorCtrl.selectedSample" value="{{ inspectorCtrl.getCurrentVariantSample() }}">
+            {{ inspectorCtrl.getCurrentVariantSample() }}
+            <small><em>called</em></small>
+          </label>
+        </div>
+
+        <div class="radio" ng-repeat="partnerSample in inspectorCtrl.getCurrentPartners()">
+          <label>
+            <input type="radio" ng-model="inspectorCtrl.selectedSample" value="{{ partnerSample }}">
+            {{ partnerSample }}
+            <small><em>partner</em></small>
+          </label>
+        </div>
+
+      </div>
+
       <div ng-if="inspectorCtrl.relatedVariants.length > 1">
 
-        <strong>Select related call to inspect:</strong>
+        <strong>Select related call in group to inspect:</strong>
 
         <rzslider
           rz-slider-model="inspectorCtrl.relatedCallIndex"
@@ -196,7 +220,7 @@
 
           <div class="col-md-6">
             <igv-image
-              sample="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]['sample']"
+              sample="inspectorCtrl.selectedSample"
               chr="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]['chr1']"
               pos="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]['bp1']"
               igv-configuration-hash="inspectorCtrl.configurationHash">
@@ -205,7 +229,7 @@
 
           <div class="col-md-6">
             <igv-image
-              sample="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]['sample']"
+              sample="inspectorCtrl.selectedSample"
               chr="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]['chr2']"
               pos="inspectorCtrl.relatedVariants[inspectorCtrl.relatedCallIndex]['bp2']"
               igv-configuration-hash="inspectorCtrl.configurationHash">

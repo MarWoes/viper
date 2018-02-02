@@ -129,8 +129,19 @@ public class SnapshotRoutes extends ViperRoutes {
                 int bp1 = ((Double) relatedCall.get(VariantTable.BP1_COLUMN_NAME)).intValue();
                 int bp2 = ((Double) relatedCall.get(VariantTable.BP2_COLUMN_NAME)).intValue();
 
-                this.igv.scheduleSnapshot(sample, chr1, bp1, i == queryIndex && j == selectedRelatedCall);
-                this.igv.scheduleSnapshot(sample, chr2, bp2, i == queryIndex && j == selectedRelatedCall);
+                boolean isCurrentSnapshot = i == queryIndex && j == selectedRelatedCall;
+
+                this.igv.scheduleSnapshot(sample, chr1, bp1, isCurrentSnapshot);
+                this.igv.scheduleSnapshot(sample, chr2, bp2, isCurrentSnapshot);
+
+                List<String> relatedPartners = this.partners.getPartners(sample);
+
+                for (String partner : relatedPartners) {
+
+                    this.igv.scheduleSnapshot(partner, chr1, bp1, isCurrentSnapshot);
+                    this.igv.scheduleSnapshot(partner, chr2, bp2, isCurrentSnapshot);
+
+                }
 
             }
         }

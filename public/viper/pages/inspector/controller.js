@@ -30,11 +30,14 @@ var module = angular.module('de.imi.marw.viper.inspector', [
   Ctrl.index          = null;
   Ctrl.relatedCallIndex = null;
   Ctrl.currentVariant = null;
+  Ctrl.selectedSample = null;
   Ctrl.relatedVariants = [ ];
   Ctrl.columnNames = [ ];
 
   Ctrl.init = init;
   Ctrl.onIndexChange = onIndexChange;
+  Ctrl.getCurrentPartners = getCurrentPartners;
+  Ctrl.getCurrentVariantSample = getCurrentVariantSample;
   Ctrl.variantPropertyToString = VariantTableService.variantPropertyToString;
   Ctrl.sendDecision = sendDecision;
   Ctrl.changeIGVSetting = changeIGVSetting;
@@ -46,17 +49,20 @@ var module = angular.module('de.imi.marw.viper.inspector', [
       VariantTableService.getSize(),
       VariantTableService.getRelatedColumnNames(),
       VariantTableService.getIGVConfiguration(),
-      VariantTableService.getIGVConfigurationHash()
+      VariantTableService.getIGVConfigurationHash(),
+      VariantTableService.getPartnerMap()
     ]).then(function (data) {
 
       var tableSize = data[0];
       var columnNames = data[1];
       var configuration = data[2];
       var configurationHash = data[3];
+      var partnerMap = data[4]
 
       Ctrl.tableSize = tableSize;
       Ctrl.index     = VariantTableService.currentVariantIndex;
       Ctrl.columnNames = columnNames;
+      Ctrl.partnerMap = partnerMap;
 
       Ctrl.configuration = configuration;
       Ctrl.configurationHash = configurationHash;
@@ -80,6 +86,21 @@ var module = angular.module('de.imi.marw.viper.inspector', [
     });
   }
 
+  function getCurrentVariantSample() {
+
+    if (Ctrl.relatedVariants == null || Ctrl.relatedCallIndex == null) return null;
+
+    return Ctrl.relatedVariants[Ctrl.relatedCallIndex].sample
+
+  }
+
+  function getCurrentPartners() {
+
+    if (Ctrl.partnerMap == null) return null;
+
+    return Ctrl.partnerMap[Ctrl.getCurrentVariantSample()] || [];
+  }
+
   function sendDecision (decision) {
 
     var promise = VariantTableService.sendDecision(Ctrl.index, decision);
@@ -94,6 +115,7 @@ var module = angular.module('de.imi.marw.viper.inspector', [
 
   function onRelatedCallIndexChange (sliderId, modelValue) {
     VariantTableService.scheduleSnapshot(Ctrl.index, modelValue);
+    Ctrl.selectedSample = Ctrl.relatedVariants[modelValue].sample;
   }
 
   function onIndexChange () {
@@ -109,6 +131,7 @@ var module = angular.module('de.imi.marw.viper.inspector', [
     ]).then(function (data) {
       Ctrl.currentVariant = data[0];
       Ctrl.relatedVariants = data[1];
+      Ctrl.selectedSample = Ctrl.relatedVariants[0].sample;
 
       var samples = [];
 
