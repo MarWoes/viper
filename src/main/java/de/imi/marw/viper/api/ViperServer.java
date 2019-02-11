@@ -160,7 +160,9 @@ public class ViperServer {
                 this.config.getXvfbDisplay(),
                 this.config.getXvfbWidth(),
                 this.config.getXvfbHeight(),
-                this.config.getIgvMaxMemory());
+                this.config.getIgvMaxMemory(),
+                this.config.getSleepInterval()
+        );
     }
 
     private String getViperVersion() {

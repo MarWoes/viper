@@ -46,6 +46,7 @@ public class ViperServerConfig {
     private int xvfbWidth = 1280;
     private int xvfbHeight = 1680;
     private int igvMaxMemory = 1200;
+    private int sleepInterval = 0;
 
     public ViperServerConfig() {
     }
@@ -226,9 +227,37 @@ public class ViperServerConfig {
         this.enableGrouping = enableGrouping;
     }
 
+    public int getSleepInterval() {
+        return sleepInterval;
+    }
+
+    public void setSleepInterval(int sleepInterval) {
+        this.sleepInterval = sleepInterval;
+    }
+
     @Override
     public String toString() {
-        return "ViperServerConfig{" + "analysisFile=" + analysisFile + ", viperPort=" + viperPort + ", igvPort=" + igvPort + ", csvDelimiter=" + csvDelimiter + ", collectionDelimiter=" + collectionDelimiter + ", enableClustering=" + enableGrouping + ", breakpointTolerance=" + breakpointTolerance + ", workDir=" + workDir + ", fastaRef=" + fastaRef + ", igvJar=" + igvJar + ", bamDir=" + bamDir + ", keepVcfSimple=" + keepVcfSimple + ", excludeRefVcfCalls=" + excludeRefVcfCalls + ", numPrecomputedSnapshots=" + numPrecomputedSnapshots + ", xslxExportWindowSize=" + xslxExportWindowSize + ", xvfbDisplay=" + xvfbDisplay + ", xvfbWidth=" + xvfbWidth + ", xvfbHeight=" + xvfbHeight + ", igvMaxMemory=" + igvMaxMemory + '}';
+        return "ViperServerConfig{" + "analysisFile=" + analysisFile
+                + ", viperPort=" + viperPort
+                + ", igvPort=" + igvPort
+                + ", csvDelimiter=" + csvDelimiter
+                + ", collectionDelimiter=" + collectionDelimiter
+                + ", enableClustering=" + enableGrouping
+                + ", breakpointTolerance=" + breakpointTolerance
+                + ", workDir=" + workDir
+                + ", fastaRef=" + fastaRef
+                + ", igvJar=" + igvJar
+                + ", bamDir=" + bamDir
+                + ", keepVcfSimple=" + keepVcfSimple
+                + ", excludeRefVcfCalls=" + excludeRefVcfCalls
+                + ", numPrecomputedSnapshots=" + numPrecomputedSnapshots
+                + ", xslxExportWindowSize=" + xslxExportWindowSize
+                + ", xvfbDisplay=" + xvfbDisplay
+                + ", xvfbWidth=" + xvfbWidth
+                + ", xvfbHeight=" + xvfbHeight
+                + ", igvMaxMemory=" + igvMaxMemory
+                + ", sleepInterval=" + sleepInterval
+                + '}';
     }
 
 }

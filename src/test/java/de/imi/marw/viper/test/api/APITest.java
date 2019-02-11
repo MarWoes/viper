@@ -68,6 +68,7 @@ public class APITest {
         conf.setIgvPort(13338);
         conf.setFastaRef("hg19");
         conf.setPartnerFile(TestUtil.getResourceFile("partners/some-simple-partners.csv"));
+        conf.setSleepInterval(100);
 
         testServer = new ViperServer(conf);
         testServer.start();

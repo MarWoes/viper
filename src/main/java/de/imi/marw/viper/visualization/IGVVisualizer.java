@@ -67,6 +67,7 @@ public class IGVVisualizer extends Thread {
     private final Map<String, Boolean> visualizationProgressMap;
     private final PriorityBlockingQueue<IGVCommand> commandQueue;
     private final int port;
+    private final int sleepInterval;
     private final String fastaRef;
     private final String igvJar;
     private final String workDir;
@@ -76,7 +77,7 @@ public class IGVVisualizer extends Thread {
     private Process xvfbServer;
     private Socket client;
 
-    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir, String logFile, int xvfbDisplay, int xvfbWidth, int xvfbHeight, int jvmMBSpace) {
+    public IGVVisualizer(String igvJar, String fastaRef, int port, String workDir, String bamDir, String logFile, int xvfbDisplay, int xvfbWidth, int xvfbHeight, int jvmMBSpace, int sleepInterval) {
         this.port = port;
         this.fastaRef = fastaRef;
         this.igvJar = igvJar;
@@ -90,6 +91,7 @@ public class IGVVisualizer extends Thread {
         this.xvfbHeight = xvfbHeight;
         this.jvmMBSpace = jvmMBSpace;
         this.configurationMap = new HashMap<>();
+        this.sleepInterval = sleepInterval;
     }
 
     @Override
@@ -260,7 +262,7 @@ public class IGVVisualizer extends Thread {
     }
 
     private void setupViewer() {
-        this.enqueueCommand(new IGVCommand("pref-change", new String[]{"setSleepInterval 0"}, true, () -> {
+        this.enqueueCommand(new IGVCommand("pref-change", new String[]{"setSleepInterval " + this.sleepInterval}, true, () -> {
         }));
     }
 
