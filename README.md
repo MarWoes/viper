@@ -57,6 +57,7 @@ These parameters are optional and may be omitted using the default values:
 | *igvMaxMemory* | Maximum heap size of the IGV process. | `1200` |
 | *xslxExportWindowSize* | When creating `.xlsx` files, this improves memory usage. Only change if exceptions occur during `.xlsx` export. | `1000` |
 | *igvLog* | File containing IGV logs | `igv.log` |
+| *sleepInterval* | Time to wait between IGV commands | `0` |
 
 ## Examples
 
