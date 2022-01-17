@@ -1,3 +1,9 @@
+# ARCHIVE NOTICE
+
+**VIPER is no longer maintained. This repository now only serves archive purposes.**
+
+
+
 VIPER (Variant InsPector and Expert Rating tool) can be utilised to view variant calls and decide whether or not those are true or false positives. All calls are visualised using [IGV](https://github.com/igvteam/igv), thus enabling fast rating of sv calls. VIPER is implemented using Java and AngularJS.
 
 If you are using VIPER for the first time, you should have a look at at the [short tutorial](https://github.com/MarWoes/viper/wiki/Tutorial).
